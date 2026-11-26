@@ -1,0 +1,88 @@
+{
+  "nav": { "home": "Inicio", "movies": "Películas", "series": "Series", "live": "TV en directo", "myList": "Mi lista", "search": "Buscar", "settings": "Ajustes", "profiles": "Cambiar de perfil", "menu": "Navegación principal" },
+  "common": {
+    "play": "Reproducir", "resume": "Continuar", "moreInfo": "Más información", "addToList": "Añadir a Mi lista", "removeFromList": "Quitar de Mi lista",
+    "like": "Me gusta", "liked": "Te gusta", "close": "Cerrar", "back": "Atrás", "retry": "Reintentar", "cancel": "Cancelar", "save": "Guardar", "continue": "Continuar",
+    "done": "Listo", "all": "Todo", "off": "Desactivado", "delete": "Eliminar", "clear": "Borrar", "edit": "Editar", "add": "Añadir", "remove": "Quitar", "seeAll": "Ver todo",
+    "minutes": "{{count}} min", "hoursMinutes": "{{h}} h {{m}} min", "season": "Temporada {{n}}", "episode": "Episodio {{n}}",
+    "seasonsCount_one": "{{count}} temporada", "seasonsCount_other": "{{count}} temporadas", "left": "Quedan {{time}}", "loading": "Cargando"
+  },
+  "badge": { "new": "Nuevo", "live": "Directo" },
+  "home": {
+    "continueWatching": "Seguir viendo", "myList": "Mi lista", "recent": "Añadido recientemente", "trending": "Tendencias en tu biblioteca",
+    "newEpisodes": "Episodios nuevos", "liveNow": "En directo ahora", "heroGo": "Mostrar {{title}}", "sectionScrollBack": "Desplazar atrás", "sectionScrollForward": "Desplazar adelante"
+  },
+  "card": { "play": "Reproducir {{title}}", "details": "Detalles de {{title}}" },
+  "detail": {
+    "cast": "Reparto", "moreLikeThis": "Más como este", "episodes": "Episodios", "versions": "Versiones", "genres": "Géneros", "originalLanguage": "Idioma original",
+    "fixMatch": "Corregir coincidencia", "matchTitle": "Asociar este título", "matchHint": "Elige la entrada correcta de TMDB. Los pósters y los datos se actualizan al instante.",
+    "matchSearch": "Buscar en TMDB", "noMatches": "Sin resultados. Prueba con un título más corto.", "unmatched": "Aún sin asociar", "unmatchedHint": "Marquee no encontró este título en TMDB y muestra el nombre del archivo. Corrige la coincidencia para obtener carteles y detalles.",
+    "unlink": "Quitar coincidencia", "noEpisodes": "Aún no hay episodios en esta temporada.", "playEpisode": "Reproducir {{label}}", "resumeEpisode": "Continuar {{label}}",
+    "notFound": "Ese título ya no está", "notFoundBody": "Puede que se haya eliminado de su chat. Vuelve a la biblioteca.", "season": "Temporada", "matchSaved": "Coincidencia actualizada"
+  },
+  "browse": {
+    "movies": "Películas", "series": "Series", "sort": "Ordenar", "sortRecent": "Añadido recientemente", "sortTitle": "Título", "sortRating": "Valoración", "sortYear": "Año",
+    "allGenres": "Todos los géneros", "emptyTitle": "Aún no hay nada", "emptyBody": "Elige qué chats indexar y etiquétalos; tu biblioteca se irá llenando sola.",
+    "emptyAction": "Elegir chats", "noMatchTitle": "No hay títulos en este género", "noMatchBody": "Prueba con otro género o quita el filtro."
+  },
+  "live": {
+    "title": "TV en directo", "favourites": "Favoritos", "search": "Buscar canales", "noneTitle": "Aún no hay canales", "noneBody": "Publica una lista M3U o un enlace de emisión en un chat etiquetado como TV en directo y los canales aparecerán aquí.",
+    "noMatchTitle": "Ningún canal coincide", "noMatchBody": "Prueba otra categoría u otro nombre.", "noFavTitle": "Aún no hay favoritos", "noFavBody": "Toca el corazón de un canal para tenerlo a mano.",
+    "now": "Ahora", "next": "Después", "addFav": "Añadir {{name}} a favoritos", "removeFav": "Quitar {{name}} de favoritos", "noGuide": "Sin datos de guía"
+  },
+  "search": {
+    "placeholder": "Títulos, series, canales", "recent": "Búsquedas recientes", "clearRecent": "Borrar", "movies": "Películas", "series": "Series", "channels": "Canales",
+    "noResultsTitle": "Nada para «{{q}}»", "noResultsBody": "Revisa la ortografía o prueba con un título más corto.", "startTitle": "Encuentra algo para ver", "startBody": "Los resultados aparecen mientras escribes.", "open": "Abrir búsqueda", "clearInput": "Borrar búsqueda"
+  },
+  "myList": { "title": "Mi lista", "emptyTitle": "Tu lista está vacía", "emptyBody": "Añade un título desde cualquier sitio y te esperará aquí." },
+  "toast": { "added": "Añadido a Mi lista", "removed": "Quitado de Mi lista", "language": "Idioma: {{name}}", "cacheCleared": "Caché vaciada", "scanStarted": "Analizando tus chats", "saved": "Guardado", "offline": "No se puede conectar con el servidor de Marquee" },
+  "player": {
+    "play": "Reproducir", "pause": "Pausa", "mute": "Silenciar", "unmute": "Activar sonido", "volume": "Volumen", "fullscreen": "Pantalla completa", "exitFullscreen": "Salir de pantalla completa", "pip": "Imagen en imagen",
+    "captions": "Subtítulos y audio", "audio": "Audio", "subtitles": "Subtítulos", "speed": "Velocidad", "normal": "Normal", "version": "Versión", "skipIntro": "Saltar intro", "skipRecap": "Saltar resumen",
+    "nextEpisode": "Siguiente episodio", "nextIn": "Siguiente episodio en {{count}}", "playNow": "Reproducir ya", "back10": "Retroceder 10 segundos", "forward10": "Avanzar 10 segundos", "live": "Directo", "channels": "Canales",
+    "buffering": "Cargando", "errorTitle": "Esto no se puede reproducir ahora", "errorBody": "Telegram o la emisión no respondieron. Espera un momento e inténtalo de nuevo.", "errorUnavailable": "Telegram no está conectado, así que este archivo no se puede emitir.",
+    "resumedAt": "Reanudado en {{time}}", "trackDefault": "Predeterminada", "subtitlesOff": "Desactivados", "converting": "Convirtiendo para tu navegador", "close": "Cerrar reproductor", "goBack": "Volver a los detalles", "searchChannels": "Buscar un canal", "seek": "Buscar posición", "unknownTrack": "Pista {{n}}"
+  },
+  "settings": {
+    "title": "Ajustes", "general": "General", "playback": "Reproducción", "library": "Biblioteca", "profiles": "Perfiles", "storage": "Almacenamiento", "about": "Acerca de",
+    "language": "Idioma", "languageHint": "Cambia toda la interfaz, además de títulos, sinopsis, pósters y logotipos.",
+    "audioLang": "Idioma del audio", "audioLangHint": "Qué pista usar al empezar cuando un archivo tiene varias. Independiente del idioma de la interfaz.", "audioOriginal": "Predeterminada del archivo", "audioUi": "Igual que la interfaz",
+    "subLang": "Idioma de subtítulos", "subLangHint": "Automático muestra subtítulos solo cuando el audio no está en el idioma de la interfaz.", "subAuto": "Automático", "subUi": "Igual que la interfaz",
+    "quality": "Versión preferida", "qualityHint": "Se usa cuando un título tiene más de un lanzamiento.", "qualityBest": "La más alta disponible",
+    "autoplayNext": "Reproducir el siguiente episodio automáticamente", "autoplayNextHint": "Aparece una cuenta atrás cerca del final del episodio.",
+    "heroPreview": "Reproducir avances en el inicio", "heroPreviewHint": "Un tráiler sin sonido aparece tras el título destacado.",
+    "skipIntro": "Saltar intros automáticamente", "skipIntroHint": "Solo funciona con archivos que tienen capítulos.",
+    "sources": "Chats indexados", "sourcesHint": "Los chats de los que lee Marquee y cómo está etiquetado cada uno.", "editSources": "Cambiar chats", "kindMovies": "Películas", "kindSeries": "Series", "kindLive": "TV en directo",
+    "rescan": "Volver a analizar la biblioteca", "rescanHint": "Lee cada chat seleccionado desde el principio. Los mensajes nuevos se detectan solos.", "scanning": "Analizando, {{count}} mensajes hasta ahora", "counts": "{{items}} archivos, {{titles}} títulos, {{channels}} canales",
+    "disconnect": "Desconectar Telegram", "disconnectHint": "Cierra la sesión y borra la sesión guardada. Tu biblioteca se conserva.", "disconnectConfirm": "Desconectar",
+    "streamCache": "Caché de emisión", "streamCacheHint": "Partes recientes de los archivos, para que volver atrás sea instantáneo.", "imageCache": "Caché de imágenes", "cacheLimit": "Límite de caché", "clearCache": "Vaciar cachés",
+    "version": "Versión", "mode": "Modo", "modeDemo": "Datos de demostración", "modeLive": "Conectado", "tmdb": "TMDB", "tmdbOn": "Conectado", "tmdbOff": "Sin clave", "account": "Cuenta de Telegram", "metadataLangs": "Idiomas en caché",
+    "profilesHint": "Añade o edita perfiles. Cada uno tiene su propia lista, historial y canales favoritos.", "manageProfiles": "Gestionar perfiles"
+  },
+  "profiles": { "who": "¿Quién está viendo?", "manage": "Gestionar perfiles", "done": "Listo", "newName": "Perfil nuevo", "namePlaceholder": "Nombre", "create": "Añadir perfil", "createTitle": "Añadir perfil", "editTitle": "Editar perfil", "switchTo": "Cambiar a {{name}}", "edit": "Editar {{name}}", "nameRequired": "Ponle un nombre al perfil", "deleteConfirm": "¿Eliminar {{name}}? Su lista y su historial también se borran.", "lastOne": "Necesitas al menos un perfil", "saved": "Perfil guardado", "maxReached": "Puedes tener hasta 6 perfiles", "manageHint": "Cada persona tiene su propia lista, historial y canales favoritos.", "color": "Color", "icon": "Icono", "delete": "Eliminar perfil" },
+  "status": {
+    "connecting": "Conectando con Telegram", "reconnecting": "Telegram cortó la conexión. Reconectando.", "floodWait": "Telegram nos pidió ir más despacio. Volvemos en {{seconds}} s.",
+    "error": "No se puede conectar con Telegram", "loggedOut": "Telegram no está conectado", "unconfigured": "Faltan las claves de Telegram", "scanning": "Actualizando tu biblioteca", "fix": "Arreglar"
+  },
+  "error": { "title": "Algo salió mal", "body": "No se pudo cargar. Comprueba que el servidor esté en marcha e inténtalo de nuevo.", "offlineTitle": "No se puede conectar con Marquee", "offlineBody": "El servidor no responde. Inícialo con npm run dev y recarga.", "notFoundTitle": "Página no encontrada", "notFoundBody": "Esa dirección no lleva a ningún sitio." },
+  "auth": {
+    "phone_invalid": "Ese número de teléfono no parece correcto.", "code_invalid": "Ese código no es correcto. Revisa los dígitos e inténtalo de nuevo.", "code_expired": "Ese código caducó. Pide uno nuevo.",
+    "password_invalid": "Contraseña incorrecta. Inténtalo de nuevo.", "credentials_invalid": "Telegram rechazó esas claves. Cópialas de nuevo desde my.telegram.org.", "flood": "Demasiados intentos. Prueba de nuevo en {{seconds}} segundos.",
+    "no_account": "Ese número no tiene cuenta de Telegram.", "network": "No se pudo conectar con Telegram. Revisa tu conexión.", "unknown": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "onboarding": {
+    "steps": { "connect": "Conectar", "choose": "Elegir chats", "index": "Crear biblioteca" },
+    "tagline": "Tus chats, como biblioteca.", "taglineBody": "Marquee lee los grupos y canales que elijas y convierte su contenido en películas, series y canales en directo.",
+    "credTitle": "Añade tus claves de Telegram", "credBody": "Telegram pide un API ID y un hash a cualquier app que inicie sesión. Créalos una vez en my.telegram.org, en API development tools.",
+    "apiId": "API ID", "apiHash": "API hash", "credSave": "Guardar claves",
+    "phoneTitle": "Inicia sesión en Telegram", "phoneBody": "Usa el número con el que está registrada tu cuenta de Telegram.", "phoneLabel": "Número de teléfono", "sendCode": "Enviar código", "tabPhone": "Número de teléfono", "tabQr": "Código QR",
+    "qrBody": "En tu móvil abre Telegram, luego Ajustes, Dispositivos, Vincular dispositivo de escritorio, y escanea este código.", "qrLoading": "Preparando el código",
+    "codeTitle": "Introduce el código", "codeViaApp": "Telegram envió un código a tu otro dispositivo con sesión iniciada.", "codeViaSms": "Telegram envió el código por SMS.", "codeLabel": "Código de acceso", "verify": "Verificar",
+    "passwordTitle": "Contraseña en dos pasos", "passwordBody": "Esta cuenta tiene una contraseña en la nube.", "hint": "Pista: {{hint}}", "passwordLabel": "Contraseña", "unlock": "Desbloquear", "differentNumber": "Usar otro número",
+    "demoNote": "Modo demostración. Vale cualquier número, el código es 12345 y la contraseña en dos pasos es demo (con un número que termine en 9).",
+    "chooseTitle": "Elige qué indexar", "chooseBody": "Etiqueta cada chat que quieras en la biblioteca. Deja el resto en Omitir.", "filter": "Filtrar chats", "members": "{{count}} miembros", "skip": "Omitir",
+    "chooseNone": "Elige al menos un chat", "start": "Crear biblioteca", "noChats": "No se encontraron grupos ni canales en esta cuenta.", "loadingChats": "Cargando tus chats",
+    "indexTitle": "Creando tu biblioteca", "indexBody": "Puedes empezar a explorar mientras trabaja. Los mensajes nuevos se detectan automáticamente.", "files": "Archivos", "titles": "Títulos", "channels": "Canales", "open": "Abrir biblioteca", "waiting": "Esperando los primeros resultados",
+    "noTmdb": "No hay clave de TMDB, así que los títulos se mostrarán con el nombre del archivo, sin pósters ni sinopsis. Añade TMDB_API_KEY a .env y reinicia."
+  }
+}

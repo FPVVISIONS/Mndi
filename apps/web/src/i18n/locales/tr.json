@@ -1,0 +1,88 @@
+{
+  "nav": { "home": "Ana sayfa", "movies": "Filmler", "series": "Diziler", "live": "Canlı TV", "myList": "Listem", "search": "Ara", "settings": "Ayarlar", "profiles": "Profil değiştir", "menu": "Ana gezinme" },
+  "common": {
+    "play": "Oynat", "resume": "Devam et", "moreInfo": "Daha fazla bilgi", "addToList": "Listeme ekle", "removeFromList": "Listemden çıkar",
+    "like": "Beğen", "liked": "Beğenildi", "close": "Kapat", "back": "Geri", "retry": "Tekrar dene", "cancel": "Vazgeç", "save": "Kaydet", "continue": "Devam",
+    "done": "Bitti", "all": "Tümü", "off": "Kapalı", "delete": "Sil", "clear": "Temizle", "edit": "Düzenle", "add": "Ekle", "remove": "Kaldır", "seeAll": "Tümünü gör",
+    "minutes": "{{count}} dk", "hoursMinutes": "{{h}} sa {{m}} dk", "season": "{{n}}. Sezon", "episode": "{{n}}. Bölüm",
+    "seasonsCount_one": "{{count}} sezon", "seasonsCount_other": "{{count}} sezon", "left": "{{time}} kaldı", "loading": "Yükleniyor"
+  },
+  "badge": { "new": "Yeni", "live": "Canlı" },
+  "home": {
+    "continueWatching": "İzlemeye devam et", "myList": "Listem", "recent": "Yeni eklenenler", "trending": "Kütüphanende öne çıkanlar",
+    "newEpisodes": "Yeni bölümler", "liveNow": "Şimdi canlı", "heroGo": "{{title}} göster", "sectionScrollBack": "Geri kaydır", "sectionScrollForward": "İleri kaydır"
+  },
+  "card": { "play": "{{title}} oynat", "details": "{{title}} ayrıntıları" },
+  "detail": {
+    "cast": "Oyuncular", "moreLikeThis": "Benzerleri", "episodes": "Bölümler", "versions": "Sürümler", "genres": "Türler", "originalLanguage": "Orijinal dil",
+    "fixMatch": "Eşleşmeyi düzelt", "matchTitle": "Bu yapımı eşleştir", "matchHint": "TMDB'den doğru kaydı seç. Afişler ve ayrıntılar hemen güncellenir.",
+    "matchSearch": "TMDB'de ara", "noMatches": "Sonuç yok. Daha kısa bir ad dene.", "unmatched": "Henüz eşleşmedi", "unmatchedHint": "Marquee bunu TMDB'de bulamadı, bu yüzden dosya adını gösteriyor. Afiş ve ayrıntılar için eşleşmeyi düzelt.",
+    "unlink": "Eşleşmeyi kaldır", "noEpisodes": "Bu sezonda henüz bölüm yok.", "playEpisode": "{{label}} oynat", "resumeEpisode": "{{label}} devam et",
+    "notFound": "Bu yapım artık yok", "notFoundBody": "Sohbetten silinmiş olabilir. Kütüphaneye dön.", "season": "Sezon", "matchSaved": "Eşleşme güncellendi"
+  },
+  "browse": {
+    "movies": "Filmler", "series": "Diziler", "sort": "Sırala", "sortRecent": "Yeni eklenenler", "sortTitle": "Ad", "sortRating": "Puan", "sortYear": "Yıl",
+    "allGenres": "Tüm türler", "emptyTitle": "Burada henüz bir şey yok", "emptyBody": "Hangi sohbetlerin taranacağını seç ve etiketle; kütüphanen kendiliğinden dolar.",
+    "emptyAction": "Sohbetleri seç", "noMatchTitle": "Bu türde yapım yok", "noMatchBody": "Başka bir tür dene ya da filtreyi temizle."
+  },
+  "live": {
+    "title": "Canlı TV", "favourites": "Favoriler", "search": "Kanal ara", "noneTitle": "Henüz kanal yok", "noneBody": "Canlı TV olarak etiketlenmiş bir sohbete M3U listesi ya da yayın bağlantısı gönder; kanallar burada görünür.",
+    "noMatchTitle": "Eşleşen kanal yok", "noMatchBody": "Başka bir kategori ya da ad dene.", "noFavTitle": "Henüz favori yok", "noFavBody": "Bir kanalı yakında tutmak için kalbe dokun.",
+    "now": "Şimdi", "next": "Sonra", "addFav": "{{name}} kanalını favorilere ekle", "removeFav": "{{name}} kanalını favorilerden çıkar", "noGuide": "Yayın akışı yok"
+  },
+  "search": {
+    "placeholder": "Yapımlar, diziler, kanallar", "recent": "Son aramalar", "clearRecent": "Temizle", "movies": "Filmler", "series": "Diziler", "channels": "Kanallar",
+    "noResultsTitle": "“{{q}}” için sonuç yok", "noResultsBody": "Yazımı kontrol et ya da daha kısa bir ad dene.", "startTitle": "İzleyecek bir şey bul", "startBody": "Sonuçlar yazdıkça görünür.", "open": "Aramayı aç", "clearInput": "Aramayı temizle"
+  },
+  "myList": { "title": "Listem", "emptyTitle": "Listen boş", "emptyBody": "Her yerden bir yapım ekle, seni burada beklesin." },
+  "toast": { "added": "Listene eklendi", "removed": "Listenden çıkarıldı", "language": "Dil: {{name}}", "cacheCleared": "Önbellek temizlendi", "scanStarted": "Sohbetlerin taranıyor", "saved": "Kaydedildi", "offline": "Marquee sunucusuna ulaşılamıyor" },
+  "player": {
+    "play": "Oynat", "pause": "Duraklat", "mute": "Sessize al", "unmute": "Sesi aç", "volume": "Ses", "fullscreen": "Tam ekran", "exitFullscreen": "Tam ekrandan çık", "pip": "Pencere içinde pencere",
+    "captions": "Altyazı ve ses", "audio": "Ses", "subtitles": "Altyazı", "speed": "Hız", "normal": "Normal", "version": "Sürüm", "skipIntro": "Girişi geç", "skipRecap": "Özeti geç",
+    "nextEpisode": "Sonraki bölüm", "nextIn": "Sonraki bölüm {{count}} sn sonra", "playNow": "Şimdi oynat", "back10": "10 saniye geri", "forward10": "10 saniye ileri", "live": "Canlı", "channels": "Kanallar",
+    "buffering": "Yükleniyor", "errorTitle": "Bu şu an oynatılamıyor", "errorBody": "Telegram ya da yayın yanıt vermedi. Biraz bekleyip tekrar dene.", "errorUnavailable": "Telegram bağlı değil, bu yüzden dosya yayınlanamıyor.",
+    "resumedAt": "{{time}} noktasından devam edildi", "trackDefault": "Varsayılan", "subtitlesOff": "Kapalı", "converting": "Tarayıcın için dönüştürülüyor", "close": "Oynatıcıyı kapat", "goBack": "Ayrıntılara dön", "searchChannels": "Kanal bul", "seek": "Konum", "unknownTrack": "{{n}}. iz"
+  },
+  "settings": {
+    "title": "Ayarlar", "general": "Genel", "playback": "Oynatma", "library": "Kütüphane", "profiles": "Profiller", "storage": "Depolama", "about": "Hakkında",
+    "language": "Dil", "languageHint": "Tüm arayüzü, ayrıca adları, özetleri, afişleri ve logoları değiştirir.",
+    "audioLang": "Ses dili", "audioLangHint": "Dosyada birden çok iz olduğunda hangisiyle başlanacağı. Arayüz dilinden bağımsızdır.", "audioOriginal": "Dosyanın varsayılanı", "audioUi": "Arayüzle aynı",
+    "subLang": "Altyazı dili", "subLangHint": "Otomatik, yalnızca ses arayüz dilinde değilse altyazı gösterir.", "subAuto": "Otomatik", "subUi": "Arayüzle aynı",
+    "quality": "Tercih edilen sürüm", "qualityHint": "Bir yapımın birden çok sürümü olduğunda kullanılır.", "qualityBest": "Mevcut en yüksek",
+    "autoplayNext": "Sonraki bölümü otomatik oynat", "autoplayNextHint": "Bölümün sonuna doğru bir geri sayım görünür.",
+    "heroPreview": "Ana sayfada fragman oynat", "heroPreviewHint": "Öne çıkan yapımın arkasında sessiz bir fragman belirir.",
+    "skipIntro": "Girişleri otomatik geç", "skipIntroHint": "Yalnızca bölümlere (chapter) sahip dosyalarda çalışır.",
+    "sources": "Taranan sohbetler", "sourcesHint": "Marquee'nin okuduğu sohbetler ve her birinin etiketi.", "editSources": "Sohbetleri değiştir", "kindMovies": "Filmler", "kindSeries": "Diziler", "kindLive": "Canlı TV",
+    "rescan": "Kütüphaneyi yeniden tara", "rescanHint": "Seçili her sohbeti baştan okur. Yeni mesajlar kendiliğinden alınır.", "scanning": "Taranıyor, şimdiye dek {{count}} mesaj", "counts": "{{items}} dosya, {{titles}} yapım, {{channels}} kanal",
+    "disconnect": "Telegram bağlantısını kes", "disconnectHint": "Oturumu kapatır ve kayıtlı oturumu siler. Kütüphanen kalır.", "disconnectConfirm": "Bağlantıyı kes",
+    "streamCache": "Yayın önbelleği", "streamCacheHint": "Dosyaların son izlenen parçaları; geri sarmak anında olsun diye.", "imageCache": "Görsel önbelleği", "cacheLimit": "Önbellek sınırı", "clearCache": "Önbellekleri temizle",
+    "version": "Sürüm", "mode": "Mod", "modeDemo": "Demo verisi", "modeLive": "Bağlı", "tmdb": "TMDB", "tmdbOn": "Bağlı", "tmdbOff": "Anahtar yok", "account": "Telegram hesabı", "metadataLangs": "Önbellekteki diller",
+    "profilesHint": "Profil ekle ya da düzenle. Her birinin kendi listesi, geçmişi ve favori kanalları vardır.", "manageProfiles": "Profilleri yönet"
+  },
+  "profiles": { "who": "Kim izliyor?", "manage": "Profilleri yönet", "done": "Bitti", "newName": "Yeni profil", "namePlaceholder": "Ad", "create": "Profil ekle", "createTitle": "Profil ekle", "editTitle": "Profili düzenle", "switchTo": "{{name}} profiline geç", "edit": "{{name}} düzenle", "nameRequired": "Profile bir ad ver", "deleteConfirm": "{{name}} silinsin mi? Listesi ve geçmişi de silinir.", "lastOne": "En az bir profil gerekli", "saved": "Profil kaydedildi", "maxReached": "En fazla 6 profil olabilir", "manageHint": "Herkesin kendi listesi, geçmişi ve favori kanalları olur.", "color": "Renk", "icon": "Simge", "delete": "Profili sil" },
+  "status": {
+    "connecting": "Telegram'a bağlanılıyor", "reconnecting": "Telegram bağlantıyı kesti. Yeniden bağlanılıyor.", "floodWait": "Telegram yavaşlamamızı istedi. {{seconds}} sn sonra devam.",
+    "error": "Telegram'a ulaşılamıyor", "loggedOut": "Telegram bağlı değil", "unconfigured": "Telegram anahtarları gerekli", "scanning": "Kütüphanen güncelleniyor", "fix": "Düzelt"
+  },
+  "error": { "title": "Bir şeyler ters gitti", "body": "Yüklenemedi. Sunucunun çalıştığını kontrol et ve tekrar dene.", "offlineTitle": "Marquee'ye ulaşılamıyor", "offlineBody": "Sunucu yanıt vermiyor. npm run dev ile başlat ve sayfayı yenile.", "notFoundTitle": "Sayfa bulunamadı", "notFoundBody": "Bu adres hiçbir yere çıkmıyor." },
+  "auth": {
+    "phone_invalid": "Bu telefon numarası doğru görünmüyor.", "code_invalid": "Kod doğru değil. Rakamları kontrol edip tekrar dene.", "code_expired": "Kodun süresi doldu. Yeni bir kod iste.",
+    "password_invalid": "Parola yanlış. Tekrar dene.", "credentials_invalid": "Telegram bu anahtarları reddetti. my.telegram.org'dan yeniden kopyala.", "flood": "Çok fazla deneme. {{seconds}} saniye sonra tekrar dene.",
+    "no_account": "Bu numaraya ait bir Telegram hesabı yok.", "network": "Telegram'a ulaşılamadı. Bağlantını kontrol et.", "unknown": "Bir şeyler ters gitti. Tekrar dene."
+  },
+  "onboarding": {
+    "steps": { "connect": "Bağlan", "choose": "Sohbetleri seç", "index": "Kütüphaneyi kur" },
+    "tagline": "Sohbetlerin, bir kütüphane olarak.", "taglineBody": "Marquee seçtiğin grup ve kanalları okur, içindekileri film, dizi ve canlı kanallara dönüştürür.",
+    "credTitle": "Telegram anahtarlarını ekle", "credBody": "Telegram, oturum açan her uygulamadan bir API ID ve hash ister. Bunları my.telegram.org'da API development tools altında bir kez oluştur.",
+    "apiId": "API ID", "apiHash": "API hash", "credSave": "Anahtarları kaydet",
+    "phoneTitle": "Telegram'a giriş yap", "phoneBody": "Telegram hesabının kayıtlı olduğu numarayı kullan.", "phoneLabel": "Telefon numarası", "sendCode": "Kod gönder", "tabPhone": "Telefon numarası", "tabQr": "QR kod",
+    "qrBody": "Telefonunda Telegram'ı aç; Ayarlar, Cihazlar, Masaüstü Cihazı Bağla yolunu izle ve bu kodu tara.", "qrLoading": "Kod hazırlanıyor",
+    "codeTitle": "Kodu gir", "codeViaApp": "Telegram, oturum açık diğer cihazına bir kod gönderdi.", "codeViaSms": "Telegram kodu SMS ile gönderdi.", "codeLabel": "Giriş kodu", "verify": "Doğrula",
+    "passwordTitle": "İki adımlı parola", "passwordBody": "Bu hesabın bulut parolası var.", "hint": "İpucu: {{hint}}", "passwordLabel": "Parola", "unlock": "Kilidi aç", "differentNumber": "Başka bir numara kullan",
+    "demoNote": "Demo modu. Her numara olur, kod 12345, iki adımlı parola demo (9 ile biten bir numarayla).",
+    "chooseTitle": "Neyin taranacağını seç", "chooseBody": "Kütüphanede istediğin her sohbeti etiketle. Gerisini Atla'da bırak.", "filter": "Sohbetleri filtrele", "members": "{{count}} üye", "skip": "Atla",
+    "chooseNone": "En az bir sohbet seç", "start": "Kütüphaneyi kur", "noChats": "Bu hesapta grup ya da kanal bulunamadı.", "loadingChats": "Sohbetlerin yükleniyor",
+    "indexTitle": "Kütüphanen kuruluyor", "indexBody": "O sürerken göz atmaya başlayabilirsin. Yeni mesajlar otomatik alınır.", "files": "Dosyalar", "titles": "Yapımlar", "channels": "Kanallar", "open": "Kütüphaneyi aç", "waiting": "İlk sonuçlar bekleniyor",
+    "noTmdb": "TMDB anahtarı ayarlı değil; yapımlar afişsiz ve özetsiz, dosya adlarıyla görünecek. .env dosyasına TMDB_API_KEY ekleyip yeniden başlat."
+  }
+}

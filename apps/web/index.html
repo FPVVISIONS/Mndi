@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0b0c" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content="Marquee turns your Telegram groups and channels into a clean library of movies, series and live TV." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <title>Marquee</title>
+    <script>
+      // Set language and direction before first paint so RTL never flashes as LTR.
+      try {
+        var s = JSON.parse(localStorage.getItem('marquee.prefs') || '{}');
+        var l = (s.state && s.state.language) || 'en';
+        document.documentElement.lang = l;
+        document.documentElement.dir = ['he', 'ar'].indexOf(l) >= 0 ? 'rtl' : 'ltr';
+      } catch (e) {}
+    </script>
+    <style>
+      html { background: #0b0b0c; }
+      body { margin: 0; background: #0b0b0c; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,174 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scrollbar-color: var(--color-line-strong) transparent;
+    scrollbar-width: thin;
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    background: var(--color-bg);
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+  input {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+    border: 3px solid var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-fg-faint);
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: var(--tracking-tight);
+  }
+  html[lang='he'] .font-display,
+  html[lang='ar'] .font-display,
+  html[lang='ru'] .font-display {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .page-x {
+    padding-inline: var(--gutter);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .eyebrow {
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--color-fg-faint);
+    font-weight: 600;
+  }
+  /* Skeleton shimmer: transform only, so it stays on the compositor. */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-surface-2);
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.05), transparent);
+    animation: shimmer 1.4s var(--ease-inout, ease-in-out) infinite;
+  }
+  [dir='rtl'] .shimmer::after {
+    animation-name: shimmer-rtl;
+  }
+  /* Subtle legibility scrims. They exist only to keep text readable over artwork. */
+  .scrim-bottom {
+    background: linear-gradient(to top, rgb(11 11 12 / 0.92), rgb(11 11 12 / 0.55) 40%, transparent 100%);
+  }
+  .scrim-start {
+    background: linear-gradient(to right, rgb(11 11 12 / 0.88), rgb(11 11 12 / 0.4) 45%, transparent 75%);
+  }
+  [dir='rtl'] .scrim-start {
+    background: linear-gradient(to left, rgb(11 11 12 / 0.88), rgb(11 11 12 / 0.4) 45%, transparent 75%);
+  }
+  .scrim-fade-bg {
+    background: linear-gradient(to top, var(--color-bg), transparent);
+  }
+  .flip-rtl {
+    transition: none;
+  }
+  [dir='rtl'] .flip-rtl {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes shimmer-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .shimmer::after {
+    display: none;
+  }
+}

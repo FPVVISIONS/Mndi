@@ -1,0 +1,110 @@
+/*
+ * Marquee design tokens.
+ * Everything visual comes from here: colour, type, spacing, radii, elevation.
+ * Motion tokens live in src/design/motion.ts and are mirrored into CSS variables at startup.
+ */
+@import '@fontsource-variable/instrument-sans/index.css';
+@import '@fontsource-variable/noto-sans/index.css';
+@import '@fontsource-variable/noto-sans-hebrew/index.css';
+@import '@fontsource-variable/noto-sans-arabic/index.css';
+@import '@fontsource/instrument-serif/latin-400.css';
+@import '@fontsource/instrument-serif/latin-ext-400.css';
+@import '@fontsource/instrument-serif/latin-400-italic.css';
+
+@theme {
+  /* Colour: near-black neutrals with warm paper-white text, and one accent. */
+  --color-bg: #0b0b0c;
+  --color-surface-1: #131315;
+  --color-surface-2: #1a1a1d;
+  --color-surface-3: #232327;
+  --color-line: #2a2a2f;
+  --color-line-strong: #3b3b42;
+  --color-fg: #f3f1ec;
+  --color-fg-dim: #b0ada6;
+  --color-fg-faint: #8a8781;
+  --color-accent: #ff5a36;
+  --color-accent-strong: #ff7452;
+  --color-accent-dim: #3a1a12;
+  --color-on-accent: #0b0b0c;
+  --color-scrim: rgb(11 11 12 / 0.72);
+
+  /* Type families. Display swaps to the sans for scripts the serif does not cover. */
+  --font-sans: 'Instrument Sans Variable', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+    'Noto Sans Arabic Variable', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+    'Noto Sans Arabic Variable', Georgia, serif;
+
+  /* Type scale: size / line height. */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.125rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.625rem;
+  --text-title-s: 1.25rem;
+  --text-title-s--line-height: 1.625rem;
+  --text-title-m: 1.5rem;
+  --text-title-m--line-height: 1.875rem;
+  --text-title-l: 2rem;
+  --text-title-l--line-height: 2.25rem;
+  --text-display-s: 2.75rem;
+  --text-display-s--line-height: 2.875rem;
+  --text-display-m: 4rem;
+  --text-display-m--line-height: 3.875rem;
+  --text-display-l: 5.5rem;
+  --text-display-l--line-height: 5.25rem;
+
+  --tracking-tight: -0.02em;
+  --tracking-caps: 0.08em;
+
+  /* Radii */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 24px 48px -12px rgb(0 0 0 / 0.75);
+  --shadow-modal: 0 40px 100px -20px rgb(0 0 0 / 0.85);
+
+  /* Breakpoints */
+  --breakpoint-xs: 30rem;
+  --breakpoint-3xl: 100rem;
+}
+
+:root {
+  --gutter: clamp(1rem, 4.2vw, 3.5rem);
+  --nav-h: 4rem;
+  --tab-h: 3.75rem;
+  --card-w: clamp(8.25rem, 13.2vw, 13rem);
+  --card-w-wide: clamp(15rem, 24vw, 22rem);
+  --z-nav: 40;
+  --z-modal: 60;
+  --z-player: 80;
+  --z-toast: 100;
+  color-scheme: dark;
+}
+
+@media (max-width: 47.99rem) {
+  :root {
+    --nav-h: 3.5rem;
+  }
+}
+
+/* Large "TV" layouts get bigger type and cards. */
+@media (min-width: 100rem) {
+  :root {
+    --card-w: 14rem;
+    --card-w-wide: 24rem;
+  }
+}
+
+html[lang='he'],
+html[lang='ar'],
+html[lang='ru'] {
+  --font-display: var(--font-sans);
+}
