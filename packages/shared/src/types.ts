@@ -190,13 +190,26 @@ export interface AppStatus {
   languagesCached: LanguageCode[];
 }
 
-export type AuthStep = 'phone' | 'code' | 'password' | 'qr' | 'done';
+export type AuthStep = 'credentials' | 'phone' | 'code' | 'password' | 'qr' | 'done';
+
+/** Error codes the UI translates; the server never sends raw Telegram messages. */
+export type AuthErrorCode =
+  | 'phone_invalid'
+  | 'code_invalid'
+  | 'code_expired'
+  | 'password_invalid'
+  | 'credentials_invalid'
+  | 'flood'
+  | 'no_account'
+  | 'network'
+  | 'unknown';
 
 export interface AuthState {
   step: AuthStep;
   qr?: { svg: string; expiresAt: number };
   codeViaApp?: boolean;
-  error?: string;
+  error?: AuthErrorCode;
+  waitSeconds?: number;
   hint?: string;
 }
 
