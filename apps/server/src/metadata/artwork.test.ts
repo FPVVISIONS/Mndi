@@ -79,11 +79,11 @@ describe('resolveMeta', () => {
   };
   const en: RawDetails = { id: 1, title: 'Harbour', overview: 'A quiet port.', tagline: 'Hold the line.' };
 
-  it('fills untranslated text from English', () => {
+  it('fills untranslated text from English, except taglines', () => {
     const m = resolveMeta('movie', he, en, 'he');
     expect(m.title).toBe('נמל');
     expect(m.overview).toBe('A quiet port.');
-    expect(m.tagline).toBe('Hold the line.');
+    expect(m.tagline).toBe('');
     expect(m.genres).toEqual(['דרמה']);
   });
 

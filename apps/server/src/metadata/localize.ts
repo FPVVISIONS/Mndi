@@ -21,13 +21,13 @@ function certificationOf(raw: RawDetails): string | null {
 }
 
 function trailerOf(raw: RawDetails, lang: string): LocalizedMeta['trailer'] {
-  const list = (raw.videos?.results ?? []).filter((v) => v.site === 'YouTube');
+  const list = (raw.videos?.results ?? []).filter((v) => v.site === 'YouTube' || v.site === 'File');
   const rank = (v: (typeof list)[number]) =>
     (v.type === 'Trailer' ? 4 : v.type === 'Teaser' ? 2 : 0) +
     (v.official ? 1 : 0) +
     (v.iso_639_1 === lang ? 0.5 : 0);
   const best = list.filter((v) => rank(v) >= 2).sort((a, b) => rank(b) - rank(a))[0];
-  return best ? { site: 'YouTube', key: best.key } : null;
+  return best ? { site: best.site === 'File' ? 'file' : 'YouTube', key: best.key } : null;
 }
 
 /**
@@ -55,7 +55,8 @@ export function resolveMeta(
     title: title ?? originalTitle,
     originalTitle,
     overview: pick(raw.overview, english?.overview) ?? '',
-    tagline: pick(raw.tagline, english?.tagline) ?? '',
+    // Taglines are copywriting; an English one under a Hebrew UI reads as a bug, so no fallback.
+    tagline: raw.tagline ?? '',
     genres: (pick(raw.genres, english?.genres) ?? []).map((g) => g.name),
     year: yearOf(date),
     runtime: runtime && runtime > 0 ? runtime : null,
