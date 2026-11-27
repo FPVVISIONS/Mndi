@@ -7,7 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../../..');
-const out = process.argv[2] ? resolve(process.argv[2]) : resolve(root, 'apps/android/app/src/main/assets/nodejs-project');
+const out = process.argv[2]
+  ? resolve(process.argv[2])
+  : resolve(root, 'apps/android/app/src/main/assets/nodejs-project');
 const web = resolve(root, 'apps/web/dist');
 
 if (!existsSync(resolve(web, 'index.html'))) {
@@ -20,22 +22,26 @@ mkdirSync(out, { recursive: true });
 
 await build({
   entryPoints: [resolve(here, '../src/mobile.ts')],
-  outfile: resolve(out, 'main.mjs'),
+  outfile: resolve(out, 'main.js'),
   bundle: true,
   platform: 'node',
   target: 'node18',
-  format: 'esm',
+  // CommonJS is what nodejs-mobile runs most reliably; ESM loading failed on some phones.
+  format: 'cjs',
+  // Paths derived from import.meta.url are only defaults; the app passes real ones in.
+  define: { 'import.meta.url': JSON.stringify('file:///marquee/apps/server/src/bundle.js') },
   // Readable code, so an error on a phone points at a real line and function.
   minify: false,
   keepNames: true,
   legalComments: 'none',
   // Native modules are optional at runtime and absent on Android.
   external: ['better-sqlite3', 'drizzle-orm/better-sqlite3', 'sharp'],
-  // CommonJS dependencies call require(); give the ESM bundle a real one.
-  banner: { js: "import { createRequire as __mqRequire } from 'module'; const require = __mqRequire(import.meta.url);" },
   logLevel: 'warning',
 });
 
 cpSync(web, resolve(out, 'web'), { recursive: true });
-writeFileSync(resolve(out, 'package.json'), JSON.stringify({ name: 'marquee-mobile', private: true, type: 'module' }, null, 2));
+writeFileSync(
+  resolve(out, 'package.json'),
+  JSON.stringify({ name: 'marquee-mobile', private: true }, null, 2),
+);
 console.log(`Mobile bundle written to ${out}`);

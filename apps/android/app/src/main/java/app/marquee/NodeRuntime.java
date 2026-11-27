@@ -60,7 +60,7 @@ public final class NodeRuntime {
                 data.mkdirs();
                 int code = startNode(new String[] {
                     "node",
-                    new File(project, "main.mjs").getAbsolutePath(),
+                    new File(project, "main.js").getAbsolutePath(),
                     data.getAbsolutePath(),
                     new File(project, "web").getAbsolutePath(),
                     String.valueOf(PORT),

@@ -173,11 +173,12 @@ public class MainActivity extends Activity {
     /** The app's own recent log lines (Android lets an app read its own log). */
     private static String recentLog() {
         try {
-            java.lang.Process p = Runtime.getRuntime().exec(new String[] {"logcat", "-d", "-t", "200", "-v", "brief"});
+            java.lang.Process p = Runtime.getRuntime().exec(new String[] {"logcat", "-d", "-t", "400", "-v", "brief"});
             String all = new String(p.getInputStream().readAllBytes());
             StringBuilder out = new StringBuilder();
+            // Everything this app logged (Android only shows an app its own lines), minus loader noise.
             for (String line : all.split("\n")) {
-                if (line.matches(".*(Marquee|AndroidRuntime|DEBUG|libc|linker|FATAL|nativeloader).*")) out.append(line).append('\n');
+                if (!line.contains("nativeloader")) out.append(line).append('\n');
             }
             String text = out.toString();
             return text.length() > 12000 ? text.substring(text.length() - 12000) : text;
