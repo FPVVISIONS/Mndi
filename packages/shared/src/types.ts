@@ -1,0 +1,285 @@
+import type { LanguageCode } from './languages.js';
+
+export type SourceKind = 'movies' | 'series' | 'live';
+export type TitleKind = 'movie' | 'series';
+
+/** A reference to artwork. The web app turns it into a URL for the size it needs. */
+export interface ImageRef {
+  /** TMDB file path such as `/abc.jpg`, or `mock/...` for generated artwork. */
+  id: string;
+  /** Dominant colour, shown while the image loads. */
+  color: string;
+  /** Language the artwork is in; null when it is language-neutral. */
+  lang: string | null;
+}
+
+export interface Progress {
+  fileId: number;
+  position: number;
+  duration: number;
+  episodeLabel?: string;
+  updatedAt: number;
+}
+
+export interface TitleCard {
+  id: number;
+  kind: TitleKind;
+  title: string;
+  year: number | null;
+  overview: string;
+  genres: string[];
+  rating: number | null;
+  runtime: number | null;
+  poster: ImageRef | null;
+  backdrop: ImageRef | null;
+  logo: ImageRef | null;
+  addedAt: number;
+  seasons: number | null;
+  inList: boolean;
+  liked: boolean;
+  matched: boolean;
+  /** True while localized metadata is still being fetched. */
+  pending?: boolean;
+  progress?: Progress;
+}
+
+export interface CastMember {
+  name: string;
+  role: string;
+  photo: ImageRef | null;
+}
+
+export interface SeasonSummary {
+  season: number;
+  name: string;
+  episodes: number;
+}
+
+export interface TitleDetail extends TitleCard {
+  tagline: string;
+  certification: string | null;
+  originalLanguage: string | null;
+  cast: CastMember[];
+  trailer: { site: 'YouTube' | 'file'; key: string } | null;
+  seasonList: SeasonSummary[];
+  similar: TitleCard[];
+  /** Other movies of the same saga that are in the library (movies only). */
+  collection?: { name: string; items: TitleCard[] };
+  /** For movies: the file to play. For series: the episode to continue with. */
+  playFileId: number | null;
+  playLabel: string | null;
+  versions: FileVersion[];
+}
+
+/** One release of a title or episode. Telegram chats often hold several, so people can choose. */
+export interface FileVersion {
+  id: number;
+  /** Short summary such as "2160p · WEB-DL · HEVC". */
+  label: string;
+  quality: string;
+  source: string | null;
+  codec: string | null;
+  resolution: string | null;
+  size: number;
+  languages: string[];
+  subtitles: string[];
+  container: string;
+  /** Title of the chat the file came from. */
+  chat: string;
+  name: string;
+  date: number;
+  /** True for the version Play will use. */
+  chosen: boolean;
+  /** True when the browser can play the container natively without conversion. */
+  native: boolean;
+}
+
+export interface EpisodeItem {
+  id: number;
+  season: number;
+  episode: number;
+  name: string;
+  overview: string;
+  still: ImageRef | null;
+  runtime: number | null;
+  airDate: string | null;
+  fileId: number | null;
+  versions: number;
+  progress?: Progress;
+}
+
+export type HomeRowId = 'continue' | 'myList' | 'recent' | 'trending' | 'newEpisodes' | 'genre';
+
+export interface HomeRow {
+  id: HomeRowId;
+  /** Only for genre rows. */
+  label?: string;
+  items: TitleCard[];
+}
+
+export interface Channel {
+  id: number;
+  name: string;
+  logo: string | null;
+  group: string;
+  favourite: boolean;
+  nowPlaying: { title: string; start: number; end: number; next?: string } | null;
+}
+
+export interface HomePayload {
+  hero: TitleCard[];
+  rows: HomeRow[];
+  live: Channel[];
+  pending: boolean;
+}
+
+export interface AudioTrack {
+  index: number;
+  lang: string | null;
+  label: string;
+  codec: string;
+  channels: number | null;
+}
+
+export interface SubtitleTrack {
+  index: number;
+  lang: string | null;
+  label: string;
+  forced: boolean;
+}
+
+export interface Chapter {
+  start: number;
+  end: number;
+  title: string;
+  kind: 'intro' | 'recap' | 'credits' | 'other';
+}
+
+export type PlayMode = 'direct' | 'remux' | 'transcode' | 'live-hls' | 'live-direct';
+
+export interface PlaybackInfo {
+  fileId: number | null;
+  channelId: number | null;
+  titleId: number | null;
+  episodeId: number | null;
+  title: string;
+  subtitle: string | null;
+  duration: number;
+  mode: PlayMode;
+  url: string;
+  audioTracks: AudioTrack[];
+  subtitleTracks: SubtitleTrack[];
+  chapters: Chapter[];
+  resume: number;
+  next: { fileId: number; label: string; title: string } | null;
+  versions: FileVersion[];
+  thumbs: boolean;
+  backdrop: ImageRef | null;
+}
+
+export interface Profile {
+  id: number;
+  name: string;
+  color: string;
+  avatar: string;
+}
+
+export type TelegramState =
+  'unconfigured' | 'logged-out' | 'connecting' | 'ready' | 'reconnecting' | 'flood-wait' | 'error';
+
+export interface AppStatus {
+  mock: boolean;
+  tmdb: boolean;
+  version: string;
+  telegram: {
+    state: TelegramState;
+    retryAt?: number;
+    user?: { name: string };
+  };
+  onboarded: boolean;
+  index: {
+    scanning: boolean;
+    /** True while Marquee is looking through the account's chats to decide which hold media. */
+    discovering: boolean;
+    scanned: number;
+    items: number;
+    titles: number;
+    channels: number;
+  };
+  languagesCached: LanguageCode[];
+}
+
+/**
+ * 'credentials' asks for a phone number to create API keys automatically (or for keys by hand);
+ * 'keys-code' waits for the code my.telegram.org sends to the Telegram app.
+ */
+export type AuthStep = 'credentials' | 'keys-code' | 'phone' | 'code' | 'password' | 'qr' | 'done';
+
+/** Error codes the UI translates; the server never sends raw Telegram messages. */
+export type AuthErrorCode =
+  | 'phone_invalid'
+  | 'code_invalid'
+  | 'code_expired'
+  | 'password_invalid'
+  | 'credentials_invalid'
+  | 'keys_failed'
+  | 'email_required'
+  | 'flood'
+  | 'no_account'
+  | 'network'
+  | 'unknown';
+
+export interface AuthState {
+  step: AuthStep;
+  /** url is the tg://login link: opened on the same phone, the Telegram app approves the sign-in. */
+  qr?: { svg: string; expiresAt: number; url?: string };
+  codeViaApp?: boolean;
+  /** Where Telegram said it sent the login code. */
+  codeVia?: 'app' | 'sms' | 'call' | 'email' | 'other';
+  /** Telegram offers another way to deliver the code (usually SMS). */
+  canResend?: boolean;
+  /** The API keys in use were saved in the app (not built in), so they can be replaced. */
+  canChangeKeys?: boolean;
+  error?: AuthErrorCode;
+  waitSeconds?: number;
+  hint?: string;
+  /** Short technical note (what Telegram answered) shown under an error, for support. */
+  detail?: string;
+  /** On 'keys-code': the code was accepted, so creating the keys can be retried without a new one. */
+  retry?: boolean;
+}
+
+export interface ChatSummary {
+  id: string;
+  title: string;
+  type: 'channel' | 'group' | 'user';
+  members: number | null;
+  kind: SourceKind | null;
+  indexed: number;
+}
+
+export interface SourceInput {
+  chatId: string;
+  title: string;
+  kind: SourceKind;
+}
+
+export interface SearchResults {
+  movies: TitleCard[];
+  series: TitleCard[];
+  channels: Channel[];
+}
+
+export interface TmdbCandidate {
+  tmdbId: number;
+  title: string;
+  year: number | null;
+  overview: string;
+  poster: ImageRef | null;
+}
+
+export interface CacheInfo {
+  streamBytes: number;
+  imageBytes: number;
+  limitMb: number;
+}

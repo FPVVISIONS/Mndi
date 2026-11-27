@@ -1,0 +1,104 @@
+/*
+ * Marquee design tokens.
+ * Everything visual comes from here: colour, type, spacing, radii, elevation.
+ * Motion tokens live in src/design/motion.ts and are mirrored into CSS variables at startup.
+ */
+
+@theme {
+  /* Colour: near-black neutrals with warm paper-white text, and one accent. */
+  --color-bg: #050506;
+  --color-surface-1: #131315;
+  --color-surface-2: #1a1a1d;
+  --color-surface-3: #232327;
+  --color-line: #2a2a2f;
+  --color-line-strong: #3b3b42;
+  --color-fg: #f5f5f7;
+  --color-fg-dim: #a1a1a6;
+  --color-fg-faint: #86868b;
+  --color-accent: #ff5a36;
+  --color-accent-strong: #ff7452;
+  --color-accent-dim: #3a1a12;
+  --color-on-accent: #0b0b0c;
+  --color-scrim: rgb(11 11 12 / 0.72);
+
+  /*
+   * Type: the device's own UI font, like native apps. SF Pro on iPhone and Mac, the system font
+   * on Android (Samsung's on Galaxy phones), Segoe on Windows. Noto only fills gaps.
+   */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, system-ui, 'SF Pro Text', 'Segoe UI Variable Text',
+    'Segoe UI', Roboto, 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+    'Noto Sans Arabic Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-display:
+    -apple-system, BlinkMacSystemFont, system-ui, 'SF Pro Display', 'Segoe UI Variable Display',
+    'Segoe UI', Roboto, 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+    'Noto Sans Arabic Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Type scale: size / line height. */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.125rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.625rem;
+  --text-title-s: 1.25rem;
+  --text-title-s--line-height: 1.625rem;
+  --text-title-m: 1.5rem;
+  --text-title-m--line-height: 1.875rem;
+  --text-title-l: 2rem;
+  --text-title-l--line-height: 2.25rem;
+  --text-display-s: 2.5rem;
+  --text-display-s--line-height: 2.75rem;
+  --text-display-m: 3.5rem;
+  --text-display-m--line-height: 3.75rem;
+  --text-display-l: 4.75rem;
+  --text-display-l--line-height: 5rem;
+
+  --tracking-tight: -0.022em;
+  --tracking-caps: 0;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --shadow-pop: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 24px 48px -12px rgb(0 0 0 / 0.75);
+  --shadow-modal: 0 40px 100px -20px rgb(0 0 0 / 0.85);
+
+  /* Breakpoints */
+  --breakpoint-xs: 30rem;
+  --breakpoint-3xl: 100rem;
+}
+
+:root {
+  --gutter: clamp(1rem, 4.2vw, 3.5rem);
+  --nav-h: 4rem;
+  --tab-h: 4.75rem;
+  --card-w: clamp(8.25rem, 13.2vw, 13rem);
+  --card-w-wide: clamp(15rem, 24vw, 22rem);
+  --z-nav: 40;
+  --z-modal: 60;
+  --z-player: 80;
+  --z-toast: 100;
+  color-scheme: dark;
+}
+
+@media (max-width: 47.99rem) {
+  :root {
+    --nav-h: 3.5rem;
+  }
+}
+
+/* Large "TV" layouts get bigger type and cards. */
+@media (min-width: 100rem) {
+  :root {
+    --card-w: 14rem;
+    --card-w-wide: 24rem;
+  }
+}

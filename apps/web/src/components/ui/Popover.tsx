@@ -1,0 +1,105 @@
+import { AnimatePresence, m } from 'framer-motion';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { duration, spring } from '../../design/motion';
+import { cn } from '../../lib/cn';
+
+interface Props {
+  trigger: (props: { open: boolean; toggle: () => void }) => ReactNode;
+  children: (close: () => void) => ReactNode;
+  align?: 'start' | 'end';
+  side?: 'bottom' | 'top';
+  className?: string;
+  panelClassName?: string;
+}
+
+export function Popover({
+  trigger,
+  children,
+  align = 'end',
+  side = 'bottom',
+  className,
+  panelClassName,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      // Close the menu only; the player's own Escape handler (leave) must not also fire.
+      e.stopPropagation();
+      setOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={root} className={cn('relative', className)}>
+      {trigger({ open, toggle: () => setOpen((o) => !o) })}
+      <AnimatePresence>
+        {open && (
+          <m.div
+            initial={{
+              opacity: 0,
+              scale: 0.55,
+              y: side === 'bottom' ? -10 : 10,
+              filter: 'blur(8px)',
+            }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{
+              opacity: 0,
+              scale: 0.7,
+              filter: 'blur(6px)',
+              transition: { duration: duration.fast },
+            }}
+            transition={{ ...spring.liquid, opacity: { duration: duration.fast } }}
+            style={{
+              transformOrigin: `${side === 'bottom' ? 'top' : 'bottom'} ${align === 'end' ? 'right' : 'left'}`,
+            }}
+            className={cn(
+              'glass glass-strong absolute z-50 min-w-48 rounded-[1.375rem] p-1.5',
+              side === 'bottom' ? 'top-[calc(100%+0.5rem)]' : 'bottom-[calc(100%+0.5rem)]',
+              align === 'end' ? 'end-0' : 'start-0',
+              panelClassName,
+            )}
+          >
+            {children(() => setOpen(false))}
+          </m.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+interface ItemProps {
+  children: ReactNode;
+  onClick: () => void;
+  active?: boolean;
+  icon?: ReactNode;
+}
+
+export function MenuItem({ children, onClick, active, icon }: ItemProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-center gap-3 rounded-[0.875rem] px-3 py-2.5 text-start text-body transition-colors hover:bg-white/10 active:scale-[0.98] active:bg-white/14',
+        active ? 'text-fg' : 'text-fg-dim hover:text-fg',
+      )}
+    >
+      {icon}
+      <span className="flex-1 truncate">{children}</span>
+      {active && <span className="size-1.5 rounded-full bg-accent" aria-hidden />}
+    </button>
+  );
+}
