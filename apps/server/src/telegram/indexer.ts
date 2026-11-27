@@ -3,6 +3,7 @@ import { Api } from 'telegram';
 import { NewMessage, type NewMessageEvent } from 'telegram/events/index.js';
 import type { AppStatus, SourceKind } from '@marquee/shared';
 import type { Db } from '../db/client.js';
+import { record } from '../lib/diag.js';
 import { schema } from '../db/client.js';
 import { ingestVideo, type IngestFile } from '../library/titles.js';
 import type { LiveService } from '../live/service.js';
@@ -225,7 +226,7 @@ export class Indexer {
     this.scanned = 0;
     try {
       for (let id = this.queue.shift(); id; id = this.queue.shift())
-        await this.scanSource(id).catch(() => undefined);
+        await this.scanSource(id).catch((e) => record('scan', `${id}: ${(e as Error)?.message}`));
     } finally {
       this.scanning = false;
       void this.matchPending();

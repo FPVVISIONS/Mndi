@@ -250,7 +250,10 @@
     "reduceMotion": "Hareketi azalt",
     "reduceMotionHint": "Yaylı animasyonları, paralaksı ve cam efektlerini kapatır.",
     "lite": "Hafif mod",
-    "liteHint": "Bulanıklık ve cam efektlerini kapatır. Uygulama yavaşsa veya kapanıyorsa kullanın."
+    "liteHint": "Bulanıklık ve cam efektlerini kapatır. Uygulama yavaşsa veya kapanıyorsa kullanın.",
+    "report": "Sorun raporu",
+    "reportHint": "Uygulamanın fark ettikleri: yavaş ekranlar ve hatalar. Bir şey çalışmıyorsa kopyalayıp gönderin.",
+    "copyReport": "Raporu kopyala"
   },
   "profiles": {
     "who": "Kim izliyor?",

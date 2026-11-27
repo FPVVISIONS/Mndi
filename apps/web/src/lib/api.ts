@@ -62,6 +62,15 @@ const send = <T>(method: string, path: string, json?: unknown) =>
   request<T>(path, { method, json });
 
 export const api = {
+  diagnostics: () =>
+    request<{
+      version: string;
+      telegram: string;
+      index: { items: number; titles: number; scanning: boolean; discovering: boolean } | null;
+      uptimeSeconds: number;
+      rssMb: number;
+      entries: { agoSeconds: number; kind: string; text: string }[];
+    }>('/api/diagnostics', { lang: false }),
   status: () => request<AppStatus>('/api/status', { lang: false }),
   completeOnboarding: () => send<AppStatus>('POST', '/api/onboarding/complete'),
   resetOnboarding: () => send<AppStatus>('POST', '/api/dev/reset-onboarding'),

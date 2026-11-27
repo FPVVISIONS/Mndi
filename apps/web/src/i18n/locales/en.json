@@ -250,7 +250,10 @@
     "reduceMotion": "Reduce motion",
     "reduceMotionHint": "Turns off springy animations, parallax and glass effects.",
     "lite": "Light mode",
-    "liteHint": "Turns off blur and glass effects. Use it if the app is slow or closes on your screen."
+    "liteHint": "Turns off blur and glass effects. Use it if the app is slow or closes on your screen.",
+    "report": "Problem report",
+    "reportHint": "What the app noticed: slow screens and errors. If something isn't working, copy this and send it.",
+    "copyReport": "Copy report"
   },
   "profiles": {
     "who": "Who's watching?",

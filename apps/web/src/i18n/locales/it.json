@@ -250,7 +250,10 @@
     "reduceMotion": "Riduci movimento",
     "reduceMotionHint": "Disattiva animazioni elastiche, parallasse ed effetti vetro.",
     "lite": "Modalità leggera",
-    "liteHint": "Disattiva sfocatura ed effetti vetro. Usala se l'app è lenta o si chiude sul tuo schermo."
+    "liteHint": "Disattiva sfocatura ed effetti vetro. Usala se l'app è lenta o si chiude sul tuo schermo.",
+    "report": "Rapporto problemi",
+    "reportHint": "Cosa ha notato l'app: schermate lente ed errori. Se qualcosa non va, copialo e invialo.",
+    "copyReport": "Copia rapporto"
   },
   "profiles": {
     "who": "Chi guarda?",

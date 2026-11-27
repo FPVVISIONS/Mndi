@@ -250,7 +250,10 @@
     "reduceMotion": "Bewegung reduzieren",
     "reduceMotionHint": "Schaltet federnde Animationen, Parallaxe und Glaseffekte aus.",
     "lite": "Leichtmodus",
-    "liteHint": "Schaltet Unschärfe und Glaseffekte aus. Nutze ihn, wenn die App langsam ist oder sich schließt."
+    "liteHint": "Schaltet Unschärfe und Glaseffekte aus. Nutze ihn, wenn die App langsam ist oder sich schließt.",
+    "report": "Problembericht",
+    "reportHint": "Was die App bemerkt hat: langsame Bildschirme und Fehler. Wenn etwas nicht klappt, kopiere und sende es.",
+    "copyReport": "Bericht kopieren"
   },
   "profiles": {
     "who": "Wer schaut?",

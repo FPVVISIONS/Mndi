@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { AppStatus, SourceKind } from '@marquee/shared';
 import { schema } from '../db/client.js';
 import type { Services } from '../services.js';
+import { report } from '../lib/diag.js';
 import { badRequest } from './util.js';
 
 const { sources, profiles } = schema;
@@ -32,6 +33,13 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
   });
 
   app.get('/api/status', async () => status());
+
+  app.get('/api/diagnostics', async () => ({
+    version: svc.config.version,
+    telegram: svc.tg.status().state,
+    index: svc.indexer?.status() ?? null,
+    ...report(),
+  }));
 
   app.post('/api/onboarding/complete', async () => {
     svc.setSetting('onboarded', '1');

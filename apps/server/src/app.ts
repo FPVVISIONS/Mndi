@@ -5,6 +5,7 @@ import fastifyCompress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
+import { record } from './lib/diag.js';
 import { coreRoutes } from './routes/core.js';
 import { libraryRoutes } from './routes/library.js';
 import { liveRoutes } from './routes/live.js';
@@ -14,11 +15,23 @@ import type { Services } from './services.js';
 export async function buildApp(svc: Services): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, trustProxy: false });
 
-  app.setErrorHandler((err, _req, reply) => {
+  // Requests that take long are what make a screen "keep loading"; note them.
+  app.addHook('onResponse', (req, reply, done) => {
+    const ms = reply.elapsedTime;
+    if (ms > 1500 && !req.url.startsWith('/api/stream/') && !req.url.startsWith('/api/live/'))
+      record('slow', `${req.method} ${req.url.split('?')[0]} ${Math.round(ms)} ms`);
+    done();
+  });
+  process.on('unhandledRejection', (e) => record('rejection', String((e as Error)?.message ?? e)));
+
+  app.setErrorHandler((err, req, reply) => {
     if (err instanceof ZodError)
       return reply.code(400).send({ error: 'bad_request', message: 'Invalid request.' });
     const status = (err as { statusCode?: number }).statusCode ?? 500;
-    if (status >= 500) console.error(err);
+    if (status >= 500) {
+      console.error(err);
+      record('error', `${req.method} ${req.url.split('?')[0]}: ${(err as Error)?.message}`);
+    }
     // The first line of the failure travels with the error so the app can show what went wrong.
     const detail = String((err as Error)?.message ?? '')
       .split('\n')[0]!

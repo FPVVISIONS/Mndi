@@ -250,7 +250,10 @@
     "reduceMotion": "Reducir movimiento",
     "reduceMotionHint": "Desactiva las animaciones elásticas, el paralaje y los efectos de cristal.",
     "lite": "Modo ligero",
-    "liteHint": "Desactiva el desenfoque y los efectos de cristal. Úsalo si la app va lenta o se cierra en tu pantalla."
+    "liteHint": "Desactiva el desenfoque y los efectos de cristal. Úsalo si la app va lenta o se cierra en tu pantalla.",
+    "report": "Informe de problemas",
+    "reportHint": "Lo que notó la app: pantallas lentas y errores. Si algo falla, cópialo y envíalo.",
+    "copyReport": "Copiar informe"
   },
   "profiles": {
     "who": "¿Quién está viendo?",

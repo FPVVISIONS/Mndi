@@ -14,8 +14,8 @@ android {
         applicationId 'app.marquee'
         minSdk 24
         targetSdk 34
-        versionCode 22
-        versionName '0.4.4'
+        versionCode 23
+        versionName '0.4.5'
         externalNativeBuild {
             cmake {
                 // libnode links against the shared C++ runtime, so it must ship with the app.

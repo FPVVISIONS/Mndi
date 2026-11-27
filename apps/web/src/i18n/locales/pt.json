@@ -250,7 +250,10 @@
     "reduceMotion": "Reduzir movimento",
     "reduceMotionHint": "Desativa animações elásticas, paralaxe e efeitos de vidro.",
     "lite": "Modo leve",
-    "liteHint": "Desativa desfoque e efeitos de vidro. Use se o app estiver lento ou fechar na sua tela."
+    "liteHint": "Desativa desfoque e efeitos de vidro. Use se o app estiver lento ou fechar na sua tela.",
+    "report": "Relatório de problemas",
+    "reportHint": "O que o app notou: telas lentas e erros. Se algo não funcionar, copie e envie.",
+    "copyReport": "Copiar relatório"
   },
   "profiles": {
     "who": "Quem está assistindo?",

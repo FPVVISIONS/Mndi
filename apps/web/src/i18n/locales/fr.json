@@ -250,7 +250,10 @@
     "reduceMotion": "Réduire les animations",
     "reduceMotionHint": "Désactive les animations à ressort, la parallaxe et les effets de verre.",
     "lite": "Mode léger",
-    "liteHint": "Désactive le flou et les effets de verre. À utiliser si l'app est lente ou se ferme sur votre écran."
+    "liteHint": "Désactive le flou et les effets de verre. À utiliser si l'app est lente ou se ferme sur votre écran.",
+    "report": "Rapport de problèmes",
+    "reportHint": "Ce que l'app a remarqué : écrans lents et erreurs. En cas de souci, copiez-le et envoyez-le.",
+    "copyReport": "Copier le rapport"
   },
   "profiles": {
     "who": "Qui regarde ?",
