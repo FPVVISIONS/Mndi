@@ -2,12 +2,18 @@ import { buildApp } from './app.js';
 import { loadConfig } from './config.js';
 import { createServices } from './services.js';
 
+const step =
+  (globalThis as { __marqueeStep?: (m: string) => void }).__marqueeStep ?? (() => undefined);
 const config = loadConfig();
+step('creating services');
 const svc = await createServices(config);
+step('building routes');
 const app = await buildApp(svc);
 
 try {
+  step(`listening on ${config.host}:${config.port}`);
   await app.listen({ port: config.port, host: config.host });
+  step('ready');
   const mode = config.mock
     ? 'demo data'
     : svc.meta.enabled

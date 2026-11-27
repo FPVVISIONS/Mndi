@@ -180,7 +180,7 @@ public class MainActivity extends Activity {
                 if (line.matches(".*(Marquee|AndroidRuntime|DEBUG|libc|linker|FATAL|nativeloader).*")) out.append(line).append('\n');
             }
             String text = out.toString();
-            return text.length() > 6000 ? text.substring(text.length() - 6000) : text;
+            return text.length() > 12000 ? text.substring(text.length() - 12000) : text;
         } catch (Exception e) {
             return "(log unavailable: " + e + ")";
         }
@@ -189,7 +189,9 @@ public class MainActivity extends Activity {
     private void showError(String reason) {
         String details = "Marquee " + BuildConfigInfo.version(this) + " on " + Build.MANUFACTURER + " " + Build.MODEL
             + ", Android " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + "), ABIs " + String.join(",", Build.SUPPORTED_ABIS)
-            + "\n\n" + reason + "\n\n" + recentLog();
+            + "\n\n" + reason
+            + "\n\nStartup steps:\n" + readFile(new java.io.File(getFilesDir(), "data/startup.log"))
+            + "\n\n" + recentLog();
 
         android.widget.LinearLayout box = new android.widget.LinearLayout(this);
         box.setOrientation(android.widget.LinearLayout.VERTICAL);

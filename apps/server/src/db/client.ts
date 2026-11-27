@@ -84,11 +84,28 @@ export async function createDb(file: string): Promise<Db> {
   return createWasmDb(file);
 }
 
+/**
+ * SQLite as WebAssembly (the inline build carries its binary, so bundles need no extra file).
+ * Some Android Node builds run V8 without a JIT and therefore without WebAssembly; there the
+ * pure-JavaScript build of the same SQLite takes over.
+ */
+async function loadSqlJs() {
+  const hasWasm = typeof (globalThis as { WebAssembly?: unknown }).WebAssembly === 'object';
+  if (hasWasm) {
+    try {
+      const { default: init } = await import('sql.js/dist/sql-wasm-inline.js');
+      return await init();
+    } catch (err) {
+      console.error('SQLite WebAssembly failed, using the JavaScript build:', err);
+    }
+  }
+  const { default: init } = await import('sql.js/dist/sql-asm-memory-growth.js');
+  return init();
+}
+
 async function createWasmDb(file: string): Promise<Db> {
-  // The inline build carries its WebAssembly with it, so bundles need no extra file.
-  const { default: initSqlJs } = await import('sql.js/dist/sql-wasm-inline.js');
   const { drizzle } = await import('drizzle-orm/sql-js');
-  const SQL = await initSqlJs();
+  const SQL = await loadSqlJs();
   const memory = file !== ':memory:';
   const sqlite =
     memory && existsSync(file) ? new SQL.Database(readFileSync(file)) : new SQL.Database();

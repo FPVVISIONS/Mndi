@@ -25,7 +25,9 @@ await build({
   platform: 'node',
   target: 'node18',
   format: 'esm',
-  minify: true,
+  // Readable code, so an error on a phone points at a real line and function.
+  minify: false,
+  keepNames: true,
   legalComments: 'none',
   // Native modules are optional at runtime and absent on Android.
   external: ['better-sqlite3', 'drizzle-orm/better-sqlite3', 'sharp'],

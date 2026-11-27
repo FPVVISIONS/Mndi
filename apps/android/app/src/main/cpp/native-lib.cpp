@@ -21,7 +21,7 @@ int pipeStderr[2];
 void *pump(void *arg) {
     const bool isErr = arg != nullptr;
     int fd = isErr ? pipeStderr[0] : pipeStdout[0];
-    char buf[2048];
+    char buf[4096];
     ssize_t n;
     while ((n = read(fd, buf, sizeof buf - 1)) > 0) {
         if (buf[n - 1] == '\n') --n;
