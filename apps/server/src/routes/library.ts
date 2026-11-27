@@ -27,8 +27,19 @@ export function libraryRoutes(app: FastifyInstance, svc: Services): void {
   });
 
   app.get('/api/titles/:id', async (req, reply) => {
-    const detail = lib.detail(idParam(req), ctxOf(req, svc));
-    return detail ?? notFound(reply);
+    const ctx = ctxOf(req, svc);
+    const detail = lib.detail(idParam(req), ctx);
+    if (!detail) return notFound(reply);
+    // A movie that belongs to a saga also shows the saga's other movies from the library.
+    const tmdbId = detail.kind === 'movie' ? lib.tmdbIdOf(detail.id) : null;
+    if (tmdbId) {
+      const saga = await svc.meta.collectionFor(tmdbId, ctx.lang);
+      if (saga) {
+        const items = lib.collectionCards(saga.ids, ctx);
+        if (items.length > 1) detail.collection = { name: saga.name, items };
+      }
+    }
+    return detail;
   });
 
   app.get('/api/titles/:id/episodes', async (req) => {

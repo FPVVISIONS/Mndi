@@ -445,6 +445,19 @@ export class Library {
     return f ? { fileId: f.id, label: episodeLabel(target.season, target.episode) } : null;
   }
 
+  tmdbIdOf(titleId: number): number | null {
+    return this.db.select().from(titles).where(eq(titles.id, titleId)).get()?.tmdbId ?? null;
+  }
+
+  /** The library's movies that belong to a saga, oldest first. */
+  collectionCards(tmdbIds: number[], ctx: Ctx): TitleCard[] {
+    const wanted = new Set(tmdbIds);
+    const rows = this.allTitles().filter(
+      (r) => r.kind === 'movie' && r.tmdbId !== null && wanted.has(r.tmdbId),
+    );
+    return this.cards(rows, ctx).sort((a, b) => (a.year ?? 0) - (b.year ?? 0));
+  }
+
   similar(row: TitleRow, card: TitleCard, ctx: Ctx): TitleCard[] {
     const others = this.allTitles().filter((r) => r.id !== row.id);
     const cards = this.cards(others, ctx);

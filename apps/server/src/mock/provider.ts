@@ -115,6 +115,14 @@ export class MockProvider implements MetadataProvider {
       }));
   }
 
+  /** Demo: the first three movies form a collection, so that row can be seen without TMDB. */
+  async collectionOf(tmdbId: number): Promise<{ id: number; name: string; ids: number[] } | null> {
+    const ids = MOCK_CATALOG.filter((t) => t.kind === 'movie')
+      .slice(0, 3)
+      .map((t) => t.id);
+    return ids.includes(tmdbId) ? { id: 1, name: 'The Meridian Collection', ids } : null;
+  }
+
   async details(
     kind: TitleKind,
     id: number,

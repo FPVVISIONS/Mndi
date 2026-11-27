@@ -200,6 +200,26 @@ export class MetadataService {
     }
   }
 
+  private readonly collections = new Map<number, { name: string; ids: number[] } | null>();
+
+  /** The saga a movie belongs to and all its parts' TMDB ids; remembered for the session. */
+  async collectionFor(
+    tmdbId: number,
+    lang: LanguageCode,
+  ): Promise<{ name: string; ids: number[] } | null> {
+    if (this.collections.has(tmdbId)) return this.collections.get(tmdbId)!;
+    const provider = this.provider;
+    if (!provider?.collectionOf) return null;
+    try {
+      const col = await provider.collectionOf(tmdbId, languageInfo(lang).tmdb);
+      const value = col && col.ids.length > 1 ? { name: col.name, ids: col.ids } : null;
+      this.collections.set(tmdbId, value);
+      return value;
+    } catch {
+      return null;
+    }
+  }
+
   /** Titles already tried this run, so unmatched ones are not searched again on every scan. */
   private readonly tried = new Map<number, number>();
 

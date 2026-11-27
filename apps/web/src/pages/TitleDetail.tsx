@@ -190,6 +190,19 @@ function Body({ d }: { d: Detail }) {
           </m.section>
         )}
 
+        {d.collection && d.collection.items.length > 1 && (
+          <m.section variants={fadeUp} className="mt-12" aria-label={d.collection.name}>
+            <h2 className="mb-4 font-display text-title-m">{d.collection.name}</h2>
+            <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-3 [--card-w:100%]">
+              {d.collection.items.map((c) => (
+                <li key={c.id} className={c.id === d.id ? 'opacity-60' : undefined}>
+                  <TitleCardView card={c} />
+                </li>
+              ))}
+            </ul>
+          </m.section>
+        )}
+
         {d.similar.length > 0 && (
           <m.section variants={fadeUp} className="mt-12" aria-label={t('detail.moreLikeThis')}>
             <h2 className="mb-4 font-display text-title-m">{t('detail.moreLikeThis')}</h2>

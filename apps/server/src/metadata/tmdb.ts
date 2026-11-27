@@ -107,6 +107,23 @@ export class TmdbProvider implements MetadataProvider {
     });
   }
 
+  async collectionOf(
+    tmdbId: number,
+    lang: string,
+  ): Promise<{ id: number; name: string; ids: number[] } | null> {
+    const movie = await this.get<{ belongs_to_collection?: { id: number } | null }>(
+      `/movie/${tmdbId}`,
+      {},
+    );
+    const cid = movie.belongs_to_collection?.id;
+    if (!cid) return null;
+    const col = await this.get<{ id: number; name: string; parts?: { id: number }[] }>(
+      `/collection/${cid}`,
+      { language: lang },
+    );
+    return { id: col.id, name: col.name, ids: (col.parts ?? []).map((p) => p.id) };
+  }
+
   season(tvId: number, season: number, lang: string): Promise<RawSeason> {
     return this.get<RawSeason>(`/tv/${tvId}/season/${season}`, { language: lang });
   }

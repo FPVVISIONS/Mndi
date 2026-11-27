@@ -63,6 +63,8 @@ export interface TitleDetail extends TitleCard {
   trailer: { site: 'YouTube' | 'file'; key: string } | null;
   seasonList: SeasonSummary[];
   similar: TitleCard[];
+  /** Other movies of the same saga that are in the library (movies only). */
+  collection?: { name: string; items: TitleCard[] };
   /** For movies: the file to play. For series: the episode to continue with. */
   playFileId: number | null;
   playLabel: string | null;

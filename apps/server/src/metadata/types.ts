@@ -78,6 +78,11 @@ export interface MetadataProvider {
   ): Promise<SearchHit[]>;
   details(kind: TitleKind, id: number, tmdbLang: string, uiLang: string): Promise<RawDetails>;
   season(tvId: number, season: number, tmdbLang: string, uiLang: string): Promise<RawSeason>;
+  /** The collection a movie belongs to (for example a saga) and the TMDB ids of all its parts. */
+  collectionOf?(
+    tmdbId: number,
+    tmdbLang: string,
+  ): Promise<{ id: number; name: string; ids: number[] } | null>;
 }
 
 export interface ImagePick {
