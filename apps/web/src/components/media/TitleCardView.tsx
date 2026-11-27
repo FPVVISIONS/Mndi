@@ -59,7 +59,8 @@ export function TitleCardView({ card, className, eager }: Props) {
       className={`relative shrink-0 snap-start ${className ?? ''}`}
       style={{ width: 'var(--card-w)', zIndex: open ? 30 : 0 }}
       animate={{ scale: open ? 1.1 : 1 }}
-      transition={spring.soft}
+      whileTap={{ scale: 0.95 }}
+      transition={spring.liquid}
       onPointerEnter={() => canHover && show(160)}
       onPointerLeave={hide}
       onFocus={() => canHover && show(0)}
@@ -69,12 +70,12 @@ export function TitleCardView({ card, className, eager }: Props) {
         to={`/title/${card.id}`}
         state={{ background: location, art }}
         aria-label={card.title}
-        className="block overflow-hidden rounded-md outline-offset-4"
+        className="block overflow-hidden rounded-[0.875rem] outline-offset-4"
         draggable={false}
       >
         <m.div
           layoutId={`art-${art}`}
-          className="relative aspect-[2/3] overflow-hidden rounded-md bg-surface-2 shadow-[var(--shadow-card)]"
+          className="relative aspect-[2/3] overflow-hidden rounded-[0.875rem] bg-surface-2 shadow-[var(--shadow-card)]"
         >
           <ArtImage
             image={card.poster}
@@ -100,7 +101,7 @@ export function TitleCardView({ card, className, eager }: Props) {
             initial="hidden"
             animate="show"
             exit="exit"
-            className="absolute -inset-x-2 top-full -mt-1 rounded-b-md bg-surface-2 p-3 shadow-[var(--shadow-pop)]"
+            className="glass glass-strong absolute -inset-x-2 top-full mt-2 rounded-[1.125rem] p-3"
           >
             <m.div variants={item}>
               <QuickActions card={card} />

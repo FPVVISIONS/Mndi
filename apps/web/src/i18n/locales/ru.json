@@ -246,7 +246,9 @@
     "tmdbKeyPlaceholder": "Вставьте ключ",
     "tmdbSaved": "TMDB подключён",
     "tmdbInvalid": "TMDB отклонил этот ключ. Скопируйте его ещё раз.",
-    "tmdbConnected": "Подключено"
+    "tmdbConnected": "Подключено",
+    "reduceMotion": "Уменьшить движение",
+    "reduceMotionHint": "Отключает пружинные анимации, параллакс и эффекты стекла."
   },
   "profiles": {
     "who": "Кто смотрит?",

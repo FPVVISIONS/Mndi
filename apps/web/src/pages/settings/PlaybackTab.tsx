@@ -6,7 +6,7 @@ import { Row, Section } from './parts';
 
 export function PlaybackTab() {
   const { t } = useTranslation();
-  const { quality, autoplayNext, heroPreview, skipIntro, set } = usePrefs();
+  const { quality, autoplayNext, heroPreview, skipIntro, reduceMotion, set } = usePrefs();
   const options: { value: QualityPref; label: string }[] = [
     { value: 'best', label: t('settings.qualityBest') },
     { value: '1080p', label: '1080p' },
@@ -42,6 +42,13 @@ export function PlaybackTab() {
           label={t('settings.heroPreview')}
           checked={heroPreview}
           onChange={(v) => set('heroPreview', v)}
+        />
+      </Row>
+      <Row title={t('settings.reduceMotion')} hint={t('settings.reduceMotionHint')}>
+        <Switch
+          label={t('settings.reduceMotion')}
+          checked={reduceMotion}
+          onChange={(v) => set('reduceMotion', v)}
         />
       </Row>
     </Section>

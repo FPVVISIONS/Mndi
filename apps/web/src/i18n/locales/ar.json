@@ -248,7 +248,9 @@
     "tmdbKeyPlaceholder": "الصق مفتاحك",
     "tmdbSaved": "تم ربط TMDB",
     "tmdbInvalid": "رفض TMDB هذا المفتاح. انسخه مجددًا.",
-    "tmdbConnected": "متصل"
+    "tmdbConnected": "متصل",
+    "reduceMotion": "تقليل الحركة",
+    "reduceMotionHint": "يوقف الحركات المرنة وتأثير المنظور وتأثيرات الزجاج."
   },
   "profiles": {
     "who": "من يشاهد؟",

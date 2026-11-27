@@ -156,7 +156,7 @@ function textBlock(
   return lines
     .map(
       (l, i) =>
-        `<text x="${x}" y="${y + i * size * 1.05}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-weight="400"${dir}>${esc(l)}</text>`,
+        `<text x="${x}" y="${y + i * size * 1.05}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-family="-apple-system, system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="800" letter-spacing="-0.03em"${dir}>${esc(l)}</text>`,
     )
     .join('');
 }

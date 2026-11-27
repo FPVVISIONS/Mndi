@@ -23,18 +23,20 @@ export const ease = {
 
 export const spring = {
   /** Small controls, pills, toggles. */
-  snappy: { type: 'spring', stiffness: 520, damping: 38, mass: 0.8 },
+  snappy: { type: 'spring', stiffness: 480, damping: 30, mass: 0.7 },
   /** Cards, panels. */
-  soft: { type: 'spring', stiffness: 300, damping: 30, mass: 0.9 },
+  soft: { type: 'spring', stiffness: 260, damping: 24, mass: 0.9 },
   /** Modals and shared-element morphs. */
-  modal: { type: 'spring', stiffness: 340, damping: 36, mass: 1 },
+  modal: { type: 'spring', stiffness: 300, damping: 28, mass: 1 },
+  /** Liquid glass: a little overshoot, so the drop wobbles into place. */
+  liquid: { type: 'spring', stiffness: 380, damping: 20, mass: 0.9 },
 } as const satisfies Record<string, Transition>;
 
 export const stagger = {
-  row: 0.045,
-  list: 0.03,
-  hero: 0.09,
-  actions: 0.035,
+  row: 0.05,
+  list: 0.045,
+  hero: 0.1,
+  actions: 0.04,
 } as const;
 
 export const t = {
@@ -46,8 +48,25 @@ export const t = {
 
 /** Shared entrance variants. Opacity and transform only. */
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: t.base },
+  hidden: { opacity: 0, y: 22 },
+  show: { opacity: 1, y: 0, transition: { ...spring.soft, opacity: t.base } },
+};
+
+/** Text that comes into focus as it rises: used for headlines over artwork. */
+export const blurUp: Variants = {
+  hidden: { opacity: 0, y: 26, filter: 'blur(12px)' },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { ...spring.soft, opacity: t.slow, filter: t.slow },
+  },
+};
+
+/** Cards and tiles pop in with a slight scale. */
+export const popIn: Variants = {
+  hidden: { opacity: 0, y: 18, scale: 0.94 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { ...spring.soft, opacity: t.base } },
 };
 
 export const fade: Variants = {
@@ -60,7 +79,10 @@ export const staggerChildren = (gap: number = stagger.list, delay = 0): Variants
   show: { transition: { staggerChildren: gap, delayChildren: delay } },
 });
 
-export const press = { scale: 0.96 } as const;
+export const press = { scale: 0.95 } as const;
+
+/** Liquid press: the glass squashes like a drop under the finger. */
+export const squish = { scaleX: 1.07, scaleY: 0.9 } as const;
 
 /** Mirror tokens into CSS so plain CSS transitions use the same curves. */
 export function applyMotionVars(root: HTMLElement = document.documentElement): void {

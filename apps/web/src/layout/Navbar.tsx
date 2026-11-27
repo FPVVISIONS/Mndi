@@ -1,11 +1,13 @@
 import { m } from 'framer-motion';
 import { Search, Settings, UserRoundCog, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { MenuItem, Popover } from '../components/ui/Popover';
 import { ProfileAvatar } from '../components/profiles/ProfileAvatar';
-import { spring } from '../design/motion';
+import { press, spring } from '../design/motion';
+import { useLiquidGlass } from '../lib/glass';
+import { useScrollState } from '../lib/hooks';
+import { LiquidLens } from './LiquidLens';
 import { cn } from '../lib/cn';
 import { useProfiles } from '../queries/hooks';
 import { useProfile } from '../stores/profile';
@@ -23,81 +25,85 @@ export function Navbar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [solid, setSolid] = useState(false);
+  const { down, top } = useScrollState();
   const { data } = useProfiles();
   const { profileId, choose } = useProfile();
   const profiles = data?.profiles ?? [];
   const current = profiles.find((p) => p.id === profileId) ?? profiles[0];
-
-  useEffect(() => {
-    const on = () => setSolid(window.scrollY > 24);
-    on();
-    window.addEventListener('scroll', on, { passive: true });
-    return () => window.removeEventListener('scroll', on);
-  }, []);
+  const capsule = useLiquidGlass<HTMLElement>();
+  const searchGlass = useLiquidGlass<HTMLAnchorElement>();
 
   return (
-    <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-[var(--z-nav)] h-[var(--nav-h)] transition-colors duration-300',
-        solid
-          ? 'bg-bg/92 shadow-[0_1px_0_var(--color-line)] backdrop-blur-md'
-          : 'bg-gradient-to-b from-bg/85 to-transparent',
-      )}
+    <m.header
+      className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-nav)] pt-[env(safe-area-inset-top)]"
+      initial={false}
+      animate={{ y: down ? '-110%' : '0%' }}
+      transition={spring.soft}
     >
-      <div className="page-x flex h-full items-center gap-8">
-        <Wordmark />
-        <nav aria-label={t('nav.menu')} className="hidden items-center gap-1 md:flex">
+      {/* A soft fade behind the bar instead of a hard edge, stronger once the page scrolls. */}
+      <div
+        className="absolute inset-x-0 top-0 h-[calc(var(--nav-h)+2.5rem)] bg-gradient-to-b from-bg/90 via-bg/45 to-transparent transition-opacity duration-500"
+        style={{ opacity: top ? 0.55 : 1 }}
+      />
+      <div className="page-x relative flex h-[var(--nav-h)] items-center gap-6">
+        <div className="pointer-events-auto">
+          <Wordmark />
+        </div>
+        <nav
+          ref={capsule}
+          aria-label={t('nav.menu')}
+          className="glass pointer-events-auto absolute start-1/2 hidden -translate-x-1/2 items-center gap-0.5 rounded-full p-1 md:flex rtl:translate-x-1/2"
+        >
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={'end' in item ? item.end : false}
-              className="relative px-3 py-2 text-body font-medium"
+              className="relative rounded-full px-4 py-1.5 text-body font-semibold"
             >
               {({ isActive }) => (
                 <>
+                  {isActive && <LiquidLens layoutId="nav-lens" pulse={item.to} />}
                   <span
                     className={cn(
-                      'transition-colors duration-150',
+                      'relative transition-colors duration-200',
                       isActive ? 'text-fg' : 'text-fg-dim hover:text-fg',
                     )}
                   >
                     {t(`nav.${item.key}`)}
                   </span>
-                  {isActive && (
-                    <m.span
-                      layoutId="nav-underline"
-                      transition={spring.snappy}
-                      className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent"
-                    />
-                  )}
                 </>
               )}
             </NavLink>
           ))}
         </nav>
-        <div className="ms-auto flex items-center gap-1.5">
-          <Link
-            to="/search"
-            state={{ from: location.pathname }}
-            aria-label={t('search.open')}
-            className="grid size-10 place-items-center rounded-full text-fg-dim transition-colors hover:bg-white/10 hover:text-fg"
-          >
-            <Search size={20} />
-          </Link>
+        <div className="pointer-events-auto ms-auto flex items-center gap-2">
+          <m.div whileTap={press} whileHover={{ scale: 1.06 }} transition={spring.liquid}>
+            <Link
+              ref={searchGlass}
+              to="/search"
+              state={{ from: location.pathname }}
+              aria-label={t('search.open')}
+              className="glass hidden size-10 place-items-center rounded-full text-fg md:grid"
+            >
+              <Search size={18} strokeWidth={2.2} />
+            </Link>
+          </m.div>
           {current && (
             <Popover
               trigger={({ open, toggle }) => (
-                <button
+                <m.button
                   type="button"
                   onClick={toggle}
                   aria-label={t('nav.profiles')}
                   aria-expanded={open}
-                  className="ms-1 flex items-center rounded-md outline-offset-4"
+                  whileTap={press}
+                  whileHover={{ scale: 1.06 }}
+                  transition={spring.liquid}
+                  className="ms-1 flex items-center rounded-full outline-offset-4"
                 >
-                  <ProfileAvatar profile={current} className="size-8" />
-                </button>
+                  <ProfileAvatar profile={current} className="size-9 rounded-full" />
+                </m.button>
               )}
               panelClassName="w-60"
             >
@@ -157,6 +163,6 @@ export function Navbar() {
           )}
         </div>
       </div>
-    </header>
+    </m.header>
   );
 }

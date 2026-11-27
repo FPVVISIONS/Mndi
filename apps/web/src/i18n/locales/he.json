@@ -245,7 +245,9 @@
     "tmdbKeyPlaceholder": "הדביקו את המפתח",
     "tmdbSaved": "TMDB מחובר",
     "tmdbInvalid": "TMDB דחה את המפתח. העתיקו אותו שוב.",
-    "tmdbConnected": "מחובר"
+    "tmdbConnected": "מחובר",
+    "reduceMotion": "הפחתת תנועה",
+    "reduceMotionHint": "מכבה אנימציות קפיציות, פרלקסה ואפקטי זכוכית."
   },
   "profiles": {
     "who": "מי צופה?",

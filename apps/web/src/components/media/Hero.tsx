@@ -4,7 +4,7 @@ import { Info, Play, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { duration, fadeUp, staggerChildren, stagger } from '../../design/motion';
+import { blurUp, duration, staggerChildren, stagger } from '../../design/motion';
 import { cn } from '../../lib/cn';
 import { useTitle } from '../../queries/hooks';
 import { usePrefs } from '../../stores/prefs';
@@ -63,7 +63,7 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
   const trailerKey = trailer?.key;
   useEffect(() => {
     setShowVideo(false);
-    if (!preview || !trailerKey || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!preview || !trailerKey || usePrefs.getState().reduceMotion) return;
     const id = window.setTimeout(() => setShowVideo(true), PREVIEW_DELAY);
     return () => window.clearTimeout(id);
   }, [card?.id, trailerKey, preview]);
@@ -88,7 +88,9 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
             key={id}
             className={cn('absolute inset-0 -z-10', current && layers.length > 1 && 'hero-fade-in')}
           >
-            <ArtImage image={slide.backdrop} size="w1280" eager className="size-full" />
+            <div className="kenburns size-full">
+              <ArtImage image={slide.backdrop} size="w1280" eager className="size-full" />
+            </div>
             {current && showVideo && trailer?.site === 'file' && (
               <m.video
                 ref={video}
@@ -132,22 +134,22 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
             exit={{ opacity: 0, transition: { duration: duration.fast } }}
             className="max-w-xl"
           >
-            <m.div variants={fadeUp} className="eyebrow mb-4 text-fg-dim">
+            <m.div variants={blurUp} className="eyebrow mb-4 text-fg-dim">
               {card.kind === 'movie' ? t('nav.movies') : t('nav.series')}
             </m.div>
-            <m.div variants={fadeUp}>
+            <m.div variants={blurUp}>
               <TitleLogo logo={card.logo} title={card.title} height="clamp(5rem, 14vw, 9rem)" />
             </m.div>
-            <m.div variants={fadeUp} className="mt-5">
+            <m.div variants={blurUp} className="mt-5">
               <MetaLine card={card} />
             </m.div>
             <m.p
-              variants={fadeUp}
+              variants={blurUp}
               className="mt-3 line-clamp-3 max-w-[34rem] text-lead text-fg/90 text-pretty"
             >
               <Crossfade k={card.overview}>{card.overview}</Crossfade>
             </m.p>
-            <m.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
+            <m.div variants={blurUp} className="mt-7 flex flex-wrap items-center gap-3">
               <Button
                 variant="primary"
                 size="lg"

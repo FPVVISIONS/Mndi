@@ -2,7 +2,7 @@ import { m } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { t as tokens } from '../design/motion';
+import { spring, t as tokens } from '../design/motion';
 import { BottomTabs } from './BottomTabs';
 import { Navbar } from './Navbar';
 import { StatusBanner } from './StatusBanner';
@@ -17,9 +17,9 @@ export function PageTransition({ children }: { children: ReactNode }) {
   return (
     <m.div
       key={pathname}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={tokens.base}
+      initial={{ opacity: 0, y: 18, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ ...spring.soft, opacity: tokens.base }}
     >
       {children}
     </m.div>

@@ -1,6 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LazyMotion, MotionConfig } from 'framer-motion';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import type { HomePayload } from '@marquee/shared';
@@ -9,11 +9,23 @@ import { applyMotionVars } from './design/motion';
 import { initI18n } from './i18n';
 import { queryClient } from './queries/client';
 import { api } from './lib/api';
+import { startGlassLight } from './lib/glass';
 import { usePrefs } from './stores/prefs';
 import { useProfile } from './stores/profile';
 import './styles/index.css';
 
 applyMotionVars();
+document.documentElement.dataset.reduceMotion = String(usePrefs.getState().reduceMotion);
+startGlassLight();
+
+/** Full motion unless the person turns on Reduce motion in Settings. */
+function Motion({ children }: { children: ReactNode }) {
+  const reduce = usePrefs((s) => s.reduceMotion);
+  useEffect(() => {
+    document.documentElement.dataset.reduceMotion = String(reduce);
+  }, [reduce]);
+  return <MotionConfig reducedMotion={reduce ? 'always' : 'never'}>{children}</MotionConfig>;
+}
 
 declare global {
   interface Window {
@@ -57,11 +69,11 @@ void initI18n(usePrefs.getState().language).then(() => {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <LazyMotion features={loadFeatures} strict>
-          <MotionConfig reducedMotion="user">
+          <Motion>
             <BrowserRouter>
               <App />
             </BrowserRouter>
-          </MotionConfig>
+          </Motion>
         </LazyMotion>
       </QueryClientProvider>
     </StrictMode>,

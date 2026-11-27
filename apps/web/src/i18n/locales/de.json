@@ -244,7 +244,9 @@
     "tmdbKeyPlaceholder": "Schlüssel einfügen",
     "tmdbSaved": "TMDB verbunden",
     "tmdbInvalid": "TMDB hat diesen Schlüssel abgelehnt. Kopiere ihn erneut.",
-    "tmdbConnected": "Verbunden"
+    "tmdbConnected": "Verbunden",
+    "reduceMotion": "Bewegung reduzieren",
+    "reduceMotionHint": "Schaltet federnde Animationen, Parallaxe und Glaseffekte aus."
   },
   "profiles": {
     "who": "Wer schaut?",

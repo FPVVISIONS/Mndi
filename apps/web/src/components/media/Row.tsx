@@ -2,7 +2,7 @@ import { m } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Children, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { fadeUp, staggerChildren, stagger } from '../../design/motion';
+import { popIn, staggerChildren, stagger } from '../../design/motion';
 import { Crossfade } from '../ui/Crossfade';
 
 interface Props {
@@ -123,7 +123,7 @@ export function Row({ title, children, action }: Props) {
           className="no-scrollbar -mb-24 flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-[var(--gutter)] px-[var(--gutter)] pt-5 pb-28 sm:gap-3"
         >
           {items.slice(0, count).map((child, i) => (
-            <m.div key={i} variants={fadeUp} className="shrink-0">
+            <m.div key={i} variants={popIn} className="shrink-0">
               {child}
             </m.div>
           ))}

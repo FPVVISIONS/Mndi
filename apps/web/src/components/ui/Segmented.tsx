@@ -1,6 +1,7 @@
 import { m } from 'framer-motion';
 import { useId } from 'react';
 import { spring } from '../../design/motion';
+import { LiquidLens } from '../../layout/LiquidLens';
 import { cn } from '../../lib/cn';
 
 interface Option<T extends string> {
@@ -31,7 +32,7 @@ export function Segmented<T extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className={cn('inline-flex rounded-full bg-surface-2 p-1', className)}
+      className={cn('glass glass-clear inline-flex rounded-full p-1', className)}
     >
       {options.map((o) => {
         const on = o.value === value;
@@ -45,17 +46,11 @@ export function Segmented<T extends string>({
             className={cn(
               'relative rounded-full font-semibold whitespace-nowrap transition-colors duration-150',
               size === 'sm' ? 'px-3 py-1.5 text-small' : 'px-4 py-2 text-body',
-              on ? 'text-on-accent' : 'text-fg-dim hover:text-fg',
+              on ? 'text-fg' : 'text-fg-dim hover:text-fg',
             )}
           >
-            {on && (
-              <m.span
-                layoutId={`seg-${id}`}
-                transition={spring.snappy}
-                className="absolute inset-0 rounded-full bg-fg"
-              />
-            )}
-            <span className={cn('relative', on && 'text-bg')}>{o.label}</span>
+            {on && <LiquidLens layoutId={`seg-${id}`} pulse={o.value} />}
+            <span className="relative">{o.label}</span>
           </button>
         );
       })}
@@ -91,14 +86,14 @@ export function PillTabs<T extends string>({
               'relative shrink-0 rounded-full border px-4 py-1.5 text-small font-semibold transition-colors duration-150',
               on
                 ? 'border-transparent text-bg'
-                : 'border-line text-fg-dim hover:border-line-strong hover:text-fg',
+                : 'border-white/10 bg-white/[0.04] text-fg-dim hover:border-white/20 hover:text-fg',
             )}
           >
             {on && (
               <m.span
                 layoutId={`pill-${id}`}
-                transition={spring.snappy}
-                className="absolute inset-0 rounded-full bg-fg"
+                transition={spring.liquid}
+                className="absolute inset-0 rounded-full bg-fg shadow-[0_6px_20px_-8px_rgb(255_255_255/0.5)]"
               />
             )}
             <span className="relative">{o.label}</span>

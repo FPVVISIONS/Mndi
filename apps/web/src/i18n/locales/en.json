@@ -244,7 +244,9 @@
     "tmdbKeyPlaceholder": "Paste your key",
     "tmdbSaved": "TMDB connected",
     "tmdbInvalid": "TMDB rejected that key. Copy it again.",
-    "tmdbConnected": "Connected"
+    "tmdbConnected": "Connected",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionHint": "Turns off springy animations, parallax and glass effects."
   },
   "profiles": {
     "who": "Who's watching?",

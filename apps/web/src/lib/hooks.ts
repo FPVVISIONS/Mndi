@@ -67,3 +67,34 @@ export function languageName(code: string, uiLang: string): string {
     return code.toUpperCase();
   }
 }
+
+/**
+ * Scroll state for bars that tuck away: `down` turns true after scrolling down a little and false
+ * as soon as the person scrolls back up; `top` is true near the top of the page.
+ */
+export function useScrollState(threshold = 8): { down: boolean; top: boolean } {
+  const [state, setState] = useState({ down: false, top: true });
+  useEffect(() => {
+    let last = window.scrollY;
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const top = y < 24;
+      const delta = y - last;
+      if (Math.abs(delta) < threshold && !top) return;
+      last = y;
+      const down = !top && delta > 0;
+      setState((s) => (s.down === down && s.top === top ? s : { down, top }));
+    };
+    const on = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+    window.addEventListener('scroll', on, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', on);
+      cancelAnimationFrame(frame);
+    };
+  }, [threshold]);
+  return state;
+}

@@ -1,6 +1,6 @@
 import { AnimatePresence, m } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { duration, ease } from '../../design/motion';
+import { duration, spring } from '../../design/motion';
 import { cn } from '../../lib/cn';
 
 interface Props {
@@ -48,15 +48,25 @@ export function Popover({
       <AnimatePresence>
         {open && (
           <m.div
-            initial={{ opacity: 0, scale: 0.96, y: side === 'bottom' ? -6 : 6 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, transition: { duration: duration.fast } }}
-            transition={{ duration: duration.base, ease: ease.out }}
+            initial={{
+              opacity: 0,
+              scale: 0.55,
+              y: side === 'bottom' ? -10 : 10,
+              filter: 'blur(8px)',
+            }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{
+              opacity: 0,
+              scale: 0.7,
+              filter: 'blur(6px)',
+              transition: { duration: duration.fast },
+            }}
+            transition={{ ...spring.liquid, opacity: { duration: duration.fast } }}
             style={{
               transformOrigin: `${side === 'bottom' ? 'top' : 'bottom'} ${align === 'end' ? 'right' : 'left'}`,
             }}
             className={cn(
-              'absolute z-50 min-w-48 rounded-lg border border-line bg-surface-2 p-1.5 shadow-[var(--shadow-pop)]',
+              'glass glass-strong absolute z-50 min-w-48 rounded-[1.375rem] p-1.5',
               side === 'bottom' ? 'top-[calc(100%+0.5rem)]' : 'bottom-[calc(100%+0.5rem)]',
               align === 'end' ? 'end-0' : 'start-0',
               panelClassName,
@@ -83,7 +93,7 @@ export function MenuItem({ children, onClick, active, icon }: ItemProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        'flex w-full items-center gap-3 rounded-md px-3 py-2 text-start text-body transition-colors hover:bg-white/8',
+        'flex w-full items-center gap-3 rounded-[0.875rem] px-3 py-2.5 text-start text-body transition-colors hover:bg-white/10 active:scale-[0.98] active:bg-white/14',
         active ? 'text-fg' : 'text-fg-dim hover:text-fg',
       )}
     >

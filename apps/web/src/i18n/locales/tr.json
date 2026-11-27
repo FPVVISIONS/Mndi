@@ -244,7 +244,9 @@
     "tmdbKeyPlaceholder": "Anahtarını yapıştır",
     "tmdbSaved": "TMDB bağlandı",
     "tmdbInvalid": "TMDB bu anahtarı reddetti. Yeniden kopyala.",
-    "tmdbConnected": "Bağlı"
+    "tmdbConnected": "Bağlı",
+    "reduceMotion": "Hareketi azalt",
+    "reduceMotionHint": "Yaylı animasyonları, paralaksı ve cam efektlerini kapatır."
   },
   "profiles": {
     "who": "Kim izliyor?",

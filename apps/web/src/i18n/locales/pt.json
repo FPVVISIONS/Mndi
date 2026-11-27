@@ -244,7 +244,9 @@
     "tmdbKeyPlaceholder": "Cole sua chave",
     "tmdbSaved": "TMDB conectado",
     "tmdbInvalid": "O TMDB recusou essa chave. Copie-a de novo.",
-    "tmdbConnected": "Conectado"
+    "tmdbConnected": "Conectado",
+    "reduceMotion": "Reduzir movimento",
+    "reduceMotionHint": "Desativa animações elásticas, paralaxe e efeitos de vidro."
   },
   "profiles": {
     "who": "Quem está assistindo?",

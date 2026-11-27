@@ -16,6 +16,8 @@ export interface Prefs {
   autoplayNext: boolean;
   heroPreview: boolean;
   skipIntro: boolean;
+  /** Calmer interface: no springs, parallax or glass refraction. Off by default. */
+  reduceMotion: boolean;
   recentSearches: string[];
   set: <K extends keyof Omit<Prefs, 'set' | 'addSearch' | 'clearSearches'>>(
     key: K,
@@ -35,6 +37,7 @@ export const usePrefs = create<Prefs>()(
       autoplayNext: true,
       heroPreview: true,
       skipIntro: false,
+      reduceMotion: false,
       recentSearches: [],
       set: (key, value) => set({ [key]: value } as Partial<Prefs>),
       addSearch: (q) => {
@@ -59,6 +62,7 @@ export const usePrefs = create<Prefs>()(
         autoplayNext: s.autoplayNext,
         heroPreview: s.heroPreview,
         skipIntro: s.skipIntro,
+        reduceMotion: s.reduceMotion,
         recentSearches: s.recentSearches,
       }),
     },

@@ -16,11 +16,11 @@ export function Toaster() {
           <m.div
             key={t.id}
             layout
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={spring.soft}
-            className="pointer-events-auto flex items-center gap-2.5 rounded-full border border-line-strong bg-surface-3 py-2.5 ps-3.5 pe-5 text-small font-medium shadow-[var(--shadow-pop)]"
+            initial={{ opacity: 0, y: 30, scale: 0.6, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: 10, scale: 0.8, filter: 'blur(6px)' }}
+            transition={spring.liquid}
+            className="glass glass-strong pointer-events-auto flex items-center gap-2.5 rounded-full py-2.5 ps-3.5 pe-5 text-small font-semibold"
           >
             {t.tone === 'error' ? (
               <CircleAlert size={16} className="text-accent" />

@@ -1,22 +1,15 @@
 import { Link } from 'react-router-dom';
 
+/** The name set in the system font's heaviest weight, like an app title on iOS or macOS. */
 export function Wordmark({ className = '' }: { className?: string }) {
   return (
-    <Link
-      to="/"
-      className={`group inline-flex items-baseline gap-0.5 ${className}`}
-      aria-label="Marquee"
-    >
+    <Link to="/" className={`inline-flex items-center ${className}`} aria-label="Marquee">
       <span
-        className="font-display text-[1.65rem] leading-none tracking-tight [html[lang=he]_&]:font-semibold"
-        style={{ fontFamily: 'Instrument Serif, Georgia, serif', fontWeight: 400 }}
+        className="text-[1.375rem] leading-none font-extrabold text-fg"
+        style={{ letterSpacing: '-0.035em' }}
       >
         Marquee
       </span>
-      <span
-        className="size-1.5 translate-y-[-1px] rounded-full bg-accent transition-transform duration-300 group-hover:scale-150"
-        aria-hidden
-      />
     </Link>
   );
 }
