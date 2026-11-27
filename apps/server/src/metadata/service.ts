@@ -149,30 +149,62 @@ export class MetadataService {
     }
   }
 
-  async search(kind: TitleKind, query: string, year: number | null = null): Promise<SearchHit[]> {
+  async search(
+    kind: TitleKind,
+    query: string,
+    year: number | null = null,
+    lang = 'en-US',
+  ): Promise<SearchHit[]> {
     if (!this.provider) return [];
     try {
-      return await this.provider.search(kind, query, year, 'en-US');
+      return await this.provider.search(kind, query, year, lang);
     } catch {
       return [];
     }
+  }
+
+  /** Titles already tried this run, so unmatched ones are not searched again on every scan. */
+  private readonly tried = new Map<number, number>();
+
+  /** The search language that suits a title's script, so Hebrew or Russian names are found by their own text. */
+  private searchLanguages(name: string): string[] {
+    if (/[\u0590-\u05FF]/.test(name)) return ['he-IL', 'en-US'];
+    if (/[\u0600-\u06FF]/.test(name)) return ['ar-SA', 'en-US'];
+    if (/[\u0400-\u04FF]/.test(name)) return ['ru-RU', 'en-US'];
+    return ['en-US'];
   }
 
   /** Auto-match a title row to TMDB. Returns the id of the surviving title row. */
   async matchTitle(titleId: number): Promise<number> {
     const row = this.db.select().from(titles).where(eq(titles.id, titleId)).get();
     if (!row || row.locked || row.tmdbId || !this.provider) return titleId;
-    let hits = await this.search(row.kind, row.name, row.year || null);
-    if (!hits.length && row.year) hits = await this.search(row.kind, row.name);
-    const scored = hits
-      .map((h) => ({
-        h,
-        s: scoreCandidate({ title: row.name, year: row.year || null }, h, titleKey),
-      }))
-      .sort((a, b) => b.s - a.s);
-    const best = scored[0];
-    if (!best || best.s < MATCH_THRESHOLD) return titleId;
-    return this.setMatch(titleId, best.h.id, false);
+    const last = this.tried.get(titleId);
+    if (last && Date.now() - last < 6 * 3600_000) return titleId;
+    this.tried.set(titleId, Date.now());
+
+    // Try the name as parsed, then without its last one or two words (file names often carry extras
+    // such as "End Game" or a part number), asking TMDB in the language the name is written in.
+    const words = row.name.split(/\s+/).filter(Boolean);
+    const queries = [row.name];
+    if (words.length > 2) queries.push(words.slice(0, -1).join(' '));
+    if (words.length > 3) queries.push(words.slice(0, -2).join(' '));
+    for (const [i, q] of queries.entries()) {
+      for (const lang of this.searchLanguages(row.name)) {
+        for (const year of row.year ? [row.year, null] : [null]) {
+          const hits = await this.search(row.kind, q, year, lang);
+          const best = hits
+            .map((h) => ({
+              h,
+              s: scoreCandidate({ title: q, year: row.year || null }, h, titleKey),
+            }))
+            .sort((a, b) => b.s - a.s)[0];
+          // A shortened query must match more closely before it is trusted.
+          if (best && best.s >= (i === 0 ? MATCH_THRESHOLD : 0.9))
+            return this.setMatch(titleId, best.h.id, false);
+        }
+      }
+    }
+    return titleId;
   }
 
   /** Link a title to a TMDB id, merging it into an existing row for that id if there is one. */
