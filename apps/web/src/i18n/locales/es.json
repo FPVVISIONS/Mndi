@@ -366,6 +366,8 @@
     "codeViaCall": "Telegram te llamará con el código.",
     "codeViaEmail": "Telegram envió el código a tu correo de inicio de sesión.",
     "noCode": "¿No te llegó el código?",
-    "resendSms": "Enviar por SMS"
+    "resendSms": "Enviar por SMS",
+    "discovering": "Revisando tus grupos y canales. Películas, series y canales en vivo se ordenan solos.",
+    "changeKeys": "Usar mis propias claves API"
   }
 }

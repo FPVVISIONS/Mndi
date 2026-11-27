@@ -24,7 +24,7 @@ export function useStatus() {
     refetchInterval: (q) => {
       const s = q.state.data;
       if (!s) return 3000;
-      if (s.index.scanning || s.telegram.state !== 'ready') return 2500;
+      if (s.index.scanning || s.index.discovering || s.telegram.state !== 'ready') return 2500;
       return 12_000;
     },
   });
@@ -36,7 +36,7 @@ export function useProfiles() {
 
 /** Localized data that may still be arriving: poll briefly until the server reports it is complete. */
 function pendingPoll<T extends { pending?: boolean }>() {
-  return (q: { state: { data: T | undefined } }) => (q.state.data?.pending ? 1500 : false);
+  return (q: { state: { data: T | undefined } }) => (q.state.data?.pending ? 5000 : false);
 }
 
 export function useHome() {

@@ -126,7 +126,8 @@ async function createWasmDb(file: string): Promise<Db> {
     saved = changes();
   };
   flush();
-  setInterval(flush, 1500).unref();
+  // Exporting the whole database is costly, so write at most every few seconds, and only after changes.
+  setInterval(flush, 5000).unref();
   for (const sig of ['SIGINT', 'SIGTERM', 'beforeExit'] as const) process.once(sig, flush);
 
   const db = drizzle(sqlite, { schema }) as unknown as Db;

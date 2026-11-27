@@ -50,7 +50,11 @@ export function IndexStep() {
         {t('onboarding.indexTitle')}
       </m.h2>
       <m.p variants={fadeUp} className="text-fg-dim">
-        {idx && idx.items === 0 ? t('onboarding.waiting') : t('onboarding.indexBody')}
+        {idx?.discovering
+          ? t('onboarding.discovering')
+          : idx && idx.items === 0
+            ? t('onboarding.waiting')
+            : t('onboarding.indexBody')}
       </m.p>
       <div className="grid grid-cols-3 gap-3">
         <Counter value={idx?.items ?? 0} label={t('onboarding.files')} />

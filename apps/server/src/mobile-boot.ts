@@ -36,16 +36,24 @@ step(
 
 if (ensureFetch()) step('using built-in HTTPS client (no WebAssembly)');
 
-// Keys built into this APK (see scripts/bundle-mobile.mjs): sign-in then needs only a phone number.
-const builtInKeys = join(dirname(process.argv[1] ?? '.'), 'telegram.json');
+// Keys built into this APK (see scripts/bundle-mobile.mjs): Telegram API keys so sign-in needs only
+// a phone number, and a TMDB key so posters and descriptions work from the first launch.
+const builtInKeys = join(dirname(process.argv[1] ?? '.'), 'keys.json');
 if (existsSync(builtInKeys)) {
   try {
-    const k = JSON.parse(readFileSync(builtInKeys, 'utf8')) as { apiId: number; apiHash: string };
-    process.env.TELEGRAM_API_ID = String(k.apiId);
-    process.env.TELEGRAM_API_HASH = k.apiHash;
-    step('built-in Telegram keys present');
+    const k = JSON.parse(readFileSync(builtInKeys, 'utf8')) as {
+      apiId?: number;
+      apiHash?: string;
+      tmdbKey?: string;
+    };
+    if (k.apiId && k.apiHash) {
+      process.env.TELEGRAM_API_ID = String(k.apiId);
+      process.env.TELEGRAM_API_HASH = k.apiHash;
+    }
+    if (k.tmdbKey) process.env.TMDB_API_KEY = k.tmdbKey;
+    step(`built-in keys: telegram ${k.apiId ? 'yes' : 'no'}, tmdb ${k.tmdbKey ? 'yes' : 'no'}`);
   } catch {
-    step('built-in Telegram keys unreadable; ignoring');
+    step('built-in keys unreadable; ignoring');
   }
 }
 

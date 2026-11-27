@@ -46,6 +46,9 @@ export class MockBackend implements TelegramBackend {
   authState(): AuthState {
     return this.auth;
   }
+  async resetCredentials(): Promise<AuthState> {
+    return (this.auth = { step: 'credentials' });
+  }
   async saveCredentials(): Promise<AuthState> {
     return (this.auth = { step: 'phone' });
   }
@@ -105,6 +108,9 @@ export class MockBackend implements TelegramBackend {
     this.state = 'logged-out';
     this.auth = { step: 'phone' };
     this.emit();
+  }
+  async probeChat(): Promise<'live' | 'media' | 'empty'> {
+    return 'media';
   }
   async listChats(): Promise<ChatSummary[]> {
     const kinds = new Map(

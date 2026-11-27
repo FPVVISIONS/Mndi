@@ -254,6 +254,20 @@ public class MainActivity extends Activity {
 
     /** Called from the page as window.MarqueeNative. */
     private final class Bridge {
+        /** Plays a library file in the built-in native player. Progress is saved to the local server. */
+        @JavascriptInterface
+        public void playNative(String url, String title, double startSeconds, int fileId, int profileId) {
+            runOnUiThread(() -> {
+                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+                intent.putExtra("url", url);
+                intent.putExtra("title", title);
+                intent.putExtra("startMs", (long) (startSeconds * 1000));
+                intent.putExtra("fileId", fileId);
+                intent.putExtra("profileId", profileId);
+                startActivity(intent);
+            });
+        }
+
         @JavascriptInterface
         public void openExternal(String url, String title) {
             runOnUiThread(() -> {

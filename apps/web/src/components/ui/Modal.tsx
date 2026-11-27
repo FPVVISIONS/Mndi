@@ -1,4 +1,4 @@
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence, m, useDragControls } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -23,6 +23,7 @@ export function Modal({ open, onClose, title, children, className }: Props) {
   const { t } = useTranslation();
   const panel = useRef<HTMLDivElement>(null);
   const phone = useMedia('(max-width: 47.99rem)');
+  const controls = useDragControls();
 
   useEffect(() => {
     if (!open) return;
@@ -73,8 +74,11 @@ export function Modal({ open, onClose, title, children, className }: Props) {
             animate={phone ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
             exit={phone ? { y: '100%' } : { opacity: 0, scale: 0.9, y: 12 }}
             transition={spring.modal}
-            // On phones the sheet follows the finger and closes when pulled down far or fast.
+            // On phones the sheet follows the finger when pulled by its handle, and closes when pulled
+            // down far or fast. Dragging from the content is left to scrolling.
             drag={phone ? 'y' : false}
+            dragListener={false}
+            dragControls={controls}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0.05, bottom: 0.8 }}
             dragSnapToOrigin
@@ -87,7 +91,13 @@ export function Modal({ open, onClose, title, children, className }: Props) {
             )}
           >
             {phone && (
-              <div className="mx-auto -mt-1 mb-4 h-1.5 w-10 rounded-full bg-white/25" aria-hidden />
+              <div
+                className="sticky -top-5 z-10 -mx-5 -mt-5 mb-1 flex h-9 touch-none items-center justify-center"
+                onPointerDown={(e) => controls.start(e)}
+                aria-hidden
+              >
+                <div className="h-1.5 w-10 rounded-full bg-white/30" />
+              </div>
             )}
             {title && (
               <div className="mb-5 flex items-center justify-between gap-4">

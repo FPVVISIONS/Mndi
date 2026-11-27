@@ -69,7 +69,10 @@ export function Player({
   // Inside the Android app, files the WebView cannot decode can go to VLC or another player.
   const external = Boolean(native()) && info.fileId !== null;
   const converted = info.mode === 'remux' || info.mode === 'transcode';
-  const duration = info.duration;
+  // Some files carry no duration in Telegram's data; then the video element's own length is used,
+  // which is what makes the seek bar work for them.
+  const [mediaDuration, setMediaDuration] = useState(0);
+  const duration = info.duration || mediaDuration;
 
   const root = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -135,6 +138,13 @@ export function Player({
         },
       ],
       ['canplay', () => setWaiting(false)],
+      [
+        'durationchange',
+        () => {
+          if (Number.isFinite(v.duration) && v.duration > 0)
+            setMediaDuration(offsetRef.current + v.duration);
+        },
+      ],
       ['timeupdate', () => setTime(abs())],
       [
         'progress',
@@ -237,6 +247,15 @@ export function Player({
     return () => window.clearTimeout(idle.current);
   }, [wake]);
   const visible = active || paused || barHover || scrubbing || switcher || failed;
+
+  const coarse = useMemo(() => window.matchMedia('(pointer: coarse)').matches, []);
+  const pipOk = typeof document !== 'undefined' && Boolean(document.pictureInPictureEnabled);
+  const tapScreen = () => {
+    if (active && !paused) {
+      window.clearTimeout(idle.current);
+      setActive(false);
+    } else wake();
+  };
 
   const toggle = useCallback(() => {
     const v = video.current;
@@ -413,21 +432,28 @@ export function Player({
         'fixed inset-0 z-[var(--z-player)] overflow-hidden bg-black text-fg select-none',
         !visible && 'cursor-none',
       )}
-      onPointerMove={wake}
-      onPointerDown={wake}
+      style={{ touchAction: 'manipulation' }}
+      onPointerMove={(e) => e.pointerType === 'mouse' && wake()}
+      onPointerDown={(e) => e.pointerType === 'mouse' && wake()}
     >
       <video
         ref={video}
         playsInline
         loop={live && info.mode === 'live-direct'}
         className="size-full object-contain"
+        // Mouse: click pauses. Touch: a tap shows or hides the controls instead, so touching the
+        // screen never stops the video by accident; double-tap the sides to skip 10 seconds.
         onClick={() => {
           window.clearTimeout(clickTimer.current);
-          clickTimer.current = window.setTimeout(toggle, 220);
+          clickTimer.current = window.setTimeout(coarse ? tapScreen : toggle, 220);
         }}
-        onDoubleClick={() => {
+        onDoubleClick={(e) => {
           window.clearTimeout(clickTimer.current);
-          toggleFs();
+          if (!coarse) return toggleFs();
+          const x = e.clientX / window.innerWidth;
+          if (x < 0.35) skip(-10);
+          else if (x > 0.65) skip(10);
+          else toggleFs();
         }}
       />
 
@@ -448,6 +474,31 @@ export function Player({
       )}
 
       <Hud event={hud} />
+
+      {coarse && !live && !failed && !waiting && (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 z-[15] grid place-items-center transition-opacity duration-300',
+            visible ? 'opacity-100' : 'opacity-0',
+          )}
+        >
+          <button
+            type="button"
+            aria-label={paused ? t('player.play') : t('player.pause')}
+            onClick={toggle}
+            className={cn(
+              'glass glass-strong grid size-[4.5rem] place-items-center rounded-full',
+              visible && 'pointer-events-auto',
+            )}
+          >
+            {paused ? (
+              <Play size={32} className="translate-x-0.5 fill-fg" />
+            ) : (
+              <Pause size={32} className="fill-fg" />
+            )}
+          </button>
+        </div>
+      )}
 
       <AnimatePresence>
         {(waiting || converting) && !failed && (
@@ -595,6 +646,7 @@ export function Player({
         )}
         onPointerEnter={() => setBarHover(true)}
         onPointerLeave={() => setBarHover(false)}
+        onPointerDownCapture={wake}
       >
         {live ? (
           <div className="mb-2 flex items-center gap-2">
@@ -753,9 +805,11 @@ export function Player({
                 <ExternalLink size={22} />
               </IconButton>
             )}
-            <IconButton label={t('player.pip')} onClick={pip} className="hidden sm:grid">
-              <PictureInPicture2 size={22} />
-            </IconButton>
+            {pipOk && (
+              <IconButton label={t('player.pip')} onClick={pip} className="hidden sm:grid">
+                <PictureInPicture2 size={22} />
+              </IconButton>
+            )}
             <IconButton
               label={fullscreen ? t('player.exitFullscreen') : t('player.fullscreen')}
               onClick={toggleFs}

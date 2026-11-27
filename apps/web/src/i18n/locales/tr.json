@@ -366,6 +366,8 @@
     "codeViaCall": "Telegram sizi kodla arayacak.",
     "codeViaEmail": "Telegram kodu giriş e-postanıza gönderdi.",
     "noCode": "Kod gelmedi mi?",
-    "resendSms": "Bunun yerine SMS ile gönder"
+    "resendSms": "Bunun yerine SMS ile gönder",
+    "discovering": "Grup ve kanallarınıza bakılıyor. Filmler, diziler ve canlı kanallar otomatik ayrılır.",
+    "changeKeys": "Kendi API anahtarlarımı kullan"
   }
 }

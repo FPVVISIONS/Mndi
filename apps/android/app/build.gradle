@@ -14,8 +14,8 @@ android {
         applicationId 'app.marquee'
         minSdk 24
         targetSdk 34
-        versionCode 11
-        versionName '0.2.2'
+        versionCode 12
+        versionName '0.3.0'
         externalNativeBuild {
             cmake {
                 // libnode links against the shared C++ runtime, so it must ship with the app.
@@ -75,8 +75,22 @@ android {
         }
     }
 
+    lint {
+        // The media3 player APIs are marked unstable for lint only; they are stable in practice.
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+}
+
+dependencies {
+    // Native video player: plays MKV, seeks quickly and decodes the surround audio formats
+    // (AC3, E-AC3, DTS, TrueHD) that a web view cannot, using FFmpeg's software decoders.
+    implementation 'androidx.media3:media3-exoplayer:1.5.0'
+    implementation 'androidx.media3:media3-ui:1.5.0'
+    implementation 'org.jellyfin.media3:media3-ffmpeg-decoder:1.5.0+1'
 }

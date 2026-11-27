@@ -90,7 +90,19 @@ export class TelegramManager implements TelegramBackend {
   }
 
   authState(): AuthState {
-    return this.auth;
+    const builtIn = Boolean(this.cfg.apiId && this.cfg.apiHash);
+    return builtIn ? this.auth : { ...this.auth, canChangeKeys: true };
+  }
+
+  /** Forget the saved API keys, e.g. to enter keys created by hand at my.telegram.org. */
+  async resetCredentials(): Promise<AuthState> {
+    this.db.delete(settings).where(eq(settings.key, 'telegram_credentials')).run();
+    await this.client?.disconnect().catch(() => undefined);
+    this.client = null;
+    this.creds = this.loadCredentials();
+    this.auth = this.creds ? { step: 'phone' } : { step: 'credentials' };
+    this.set(this.creds ? 'logged-out' : 'unconfigured');
+    return this.authState();
   }
 
   private sessionFile(): string {
@@ -625,6 +637,50 @@ export class TelegramManager implements TelegramBackend {
         };
       })
       .sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  /**
+   * Looks at a chat's latest messages and, if needed, asks Telegram whether it holds any video or
+   * file at all. Used to add chats automatically.
+   */
+  async probeChat(chatId: string): Promise<'live' | 'media' | 'empty'> {
+    const client = this.client;
+    if (!client) return 'empty';
+    const entity = await this.entity(chatId);
+    const recent = await this.call(() => client.getMessages(entity, { limit: 60 }));
+    let videos = 0;
+    let playlists = 0;
+    let links = 0;
+    for (const m of recent) {
+      const doc = m.media instanceof Api.MessageMediaDocument ? m.media.document : null;
+      if (doc instanceof Api.Document) {
+        const name = doc.attributes.find((a) => a instanceof Api.DocumentAttributeFilename) as
+          Api.DocumentAttributeFilename | undefined;
+        if (/\.m3u8?$/i.test(name?.fileName ?? '') || /mpegurl/i.test(doc.mimeType)) playlists++;
+        else if (
+          doc.mimeType.startsWith('video/') ||
+          /\.(mkv|mp4|avi|mov|webm)$/i.test(name?.fileName ?? '')
+        )
+          videos++;
+      }
+      if (m.message && /https?:\/\/\S+\.(m3u8?|ts)\b|https?:\/\/\S*\/live\/\S+/i.test(m.message))
+        links++;
+    }
+    if (playlists + links >= 2 && videos < playlists + links) return 'live';
+    if (videos > 0 || playlists > 0) return videos > 0 ? 'media' : 'live';
+    // Nothing recent: ask Telegram whether the chat has any video at all.
+    for (const filter of [
+      new Api.InputMessagesFilterVideo(),
+      new Api.InputMessagesFilterDocument(),
+    ]) {
+      try {
+        const found = await this.call(() => client.getMessages(entity, { limit: 1, filter }));
+        if ((found.total ?? found.length) > 0) return 'media';
+      } catch {
+        // Chats that cannot be searched are skipped.
+      }
+    }
+    return 'empty';
   }
 
   async entity(chatId: string) {

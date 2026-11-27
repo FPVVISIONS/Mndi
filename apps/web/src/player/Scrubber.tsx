@@ -62,7 +62,7 @@ export function Scrubber({
       aria-valuemax={Math.floor(duration)}
       aria-valuenow={Math.floor(shown)}
       aria-valuetext={formatDuration(shown)}
-      className="group/scrub relative flex h-6 cursor-pointer touch-none items-center"
+      className="group/scrub relative flex h-10 cursor-pointer touch-none items-center"
       onPointerDown={(e) => {
         e.currentTarget.setPointerCapture(e.pointerId);
         setDrag(at(e.clientX));
@@ -79,6 +79,10 @@ export function Scrubber({
         onScrub(false);
       }}
       onPointerLeave={() => setHover(null)}
+      onPointerCancel={() => {
+        setDrag(null);
+        onScrub(false);
+      }}
     >
       <div className="relative h-1 w-full rounded-full bg-white/25 transition-[height] duration-150 group-hover/scrub:h-[7px]">
         {buffered.map(([a, b], i) => (
@@ -106,7 +110,7 @@ export function Scrubber({
         <span
           className={cn(
             'absolute top-1/2 size-3.5 -translate-y-1/2 rounded-full bg-accent shadow transition-transform duration-150',
-            drag !== null ? 'scale-125' : 'scale-0 group-hover/scrub:scale-100',
+            drag !== null ? 'scale-125' : 'scale-100 sm:scale-0 sm:group-hover/scrub:scale-100',
           )}
           style={{ insetInlineStart: `calc(${pct}% - 7px)` }}
         />

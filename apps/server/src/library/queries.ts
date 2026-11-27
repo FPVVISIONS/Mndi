@@ -232,19 +232,40 @@ export class Library {
   home(ctx: Ctx): HomePayload {
     const all = this.allTitles();
     const now = Math.floor(Date.now() / 1000);
-    const cards = this.cards(all, ctx);
-    const byId = new Map(cards.map((c) => [c.id, c]));
-    const rows: HomeRow[] = [];
 
-    const cont = this.continueWatching(ctx);
-    if (cont.length) rows.push({ id: 'continue', items: cont });
-
+    // Build cards only for titles a home row can show. Turning a whole library of thousands into
+    // cards on every request was what made the home screen slow on a phone.
+    const fresh = this.db.all<{ id: number }>(
+      sql`SELECT title_id AS id FROM episodes WHERE added_at > ${now - 14 * 86400} GROUP BY title_id ORDER BY MAX(added_at) DESC LIMIT 20`,
+    );
     const list = this.db
       .select()
       .from(myList)
       .where(eq(myList.profileId, ctx.profileId))
       .orderBy(desc(myList.addedAt))
       .all();
+    const wanted = new Set<number>([
+      ...[...all]
+        .sort((a, b) => b.addedAt - a.addedAt)
+        .slice(0, 150)
+        .map((r) => r.id),
+      ...[...all]
+        .sort((a, b) => b.popularity - a.popularity)
+        .slice(0, 80)
+        .map((r) => r.id),
+      ...fresh.map((f) => f.id),
+      ...list.map((l) => l.titleId),
+    ]);
+    const cards = this.cards(
+      all.filter((r) => wanted.has(r.id)),
+      ctx,
+    );
+    const byId = new Map(cards.map((c) => [c.id, c]));
+    const rows: HomeRow[] = [];
+
+    const cont = this.continueWatching(ctx);
+    if (cont.length) rows.push({ id: 'continue', items: cont });
+
     const listCards = list
       .map((l) => byId.get(l.titleId))
       .filter((c): c is TitleCard => Boolean(c));
@@ -260,9 +281,6 @@ export class Library {
     if (trending.some((c) => (popularity.get(c.id) ?? 0) > 0))
       rows.push({ id: 'trending', items: trending });
 
-    const fresh = this.db.all<{ id: number }>(
-      sql`SELECT title_id AS id FROM episodes WHERE added_at > ${now - 14 * 86400} GROUP BY title_id ORDER BY MAX(added_at) DESC LIMIT 20`,
-    );
     const freshCards = fresh.map((f) => byId.get(f.id)).filter((c): c is TitleCard => Boolean(c));
     if (freshCards.length) rows.push({ id: 'newEpisodes', items: freshCards });
 

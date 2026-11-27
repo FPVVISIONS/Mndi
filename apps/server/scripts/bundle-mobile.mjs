@@ -57,29 +57,40 @@ writeFileSync(
   JSON.stringify({ name: 'marquee-mobile', private: true }, null, 2),
 );
 
-// Optional: the app's own Telegram API keys, so people sign in with just a phone number (the way
-// published Telegram apps work). Read from the environment or a gitignored file at build time and
-// written only into the build output, never into the repository.
-const keysFile = resolve(root, 'apps/android/telegram-keys.properties');
-let apiId = process.env.MARQUEE_TG_API_ID ?? '';
-let apiHash = process.env.MARQUEE_TG_API_HASH ?? '';
-if ((!apiId || !apiHash) && existsSync(keysFile)) {
-  const props = Object.fromEntries(
-    readFileSync(keysFile, 'utf8')
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith('#') && l.includes('='))
-      .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]),
-  );
-  apiId ||= props.api_id ?? '';
-  apiHash ||= props.api_hash ?? '';
-}
+// Optional keys baked into the app so people never have to type them: the app's own Telegram API
+// keys (sign-in then needs only a phone number) and a TMDB key (posters and descriptions work from
+// the first launch). They come from the environment or a gitignored file and are written only into
+// the build output, never into the repository.
+const keysFile = resolve(root, 'apps/android/build-keys.properties');
+const props = existsSync(keysFile)
+  ? Object.fromEntries(
+      readFileSync(keysFile, 'utf8')
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#') && l.includes('='))
+        .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]),
+    )
+  : {};
+const apiId = process.env.MARQUEE_TG_API_ID || props.api_id || '';
+const apiHash = process.env.MARQUEE_TG_API_HASH || props.api_hash || '';
+const tmdbKey = process.env.MARQUEE_TMDB_KEY || props.tmdb_key || '';
+const keys = {};
 if (apiId || apiHash) {
   if (!/^\d{3,12}$/.test(apiId) || !/^[a-f0-9]{32}$/i.test(apiHash)) {
     console.error('Telegram keys look wrong: api_id is digits, api_hash is 32 hex characters.');
     process.exit(1);
   }
-  writeFileSync(resolve(out, 'telegram.json'), JSON.stringify({ apiId: Number(apiId), apiHash }));
+  keys.apiId = Number(apiId);
+  keys.apiHash = apiHash;
   console.log('Built-in Telegram keys included: sign-in needs only a phone number.');
 }
+if (tmdbKey) {
+  if (!/^([a-f0-9]{32}|[\w-]{40,})$/i.test(tmdbKey)) {
+    console.error('The TMDB key looks wrong: expected a 32-character v3 key or a v4 token.');
+    process.exit(1);
+  }
+  keys.tmdbKey = tmdbKey;
+  console.log('Built-in TMDB key included: nobody has to enter one.');
+}
+if (Object.keys(keys).length) writeFileSync(resolve(out, 'keys.json'), JSON.stringify(keys));
 console.log(`Mobile bundle written to ${out}`);

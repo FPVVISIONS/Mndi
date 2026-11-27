@@ -366,6 +366,8 @@
     "codeViaCall": "O Telegram vai ligar com o código.",
     "codeViaEmail": "O Telegram enviou o código para seu e-mail de login.",
     "noCode": "Não recebeu o código?",
-    "resendSms": "Enviar por SMS"
+    "resendSms": "Enviar por SMS",
+    "discovering": "Analisando seus grupos e canais. Filmes, séries e canais ao vivo são organizados automaticamente.",
+    "changeKeys": "Usar minhas próprias chaves de API"
   }
 }

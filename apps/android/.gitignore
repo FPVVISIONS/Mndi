@@ -8,4 +8,4 @@ app/libnode/
 app/src/main/assets/nodejs-project/
 *.keystore
 *.jks
-telegram-keys.properties
+build-keys.properties

@@ -195,7 +195,15 @@ export interface AppStatus {
     user?: { name: string };
   };
   onboarded: boolean;
-  index: { scanning: boolean; scanned: number; items: number; titles: number; channels: number };
+  index: {
+    scanning: boolean;
+    /** True while Marquee is looking through the account's chats to decide which hold media. */
+    discovering: boolean;
+    scanned: number;
+    items: number;
+    titles: number;
+    channels: number;
+  };
   languagesCached: LanguageCode[];
 }
 
@@ -228,6 +236,8 @@ export interface AuthState {
   codeVia?: 'app' | 'sms' | 'call' | 'email' | 'other';
   /** Telegram offers another way to deliver the code (usually SMS). */
   canResend?: boolean;
+  /** The API keys in use were saved in the app (not built in), so they can be replaced. */
+  canChangeKeys?: boolean;
   error?: AuthErrorCode;
   waitSeconds?: number;
   hint?: string;

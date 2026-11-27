@@ -22,6 +22,7 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
     onboarded: svc.getSetting('onboarded') === '1',
     index: svc.indexer?.status() ?? {
       scanning: false,
+      discovering: false,
       scanned: 0,
       items: count('files'),
       titles: count('titles'),
@@ -46,6 +47,7 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
 
   // ---- Telegram login --------------------------------------------------------------------
   app.get('/api/auth', async () => svc.tg.authState());
+  app.post('/api/auth/credentials/reset', async () => svc.tg.resetCredentials());
   app.post('/api/auth/credentials', async (req, reply) => {
     const body = z.object({ apiId: z.coerce.number(), apiHash: z.string() }).safeParse(req.body);
     if (!body.success) return badRequest(reply);
@@ -85,6 +87,12 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
     if (svc.tg.status().state !== 'ready')
       return reply.code(409).send({ error: 'not_ready', message: 'Not connected' });
     return { chats: await svc.tg.listChats() };
+  });
+
+  // Finds the chats that hold media and adds them, so nobody has to pick groups by hand.
+  app.post('/api/sources/discover', async () => {
+    void svc.indexer?.discover();
+    return { ok: true };
   });
 
   app.get('/api/sources', async () => ({ sources: svc.db.select().from(sources).all() }));

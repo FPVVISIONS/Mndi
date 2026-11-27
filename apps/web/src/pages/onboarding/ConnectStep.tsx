@@ -400,6 +400,20 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
                   {t('onboarding.useApp')}
                 </button>
               </m.div>
+              {auth.canChangeKeys && (
+                <m.div variants={fadeUp}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setManual(true);
+                      void api.resetKeys().then(put);
+                    }}
+                    className="text-small text-fg-faint underline underline-offset-4 hover:text-fg"
+                  >
+                    {t('onboarding.changeKeys')}
+                  </button>
+                </m.div>
+              )}
             </form>
           ) : (
             <div>

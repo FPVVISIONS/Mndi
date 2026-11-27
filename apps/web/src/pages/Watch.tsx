@@ -5,6 +5,8 @@ import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-
 import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 import { api } from '../lib/api';
+import { native, playInNativePlayer } from '../lib/native';
+import { useProfile } from '../stores/profile';
 import { Player } from '../player/Player';
 import { pickAudio } from '../player/tracks';
 import { useTitle } from '../queries/hooks';
@@ -76,8 +78,22 @@ export function WatchFile() {
     if (wanted !== audio) setAudio(wanted);
   }, [q.data, decided, audio, prefs.audio, prefs.language]);
 
+  // Inside the Android app, files play in the native player; the page just steps back.
+  const profileId = useProfile((s) => s.profileId);
+  const navigate = useNavigate();
+  const launched = useRef(false);
+  const inApp = Boolean(native()?.playNative);
+  useEffect(() => {
+    const info = q.data;
+    if (!inApp || launched.current || !info || info.fileId === null) return;
+    launched.current = true;
+    const title = info.subtitle ? `${info.title} · ${info.subtitle}` : info.title;
+    playInNativePlayer(info.fileId, title, resumeAt.current ?? info.resume, profileId ?? 0);
+    navigate(-1);
+  }, [q.data, inApp, navigate, profileId]);
+
   if (q.isError) return <Failure />;
-  if (!q.data || !decided || q.isFetching) return <Backdrop />;
+  if (!q.data || !decided || q.isFetching || inApp) return <Backdrop />;
   const info = q.data;
   const startAt = resumeAt.current ?? info.resume;
 
