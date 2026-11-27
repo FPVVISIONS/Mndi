@@ -133,6 +133,8 @@ export const api = {
     send<Profile>('PATCH', `/api/profiles/${id}`, p),
   deleteProfile: (id: number) => send<{ ok: boolean }>('DELETE', `/api/profiles/${id}`),
 
+  setTmdbKey: (key: string) => send<{ ok: boolean }>('PUT', '/api/settings/tmdb', { key }),
+
   cache: () => request<CacheInfo>('/api/cache', { lang: false }),
   setCacheLimit: (limitMb: number) => send<{ ok: boolean }>('PUT', '/api/cache', { limitMb }),
   clearCache: () => send<{ ok: boolean }>('DELETE', '/api/cache'),

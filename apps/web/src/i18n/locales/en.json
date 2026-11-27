@@ -179,7 +179,9 @@
     "goBack": "Back to details",
     "searchChannels": "Find a channel",
     "seek": "Seek",
-    "unknownTrack": "Track {{n}}"
+    "unknownTrack": "Track {{n}}",
+    "openExternal": "Open in another app",
+    "externalBody": "This phone can’t play this file format inside Marquee. Open it in VLC or another video player."
   },
   "settings": {
     "title": "Settings",
@@ -236,7 +238,13 @@
     "account": "Telegram account",
     "metadataLangs": "Languages cached",
     "profilesHint": "Add or edit profiles. Each one keeps its own list, history and favourite channels.",
-    "manageProfiles": "Manage profiles"
+    "manageProfiles": "Manage profiles",
+    "tmdbKey": "TMDB API key",
+    "tmdbKeyHint": "Adds posters, descriptions and artwork in every language. Get a free key at themoviedb.org, under Settings, API.",
+    "tmdbKeyPlaceholder": "Paste your key",
+    "tmdbSaved": "TMDB connected",
+    "tmdbInvalid": "TMDB rejected that key. Copy it again.",
+    "tmdbConnected": "Connected"
   },
   "profiles": {
     "who": "Who's watching?",
@@ -337,6 +345,6 @@
     "channels": "Channels",
     "open": "Open library",
     "waiting": "Waiting for the first results",
-    "noTmdb": "No TMDB key is set, so titles will show file names without posters or descriptions. Add TMDB_API_KEY to .env and restart."
+    "noTmdb": "No TMDB key yet, so titles show file names without posters or descriptions. Add one here or later in Settings."
   }
 }

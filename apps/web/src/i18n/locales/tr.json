@@ -179,7 +179,9 @@
     "goBack": "Ayrıntılara dön",
     "searchChannels": "Kanal bul",
     "seek": "Konum",
-    "unknownTrack": "{{n}}. iz"
+    "unknownTrack": "{{n}}. iz",
+    "openExternal": "Başka bir uygulamada aç",
+    "externalBody": "Bu telefon bu dosya biçimini Marquee içinde oynatamıyor. VLC ya da başka bir video oynatıcıda aç."
   },
   "settings": {
     "title": "Ayarlar",
@@ -236,7 +238,13 @@
     "account": "Telegram hesabı",
     "metadataLangs": "Önbellekteki diller",
     "profilesHint": "Profil ekle ya da düzenle. Her birinin kendi listesi, geçmişi ve favori kanalları vardır.",
-    "manageProfiles": "Profilleri yönet"
+    "manageProfiles": "Profilleri yönet",
+    "tmdbKey": "TMDB API anahtarı",
+    "tmdbKeyHint": "Her dilde afiş, özet ve görsel ekler. themoviedb.org adresinde Settings, API altından ücretsiz anahtar alabilirsin.",
+    "tmdbKeyPlaceholder": "Anahtarını yapıştır",
+    "tmdbSaved": "TMDB bağlandı",
+    "tmdbInvalid": "TMDB bu anahtarı reddetti. Yeniden kopyala.",
+    "tmdbConnected": "Bağlı"
   },
   "profiles": {
     "who": "Kim izliyor?",
@@ -337,6 +345,6 @@
     "channels": "Kanallar",
     "open": "Kütüphaneyi aç",
     "waiting": "İlk sonuçlar bekleniyor",
-    "noTmdb": "TMDB anahtarı ayarlı değil; yapımlar afişsiz ve özetsiz, dosya adlarıyla görünecek. .env dosyasına TMDB_API_KEY ekleyip yeniden başlat."
+    "noTmdb": "Henüz TMDB anahtarı yok; yapımlar afişsiz ve özetsiz, dosya adlarıyla görünüyor. Buradan ya da daha sonra Ayarlar’dan ekleyebilirsin."
   }
 }

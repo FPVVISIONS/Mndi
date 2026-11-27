@@ -1,9 +1,9 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { join } from 'node:path';
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import * as schema from './schema.js';
 
-export type Db = ReturnType<typeof createDb>;
+/** Both drivers are synchronous SQLite under Drizzle, so the rest of the app sees one type. */
+export type Db = BaseSQLiteDatabase<'sync', unknown, typeof schema> & { flush?: () => void };
 
 const DDL = `
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -61,13 +61,60 @@ CREATE TABLE IF NOT EXISTS epg (
   PRIMARY KEY(channel_key, start));
 `;
 
-export function createDb(file: string) {
-  const sqlite = new Database(file === ':memory:' ? file : join(file));
-  sqlite.pragma('journal_mode = WAL');
-  sqlite.pragma('synchronous = NORMAL');
-  sqlite.pragma('foreign_keys = ON');
+/**
+ * Open the database. Desktop uses better-sqlite3 (native, durable, fast). Where native modules
+ * cannot load, such as the Android app, it falls back to sql.js: SQLite compiled to WebAssembly,
+ * kept in memory and written back to the same file shortly after every change.
+ */
+export async function createDb(file: string): Promise<Db> {
+  if (process.env.MARQUEE_SQLITE !== 'wasm') {
+    try {
+      const { default: Database } = await import('better-sqlite3');
+      const { drizzle } = await import('drizzle-orm/better-sqlite3');
+      const sqlite = new Database(file);
+      sqlite.pragma('journal_mode = WAL');
+      sqlite.pragma('synchronous = NORMAL');
+      sqlite.pragma('foreign_keys = ON');
+      sqlite.exec(DDL);
+      return drizzle(sqlite, { schema }) as unknown as Db;
+    } catch (err) {
+      if (process.env.MARQUEE_SQLITE === 'native') throw err;
+    }
+  }
+  return createWasmDb(file);
+}
+
+async function createWasmDb(file: string): Promise<Db> {
+  // The inline build carries its WebAssembly with it, so bundles need no extra file.
+  const { default: initSqlJs } = await import('sql.js/dist/sql-wasm-inline.js');
+  const { drizzle } = await import('drizzle-orm/sql-js');
+  const SQL = await initSqlJs();
+  const memory = file !== ':memory:';
+  const sqlite =
+    memory && existsSync(file) ? new SQL.Database(readFileSync(file)) : new SQL.Database();
+  sqlite.run('PRAGMA foreign_keys = ON');
   sqlite.exec(DDL);
-  return drizzle(sqlite, { schema });
+
+  let saved = -1;
+  const changes = () => Number(sqlite.exec('SELECT total_changes()')[0]?.values[0]?.[0] ?? 0);
+  const flush = () => {
+    if (!memory) return;
+    const now = changes();
+    if (now === saved) return;
+    // Write to a temporary file and rename, so a crash mid-write never corrupts the database.
+    writeFileSync(`${file}.tmp`, sqlite.export());
+    renameSync(`${file}.tmp`, file);
+    // export() resets the connection; re-apply settings and remember the new baseline.
+    sqlite.run('PRAGMA foreign_keys = ON');
+    saved = changes();
+  };
+  flush();
+  setInterval(flush, 1500).unref();
+  for (const sig of ['SIGINT', 'SIGTERM', 'beforeExit'] as const) process.once(sig, flush);
+
+  const db = drizzle(sqlite, { schema }) as unknown as Db;
+  db.flush = flush;
+  return db;
 }
 
 export { schema };

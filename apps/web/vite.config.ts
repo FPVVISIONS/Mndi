@@ -41,12 +41,14 @@ function preloadApp(): Plugin {
 
 const api = process.env.MARQUEE_API ?? 'http://127.0.0.1:8787';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
     preloadApp(),
     VitePWA({
+      // Inside the Android app the files ship with the APK; a service worker would only serve stale copies.
+      disable: mode === 'android',
       registerType: 'autoUpdate',
       injectRegister: 'script-defer',
       includeAssets: ['favicon.svg'],
@@ -95,4 +97,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

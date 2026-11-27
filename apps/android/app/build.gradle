@@ -1,0 +1,80 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Release signing comes from the environment so no key ever lives in the repository.
+def keystoreFile = file(System.getenv('MARQUEE_KEYSTORE') ?: 'missing.keystore')
+
+android {
+    namespace 'app.marquee'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+
+    defaultConfig {
+        applicationId 'app.marquee'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '0.1.0'
+        externalNativeBuild {
+            cmake {
+                // libnode links against the shared C++ runtime, so it must ship with the app.
+                arguments '-DANDROID_STL=c++_shared'
+                cppFlags '-std=c++17'
+            }
+        }
+    }
+
+    // One APK per CPU type keeps each download around half the size of a universal one.
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a'
+            universalApk false
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv('MARQUEE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('MARQUEE_KEY_ALIAS') ?: 'marquee'
+                keyPassword System.getenv('MARQUEE_KEYSTORE_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig keystoreFile.exists() ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libnode/bin']
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // Compress libnode in the APK (it is large) and extract it at install time.
+            useLegacyPackaging true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

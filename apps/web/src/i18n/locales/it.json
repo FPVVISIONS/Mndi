@@ -179,7 +179,9 @@
     "goBack": "Torna ai dettagli",
     "searchChannels": "Trova un canale",
     "seek": "Posizione",
-    "unknownTrack": "Traccia {{n}}"
+    "unknownTrack": "Traccia {{n}}",
+    "openExternal": "Apri in un’altra app",
+    "externalBody": "Questo telefono non può riprodurre questo formato dentro Marquee. Aprilo in VLC o in un altro lettore video."
   },
   "settings": {
     "title": "Impostazioni",
@@ -236,7 +238,13 @@
     "account": "Account Telegram",
     "metadataLangs": "Lingue in cache",
     "profilesHint": "Aggiungi o modifica i profili. Ognuno ha la propria lista, cronologia e canali preferiti.",
-    "manageProfiles": "Gestisci i profili"
+    "manageProfiles": "Gestisci i profili",
+    "tmdbKey": "Chiave API di TMDB",
+    "tmdbKeyHint": "Aggiunge locandine, trame e immagini in ogni lingua. Ottieni una chiave gratuita su themoviedb.org, in Settings, API.",
+    "tmdbKeyPlaceholder": "Incolla la tua chiave",
+    "tmdbSaved": "TMDB collegato",
+    "tmdbInvalid": "TMDB ha rifiutato questa chiave. Copiala di nuovo.",
+    "tmdbConnected": "Collegato"
   },
   "profiles": {
     "who": "Chi guarda?",
@@ -337,6 +345,6 @@
     "channels": "Canali",
     "open": "Apri la libreria",
     "waiting": "In attesa dei primi risultati",
-    "noTmdb": "Nessuna chiave TMDB impostata: i titoli appariranno con i nomi dei file, senza locandine né trame. Aggiungi TMDB_API_KEY a .env e riavvia."
+    "noTmdb": "Ancora nessuna chiave TMDB: i titoli mostrano il nome del file, senza locandine né trame. Aggiungine una qui o più tardi nelle Impostazioni."
   }
 }

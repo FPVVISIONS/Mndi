@@ -9,6 +9,7 @@ import {
   Minimize,
   Pause,
   PictureInPicture2,
+  ExternalLink,
   Play,
   RotateCcw,
   RotateCw,
@@ -29,6 +30,7 @@ import { spring } from '../design/motion';
 import { api } from '../lib/api';
 import { cn } from '../lib/cn';
 import { formatDuration } from '../lib/format';
+import { native, openInExternalPlayer } from '../lib/native';
 import { usePrefs } from '../stores/prefs';
 import { ChannelSwitcher } from './ChannelSwitcher';
 import { Hud, type HudEvent } from './Hud';
@@ -64,6 +66,8 @@ export function Player({
   const navigate = useNavigate();
   const prefs = usePrefs();
   const live = info.channelId !== null;
+  // Inside the Android app, files the WebView cannot decode can go to VLC or another player.
+  const external = Boolean(native()) && info.fileId !== null;
   const converted = info.mode === 'remux' || info.mode === 'transcode';
   const duration = info.duration;
 
@@ -476,10 +480,21 @@ export function Player({
             <div className="max-w-sm">
               <TriangleAlert size={36} className="mx-auto mb-4 text-accent" />
               <h2 className="font-display text-title-m">{t('player.errorTitle')}</h2>
-              <p className="mt-2 text-fg-dim">{t('player.errorBody')}</p>
-              <div className="mt-6 flex justify-center gap-3">
+              <p className="mt-2 text-fg-dim">
+                {external ? t('player.externalBody') : t('player.errorBody')}
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                {external && (
+                  <Button
+                    variant="primary"
+                    icon={<ExternalLink size={17} />}
+                    onClick={() => openInExternalPlayer(info.fileId!, info.title)}
+                  >
+                    {t('player.openExternal')}
+                  </Button>
+                )}
                 <Button
-                  variant="primary"
+                  variant={external ? 'secondary' : 'primary'}
                   onClick={() => {
                     setFailed(false);
                     setWaiting(true);
@@ -726,6 +741,17 @@ export function Player({
                   ))
                 }
               </Popover>
+            )}
+            {external && (
+              <IconButton
+                label={t('player.openExternal')}
+                onClick={() => {
+                  video.current?.pause();
+                  openInExternalPlayer(info.fileId!, info.title);
+                }}
+              >
+                <ExternalLink size={22} />
+              </IconButton>
             )}
             <IconButton label={t('player.pip')} onClick={pip} className="hidden sm:grid">
               <PictureInPicture2 size={22} />

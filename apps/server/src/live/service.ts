@@ -59,7 +59,7 @@ export class LiveService {
     let added = 0;
     for (const c of list) {
       const key = createHash('sha1').update(c.url).digest('hex');
-      const res = this.db
+      this.db
         .insert(channels)
         .values({
           sourceId,
@@ -81,7 +81,7 @@ export class LiveService {
           },
         })
         .run();
-      added += res.changes;
+      added++;
     }
     return added;
   }

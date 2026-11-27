@@ -1,0 +1,10 @@
+.gradle/
+build/
+app/build/
+app/.cxx/
+local.properties
+# Fetched or generated at build time (see scripts/build-apk.sh)
+app/libnode/
+app/src/main/assets/nodejs-project/
+*.keystore
+*.jks

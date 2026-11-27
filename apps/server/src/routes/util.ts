@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { DEFAULT_LANGUAGE, isLanguageCode, type LanguageCode } from '@marquee/shared';
 import type { Ctx } from '../library/queries.js';
@@ -10,10 +11,11 @@ export function langOf(req: FastifyRequest): LanguageCode {
 
 export function ctxOf(req: FastifyRequest, svc: Services): Ctx {
   const header = Number(req.headers['x-profile']);
-  const row = svc.db.$client.prepare('SELECT id FROM profiles WHERE id = ?').get(header) as
-    { id: number } | undefined;
-  const fallback = svc.db.$client.prepare('SELECT id FROM profiles ORDER BY id LIMIT 1').get() as
-    { id: number } | undefined;
+  const valid = Number.isInteger(header) && header > 0;
+  const row = valid
+    ? svc.db.get<{ id: number }>(sql`SELECT id FROM profiles WHERE id = ${header}`)
+    : undefined;
+  const fallback = svc.db.get<{ id: number }>(sql`SELECT id FROM profiles ORDER BY id LIMIT 1`);
   const q = req.headers['x-quality'];
   const quality = q === '1080p' || q === '720p' ? q : 'best';
   return { lang: langOf(req), profileId: row?.id ?? fallback?.id ?? 0, quality };

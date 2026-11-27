@@ -61,6 +61,16 @@ export class TmdbProvider implements MetadataProvider {
     });
   }
 
+  /** True when TMDB accepts the key. */
+  async validate(): Promise<boolean> {
+    try {
+      await this.get('/configuration', {});
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async search(
     kind: TitleKind,
     query: string,

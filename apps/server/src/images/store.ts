@@ -1,6 +1,6 @@
 import { mkdirSync, readdirSync, rmSync, statSync, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import sharp from 'sharp';
+import { loadSharp } from '../lib/optional.js';
 import { createDeduper } from '../lib/async.js';
 
 const SIZES = new Set([
@@ -52,6 +52,8 @@ export class ImageStore {
 
   /** Average colour of an image, pulled toward the app background so it works as a placeholder. */
   async dominantColor(path: string): Promise<string | null> {
+    const sharp = await loadSharp();
+    if (!sharp) return null;
     const file = await this.get('w92', path);
     if (!file) return null;
     try {

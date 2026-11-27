@@ -4,7 +4,7 @@ import type { LanguageCode } from '@marquee/shared';
 import type { Config } from './config.js';
 import { createDb, schema, type Db } from './db/client.js';
 import { ImageStore } from './images/store.js';
-import { resolveKey } from './lib/crypto.js';
+import { decrypt, encrypt, resolveKey } from './lib/crypto.js';
 import { Library } from './library/queries.js';
 import { LiveService } from './live/service.js';
 import { MetadataService } from './metadata/service.js';
@@ -34,10 +34,12 @@ export interface Services {
   internalBase: () => string;
   getSetting(key: string): string | undefined;
   setSetting(key: string, value: string): void;
+  /** Validate, store (encrypted) and start using a TMDB key entered in the app. */
+  setTmdbKey(value: string): Promise<boolean>;
 }
 
 export async function createServices(config: Config, dbFile?: string): Promise<Services> {
-  const db = createDb(dbFile ?? join(config.dataDir, config.mock ? 'demo.db' : 'marquee.db'));
+  const db = await createDb(dbFile ?? join(config.dataDir, config.mock ? 'demo.db' : 'marquee.db'));
   const key = resolveKey(config.dataDir, config.sessionSecret);
   const images = new ImageStore(join(config.dataDir, 'cache', 'images'));
   const getSetting = (k: string) =>
@@ -63,11 +65,17 @@ export async function createServices(config: Config, dbFile?: string): Promise<S
 
   const limitMb = Number(getSetting('cache_limit_mb')) || config.streamCacheMb;
   const chunkCache = new ChunkCache(join(config.dataDir, 'cache', 'stream'), limitMb);
-  const provider = config.mock
-    ? new MockProvider()
-    : config.tmdbKey
-      ? new TmdbProvider(config.tmdbKey)
-      : null;
+  // A TMDB key comes from .env on desktop, or is pasted into the app (stored encrypted) on a phone.
+  const storedTmdb = (() => {
+    const raw = getSetting('tmdb_key');
+    try {
+      return raw ? decrypt(raw, key) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const tmdbKey = config.tmdbKey ?? storedTmdb;
+  const provider = config.mock ? new MockProvider() : tmdbKey ? new TmdbProvider(tmdbKey) : null;
   const meta = new MetadataService(db, provider, images);
   const library = new Library(db, meta);
   const live = new LiveService(db, key);
@@ -83,6 +91,13 @@ export async function createServices(config: Config, dbFile?: string): Promise<S
     internalBase: () => `http://127.0.0.1:${config.port}`,
     getSetting,
     setSetting,
+    setTmdbKey: async (value: string) => {
+      const next = new TmdbProvider(value.trim());
+      if (!(await next.validate())) return false;
+      setSetting('tmdb_key', encrypt(value.trim(), key));
+      meta.setProvider(next);
+      return true;
+    },
   };
 
   if (config.mock) {
@@ -103,7 +118,12 @@ export async function createServices(config: Config, dbFile?: string): Promise<S
     }
   });
   void manager.init();
-  return { ...base, tg: manager, indexer, samples: [] };
+  const svc = { ...base, tg: manager, indexer, samples: [] };
+  const setTmdbKey = svc.setTmdbKey;
+  // Once a key is added, match everything that was indexed without one.
+  svc.setTmdbKey = async (value) =>
+    (await setTmdbKey(value)) && (void indexer.matchPending(), true);
+  return svc;
 }
 
 export type { LanguageCode };

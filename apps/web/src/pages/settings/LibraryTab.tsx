@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { ChatPicker, tagsFromChats, type Tags } from '../../components/ChatPicker';
+import { TmdbKeyForm } from '../../components/TmdbKeyForm';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -104,6 +105,12 @@ export function LibraryTab() {
           >
             {t('settings.editSources')}
           </Button>
+        </div>
+      </Section>
+
+      <Section title={t('settings.tmdbKey')} hint={t('settings.tmdbKeyHint')}>
+        <div className="p-4 sm:p-5">
+          <TmdbKeyForm />
         </div>
       </Section>
 

@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:android": "tsc --noEmit && vite build --mode android"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.1.1",

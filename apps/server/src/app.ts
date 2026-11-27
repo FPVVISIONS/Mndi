@@ -34,9 +34,11 @@ export async function buildApp(svc: Services): Promise<FastifyInstance> {
 
   // In production the built web app is served from the same origin.
   const here = dirname(fileURLToPath(import.meta.url));
-  const webDist = [resolve(here, '../../web/dist'), resolve(here, '../../../web/dist')].find((p) =>
-    existsSync(join(p, 'index.html')),
-  );
+  const webDist = [
+    process.env.MARQUEE_WEB_DIST,
+    resolve(here, '../../web/dist'),
+    resolve(here, '../../../web/dist'),
+  ].find((p): p is string => Boolean(p) && existsSync(join(p!, 'index.html')));
   if (webDist) {
     await app.register(fastifyStatic, {
       root: webDist,

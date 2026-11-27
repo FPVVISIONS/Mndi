@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { AppStatus, SourceKind } from '@marquee/shared';
 import { schema } from '../db/client.js';
@@ -11,6 +11,9 @@ const { sources, profiles } = schema;
 const kinds = z.enum(['movies', 'series', 'live']);
 
 export function coreRoutes(app: FastifyInstance, svc: Services): void {
+  const count = (table: 'files' | 'titles' | 'channels' | 'profiles') =>
+    svc.db.get<{ n: number }>(sql`SELECT COUNT(*) AS n FROM ${sql.identifier(table)}`)?.n ?? 0;
+
   const status = (): AppStatus => ({
     mock: svc.config.mock,
     tmdb: svc.meta.enabled,
@@ -20,10 +23,9 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
     index: svc.indexer?.status() ?? {
       scanning: false,
       scanned: 0,
-      items: (svc.db.$client.prepare('SELECT COUNT(*) n FROM files').get() as { n: number }).n,
-      titles: (svc.db.$client.prepare('SELECT COUNT(*) n FROM titles').get() as { n: number }).n,
-      channels: (svc.db.$client.prepare('SELECT COUNT(*) n FROM channels').get() as { n: number })
-        .n,
+      items: count('files'),
+      titles: count('titles'),
+      channels: count('channels'),
     },
     languagesCached: svc.meta.languagesCached(),
   });
@@ -154,13 +156,22 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
   });
   app.delete('/api/profiles/:id', async (req, reply) => {
     const id = Number((req.params as { id: string }).id);
-    const count = (svc.db.$client.prepare('SELECT COUNT(*) n FROM profiles').get() as { n: number })
-      .n;
-    if (count <= 1) return badRequest(reply, 'Keep at least one profile');
+    if (count('profiles') <= 1) return badRequest(reply, 'Keep at least one profile');
     for (const t of ['progress', 'my_list', 'likes', 'fav_channels'])
-      svc.db.$client.prepare(`DELETE FROM ${t} WHERE profile_id = ?`).run(id);
+      svc.db.run(sql`DELETE FROM ${sql.identifier(t)} WHERE profile_id = ${id}`);
     svc.db.delete(profiles).where(eq(profiles.id, id)).run();
     return { ok: true };
+  });
+
+  // ---- Metadata key -----------------------------------------------------------------------
+  app.put('/api/settings/tmdb', async (req, reply) => {
+    const body = z.object({ key: z.string().trim().min(16).max(400) }).safeParse(req.body);
+    if (!body.success) return badRequest(reply);
+    if (svc.config.mock) return { ok: true };
+    const ok = await svc.setTmdbKey(body.data.key);
+    return ok
+      ? { ok: true }
+      : reply.code(422).send({ error: 'tmdb_invalid', message: 'TMDB rejected that key.' });
   });
 
   // ---- Cache -----------------------------------------------------------------------------

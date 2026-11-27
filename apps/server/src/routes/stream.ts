@@ -1,5 +1,5 @@
 import { createReadStream, existsSync, mkdirSync } from 'node:fs';
-import sharp from 'sharp';
+import { loadSharp } from '../lib/optional.js';
 import { join } from 'node:path';
 import type { FastifyInstance } from 'fastify';
 import { eq } from 'drizzle-orm';
@@ -128,7 +128,8 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
       if (kind !== 'poster' && kind !== 'backdrop' && kind !== 'logo') return notFound(reply);
       const svg = renderArt(slug, kind, lang);
       if (!svg) return notFound(reply);
-      if (kind === 'backdrop') {
+      const sharp = kind === 'backdrop' ? await loadSharp() : null;
+      if (sharp) {
         // Backdrops carry no text, so serve them as JPEG like TMDB does: same decode path, realistic weight.
         const width = Number(size.replace(/\D/g, '')) || 1280;
         const key = `${slug}:${width}`;

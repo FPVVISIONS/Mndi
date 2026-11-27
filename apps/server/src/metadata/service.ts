@@ -38,10 +38,15 @@ export class MetadataService {
 
   constructor(
     private readonly db: Db,
-    private readonly provider: MetadataProvider | null,
+    private provider: MetadataProvider | null,
     private readonly images: ImageStore,
   ) {
     for (const row of db.select().from(imageColors).all()) this.colors.set(row.path, row.color);
+  }
+
+  /** Swap the metadata source at runtime, e.g. when a TMDB key is added from the app. */
+  setProvider(provider: MetadataProvider | null): void {
+    this.provider = provider;
   }
 
   get enabled(): boolean {

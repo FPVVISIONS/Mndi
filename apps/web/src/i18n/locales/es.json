@@ -179,7 +179,9 @@
     "goBack": "Volver a los detalles",
     "searchChannels": "Buscar un canal",
     "seek": "Buscar posición",
-    "unknownTrack": "Pista {{n}}"
+    "unknownTrack": "Pista {{n}}",
+    "openExternal": "Abrir en otra app",
+    "externalBody": "Este teléfono no puede reproducir este formato dentro de Marquee. Ábrelo en VLC u otro reproductor."
   },
   "settings": {
     "title": "Ajustes",
@@ -236,7 +238,13 @@
     "account": "Cuenta de Telegram",
     "metadataLangs": "Idiomas en caché",
     "profilesHint": "Añade o edita perfiles. Cada uno tiene su propia lista, historial y canales favoritos.",
-    "manageProfiles": "Gestionar perfiles"
+    "manageProfiles": "Gestionar perfiles",
+    "tmdbKey": "Clave de API de TMDB",
+    "tmdbKeyHint": "Añade pósters, sinopsis e imágenes en todos los idiomas. Consigue una clave gratis en themoviedb.org, en Settings, API.",
+    "tmdbKeyPlaceholder": "Pega tu clave",
+    "tmdbSaved": "TMDB conectado",
+    "tmdbInvalid": "TMDB rechazó esa clave. Cópiala de nuevo.",
+    "tmdbConnected": "Conectado"
   },
   "profiles": {
     "who": "¿Quién está viendo?",
@@ -337,6 +345,6 @@
     "channels": "Canales",
     "open": "Abrir biblioteca",
     "waiting": "Esperando los primeros resultados",
-    "noTmdb": "No hay clave de TMDB, así que los títulos se mostrarán con el nombre del archivo, sin pósters ni sinopsis. Añade TMDB_API_KEY a .env y reinicia."
+    "noTmdb": "Aún no hay clave de TMDB, así que los títulos muestran el nombre del archivo, sin pósters ni sinopsis. Añade una aquí o más tarde en Ajustes."
   }
 }

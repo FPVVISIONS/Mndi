@@ -27,6 +27,19 @@ const { settings, files } = schema;
 
 type MediaLike = Api.TypeMessageMedia;
 
+/** How long a sign-in step may wait for Telegram before telling the person it is unreachable. */
+const CONNECT_TIMEOUT = 25_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('TIMEOUT connecting to Telegram')), ms);
+    promise.then(
+      (v) => (clearTimeout(t), resolve(v)),
+      (e) => (clearTimeout(t), reject(e)),
+    );
+  });
+}
+
 export class TelegramManager implements TelegramBackend {
   private client: TelegramClient | null = null;
   private state: TelegramState = 'unconfigured';
@@ -171,9 +184,16 @@ export class TelegramManager implements TelegramBackend {
 
   private async freshClient(): Promise<TelegramClient> {
     if (this.client) await this.client.disconnect().catch(() => undefined);
-    this.client = this.newClient('');
-    await this.client.connect();
-    return this.client;
+    const client = this.newClient('');
+    this.client = client;
+    try {
+      await withTimeout(client.connect(), CONNECT_TIMEOUT);
+    } catch (err) {
+      // Stop GramJS from retrying in the background after we have given up on this attempt.
+      void client.disconnect().catch(() => undefined);
+      throw err;
+    }
+    return client;
   }
 
   async sendPhone(phone: string): Promise<AuthState> {
@@ -183,9 +203,9 @@ export class TelegramManager implements TelegramBackend {
       return this.fail('phone', new Error('PHONE_NUMBER_INVALID'));
     try {
       const client = await this.freshClient();
-      const res = await client.sendCode(
-        { apiId: this.creds.apiId, apiHash: this.creds.apiHash },
-        digits,
+      const res = await withTimeout(
+        client.sendCode({ apiId: this.creds.apiId, apiHash: this.creds.apiHash }, digits),
+        CONNECT_TIMEOUT,
       );
       this.phone = digits;
       this.codeHash = res.phoneCodeHash;

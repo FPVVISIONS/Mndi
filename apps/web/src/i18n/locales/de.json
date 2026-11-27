@@ -179,7 +179,9 @@
     "goBack": "Zurück zu den Details",
     "searchChannels": "Sender finden",
     "seek": "Position",
-    "unknownTrack": "Spur {{n}}"
+    "unknownTrack": "Spur {{n}}",
+    "openExternal": "In anderer App öffnen",
+    "externalBody": "Dieses Handy kann das Dateiformat in Marquee nicht abspielen. Öffne es in VLC oder einem anderen Videoplayer."
   },
   "settings": {
     "title": "Einstellungen",
@@ -236,7 +238,13 @@
     "account": "Telegram-Konto",
     "metadataLangs": "Zwischengespeicherte Sprachen",
     "profilesHint": "Profile hinzufügen oder bearbeiten. Jedes hat eigene Liste, eigenen Verlauf und eigene Lieblingssender.",
-    "manageProfiles": "Profile verwalten"
+    "manageProfiles": "Profile verwalten",
+    "tmdbKey": "TMDB-API-Schlüssel",
+    "tmdbKeyHint": "Fügt Poster, Beschreibungen und Bilder in allen Sprachen hinzu. Einen kostenlosen Schlüssel gibt es auf themoviedb.org unter Settings, API.",
+    "tmdbKeyPlaceholder": "Schlüssel einfügen",
+    "tmdbSaved": "TMDB verbunden",
+    "tmdbInvalid": "TMDB hat diesen Schlüssel abgelehnt. Kopiere ihn erneut.",
+    "tmdbConnected": "Verbunden"
   },
   "profiles": {
     "who": "Wer schaut?",
@@ -337,6 +345,6 @@
     "channels": "Sender",
     "open": "Bibliothek öffnen",
     "waiting": "Warte auf die ersten Ergebnisse",
-    "noTmdb": "Es ist kein TMDB-Schlüssel gesetzt, daher erscheinen Titel mit Dateinamen, ohne Poster und Beschreibungen. Trage TMDB_API_KEY in .env ein und starte neu."
+    "noTmdb": "Noch kein TMDB-Schlüssel, daher erscheinen Titel mit Dateinamen, ohne Poster und Beschreibungen. Füge hier oder später in den Einstellungen einen hinzu."
   }
 }

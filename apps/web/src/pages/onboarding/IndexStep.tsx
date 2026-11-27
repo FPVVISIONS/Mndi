@@ -4,6 +4,7 @@ import { TriangleAlert } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { TmdbKeyForm } from '../../components/TmdbKeyForm';
 import { Button } from '../../components/ui/Button';
 import { fadeUp, staggerChildren, stagger } from '../../design/motion';
 import { api } from '../../lib/api';
@@ -59,10 +60,13 @@ export function IndexStep() {
       {data && !data.tmdb && (
         <m.div
           variants={fadeUp}
-          className="flex gap-3 rounded-lg border border-line bg-surface-1 p-4 text-small text-fg-dim"
+          className="space-y-3 rounded-lg border border-line bg-surface-1 p-4"
         >
-          <TriangleAlert size={18} className="mt-0.5 shrink-0 text-accent" />
-          {t('onboarding.noTmdb')}
+          <p className="flex gap-3 text-small text-fg-dim">
+            <TriangleAlert size={18} className="mt-0.5 shrink-0 text-accent" />
+            {t('onboarding.noTmdb')}
+          </p>
+          <TmdbKeyForm compact />
         </m.div>
       )}
       <m.div variants={fadeUp}>

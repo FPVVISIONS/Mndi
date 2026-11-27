@@ -179,7 +179,9 @@
     "goBack": "Retour aux détails",
     "searchChannels": "Trouver une chaîne",
     "seek": "Position",
-    "unknownTrack": "Piste {{n}}"
+    "unknownTrack": "Piste {{n}}",
+    "openExternal": "Ouvrir dans une autre app",
+    "externalBody": "Ce téléphone ne peut pas lire ce format dans Marquee. Ouvrez-le dans VLC ou un autre lecteur vidéo."
   },
   "settings": {
     "title": "Réglages",
@@ -236,7 +238,13 @@
     "account": "Compte Telegram",
     "metadataLangs": "Langues en cache",
     "profilesHint": "Ajoutez ou modifiez des profils. Chacun garde sa liste, son historique et ses chaînes favorites.",
-    "manageProfiles": "Gérer les profils"
+    "manageProfiles": "Gérer les profils",
+    "tmdbKey": "Clé d’API TMDB",
+    "tmdbKeyHint": "Ajoute affiches, synopsis et visuels dans toutes les langues. Obtenez une clé gratuite sur themoviedb.org, dans Settings, API.",
+    "tmdbKeyPlaceholder": "Collez votre clé",
+    "tmdbSaved": "TMDB connecté",
+    "tmdbInvalid": "TMDB a refusé cette clé. Copiez-la à nouveau.",
+    "tmdbConnected": "Connecté"
   },
   "profiles": {
     "who": "Qui regarde ?",
@@ -337,6 +345,6 @@
     "channels": "Chaînes",
     "open": "Ouvrir la bibliothèque",
     "waiting": "En attente des premiers résultats",
-    "noTmdb": "Aucune clé TMDB n’est définie : les titres s’afficheront avec le nom du fichier, sans affiches ni synopsis. Ajoutez TMDB_API_KEY à .env et redémarrez."
+    "noTmdb": "Pas encore de clé TMDB : les titres s’affichent avec le nom du fichier, sans affiches ni synopsis. Ajoutez-en une ici ou plus tard dans les Réglages."
   }
 }

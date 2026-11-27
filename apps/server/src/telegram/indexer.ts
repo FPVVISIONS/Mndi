@@ -179,7 +179,7 @@ export class Indexer {
   }
 
   /** Match titles that have no TMDB id yet, a few at a time. */
-  private async matchPending(): Promise<void> {
+  async matchPending(): Promise<void> {
     if (!this.meta.enabled) return;
     const rows = this.db
       .select()
