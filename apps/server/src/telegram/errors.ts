@@ -42,6 +42,7 @@ export function toAuthError(err: unknown): { code: AuthErrorCode; waitSeconds?: 
   const wait = floodSeconds(err);
   if (wait !== null) return { code: 'flood', waitSeconds: wait };
   if (/NO_ACCOUNT/.test(msg)) return { code: 'no_account' };
+  if (/EMAIL_SETUP_REQUIRED/.test(msg)) return { code: 'email_required' };
   if (/PHONE_NUMBER_INVALID|PHONE_NUMBER_BANNED/.test(msg)) return { code: 'phone_invalid' };
   if (/PHONE_CODE_INVALID|PHONE_CODE_EMPTY/.test(msg)) return { code: 'code_invalid' };
   if (/PHONE_CODE_EXPIRED/.test(msg)) return { code: 'code_expired' };

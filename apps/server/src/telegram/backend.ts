@@ -14,6 +14,7 @@ export interface TelegramBackend {
   submitKeysCode(code: string): Promise<AuthState>;
   sendPhone(phone: string): Promise<AuthState>;
   submitCode(code: string): Promise<AuthState>;
+  resendCode(): Promise<AuthState>;
   submitPassword(password: string): Promise<AuthState>;
   startQr(): Promise<AuthState>;
   cancelAuth(): Promise<AuthState>;

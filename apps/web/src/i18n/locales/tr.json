@@ -297,7 +297,8 @@
     "no_account": "Bu numaraya ait bir Telegram hesabı yok.",
     "network": "Telegram'a ulaşılamadı. Bağlantını kontrol et.",
     "unknown": "Bir şeyler ters gitti. Tekrar dene.",
-    "keys_failed": "Telegram otomatik olarak kurulamadı. Tekrar deneyin veya API anahtarlarınızı elle ekleyin."
+    "keys_failed": "Telegram otomatik olarak kurulamadı. Tekrar deneyin veya API anahtarlarınızı elle ekleyin.",
+    "email_required": "Telegram yeni bir uygulamaya kod göndermeden önce giriş e-postası istiyor. \"Bu telefondaki Telegram uygulamasıyla giriş yap\"ı kullanın."
   },
   "onboarding": {
     "steps": {
@@ -358,6 +359,13 @@
     "keysRetryBody": "Kodunuz işe yaradı ama Telegram anahtarları oluşturmadı. Tekrar dene'ye dokunun; yeni koda gerek yok.",
     "keysByHand": "Ya da kendiniz oluşturup \"Kendi API anahtarlarım var\"ı seçin:",
     "connecting": "Telegram'a bağlanılıyor…",
-    "connectingSlow": "Hâlâ deneniyor. Yavaş ağda bu bir dakika sürebilir."
+    "connectingSlow": "Hâlâ deneniyor. Yavaş ağda bu bir dakika sürebilir.",
+    "useApp": "Bu telefondaki Telegram uygulamasıyla giriş yap",
+    "openTelegram": "Bu telefonda Telegram'ı aç",
+    "openTelegramHint": "Bu telefonda mısınız? Düğmeye dokunun: Telegram açılır ve girişi onaylamanızı ister. Kod gerekmez.",
+    "codeViaCall": "Telegram sizi kodla arayacak.",
+    "codeViaEmail": "Telegram kodu giriş e-postanıza gönderdi.",
+    "noCode": "Kod gelmedi mi?",
+    "resendSms": "Bunun yerine SMS ile gönder"
   }
 }

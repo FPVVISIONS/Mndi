@@ -213,6 +213,7 @@ export type AuthErrorCode =
   | 'password_invalid'
   | 'credentials_invalid'
   | 'keys_failed'
+  | 'email_required'
   | 'flood'
   | 'no_account'
   | 'network'
@@ -220,8 +221,13 @@ export type AuthErrorCode =
 
 export interface AuthState {
   step: AuthStep;
-  qr?: { svg: string; expiresAt: number };
+  /** url is the tg://login link: opened on the same phone, the Telegram app approves the sign-in. */
+  qr?: { svg: string; expiresAt: number; url?: string };
   codeViaApp?: boolean;
+  /** Where Telegram said it sent the login code. */
+  codeVia?: 'app' | 'sms' | 'call' | 'email' | 'other';
+  /** Telegram offers another way to deliver the code (usually SMS). */
+  canResend?: boolean;
   error?: AuthErrorCode;
   waitSeconds?: number;
   hint?: string;

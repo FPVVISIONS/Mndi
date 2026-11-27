@@ -119,6 +119,20 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
   });
   const startQr = useMutation({ mutationFn: api.startQr, onSuccess: put });
   const cancel = useMutation({ mutationFn: api.cancelAuth, onSuccess: put });
+  const resend = useMutation({ mutationFn: api.resendCode, onSuccess: put });
+  // Sign in through the Telegram app on this phone: no code needed, the app approves the login.
+  const [openApp, setOpenApp] = useState(false);
+  const signInWithApp = async () => {
+    setOpenApp(true);
+    if (auth && auth.step !== 'phone' && auth.step !== 'qr') put(await api.cancelAuth());
+    setTab('qr');
+  };
+  useEffect(() => {
+    const url = auth?.qr?.url;
+    if (!openApp || !url) return;
+    setOpenApp(false);
+    window.location.href = url;
+  }, [openApp, auth?.qr?.url]);
 
   useEffect(() => {
     if (status?.telegram.state === 'ready') onDone();
@@ -377,6 +391,15 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
                   {t('onboarding.sendCode')}
                 </Button>
               </m.div>
+              <m.div variants={fadeUp}>
+                <button
+                  type="button"
+                  onClick={() => void signInWithApp()}
+                  className="text-small text-fg-dim underline underline-offset-4 hover:text-fg"
+                >
+                  {t('onboarding.useApp')}
+                </button>
+              </m.div>
             </form>
           ) : (
             <div>
@@ -392,6 +415,20 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
                   <Spinner />
                 )}
               </div>
+              {auth.qr?.url && (
+                <Button
+                  variant="secondary"
+                  className="mt-5"
+                  onClick={() => {
+                    window.location.href = auth.qr!.url!;
+                  }}
+                >
+                  {t('onboarding.openTelegram')}
+                </Button>
+              )}
+              <p className="mt-3 max-w-sm text-small text-fg-faint">
+                {t('onboarding.openTelegramHint')}
+              </p>
               <ErrorLine auth={auth} />
             </div>
           )}
@@ -410,7 +447,13 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             {t('onboarding.codeTitle')}
           </m.h2>
           <m.p variants={fadeUp} className="text-fg-dim">
-            {auth.codeViaApp ? t('onboarding.codeViaApp') : t('onboarding.codeViaSms')}
+            {auth.codeVia === 'sms'
+              ? t('onboarding.codeViaSms')
+              : auth.codeVia === 'call'
+                ? t('onboarding.codeViaCall')
+                : auth.codeVia === 'email'
+                  ? t('onboarding.codeViaEmail')
+                  : t('onboarding.codeViaApp')}
           </m.p>
           <m.div variants={fadeUp}>
             <Field
@@ -448,6 +491,19 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             >
               {t('onboarding.differentNumber')}
             </Button>
+          </m.div>
+          <m.div variants={fadeUp} className="space-y-2 border-t border-white/10 pt-5">
+            <p className="text-small text-fg-dim">{t('onboarding.noCode')}</p>
+            <div className="flex flex-wrap gap-3">
+              {auth.canResend && (
+                <Button size="sm" onClick={() => resend.mutate()} disabled={resend.isPending}>
+                  {resend.isPending ? <Spinner /> : t('onboarding.resendSms')}
+                </Button>
+              )}
+              <Button size="sm" onClick={() => void signInWithApp()}>
+                {t('onboarding.useApp')}
+              </Button>
+            </div>
           </m.div>
         </form>
       )}

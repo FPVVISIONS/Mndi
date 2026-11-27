@@ -70,6 +70,7 @@ export const api = {
   keysPhone: (phone: string) => send<AuthState>('POST', '/api/auth/keys/phone', { phone }),
   keysCode: (code: string) => send<AuthState>('POST', '/api/auth/keys/code', { code }),
   sendPhone: (phone: string) => send<AuthState>('POST', '/api/auth/phone', { phone }),
+  resendCode: () => send<AuthState>('POST', '/api/auth/resend'),
   sendCode: (code: string) => send<AuthState>('POST', '/api/auth/code', { code }),
   sendPassword: (password: string) => send<AuthState>('POST', '/api/auth/password', { password }),
   startQr: () => send<AuthState>('POST', '/api/auth/qr'),

@@ -63,6 +63,7 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
     const body = z.object({ phone: z.string().min(3).max(32) }).safeParse(req.body);
     return body.success ? svc.tg.sendPhone(body.data.phone) : badRequest(reply);
   });
+  app.post('/api/auth/resend', async () => svc.tg.resendCode());
   app.post('/api/auth/code', async (req, reply) => {
     const body = z.object({ code: z.string().min(3).max(12) }).safeParse(req.body);
     return body.success ? svc.tg.submitCode(body.data.code) : badRequest(reply);

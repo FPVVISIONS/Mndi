@@ -64,7 +64,10 @@ export class MockBackend implements TelegramBackend {
     if (phone.replace(/\D/g, '').length < 7)
       return (this.auth = { step: 'phone', error: 'phone_invalid' });
     this.phone = phone;
-    return (this.auth = { step: 'code', codeViaApp: true });
+    return (this.auth = { step: 'code', codeViaApp: true, codeVia: 'app', canResend: true });
+  }
+  async resendCode(): Promise<AuthState> {
+    return (this.auth = { step: 'code', codeVia: 'sms', canResend: false });
   }
   async submitCode(code: string): Promise<AuthState> {
     if (code.replace(/\D/g, '') !== '12345')
@@ -89,7 +92,10 @@ export class MockBackend implements TelegramBackend {
     setTimeout(() => {
       if (this.auth.step === 'qr') this.finish();
     }, 6000);
-    return (this.auth = { step: 'qr', qr: { svg, expiresAt: Date.now() + 30_000 } });
+    return (this.auth = {
+      step: 'qr',
+      qr: { svg, expiresAt: Date.now() + 30_000, url: 'tg://login?token=demo-only' },
+    });
   }
   async cancelAuth(): Promise<AuthState> {
     if (this.auth.step === 'keys-code') return (this.auth = { step: 'credentials' });

@@ -297,7 +297,8 @@
     "no_account": "Zu dieser Nummer gibt es kein Telegram-Konto.",
     "network": "Telegram nicht erreichbar. Prüf deine Verbindung.",
     "unknown": "Etwas ist schiefgelaufen. Versuch es erneut.",
-    "keys_failed": "Telegram konnte nicht automatisch eingerichtet werden. Versuch es noch einmal oder gib deine API-Schlüssel von Hand ein."
+    "keys_failed": "Telegram konnte nicht automatisch eingerichtet werden. Versuch es noch einmal oder gib deine API-Schlüssel von Hand ein.",
+    "email_required": "Telegram verlangt eine Login-E-Mail, bevor es einer neuen App einen Code schickt. Nutze „Mit der Telegram-App auf diesem Telefon anmelden“."
   },
   "onboarding": {
     "steps": {
@@ -358,6 +359,13 @@
     "keysRetryBody": "Dein Code hat funktioniert, aber Telegram hat die Schlüssel nicht erstellt. Tippe auf Erneut versuchen; ein neuer Code ist nicht nötig.",
     "keysByHand": "Oder erstelle sie selbst und wähle dann „Ich habe eigene API-Schlüssel“:",
     "connecting": "Verbindung zu Telegram…",
-    "connectingSlow": "Wird weiter versucht. In einem langsamen Netz kann das bis zu einer Minute dauern."
+    "connectingSlow": "Wird weiter versucht. In einem langsamen Netz kann das bis zu einer Minute dauern.",
+    "useApp": "Mit der Telegram-App auf diesem Telefon anmelden",
+    "openTelegram": "Telegram auf diesem Telefon öffnen",
+    "openTelegramHint": "Auf diesem Telefon? Tippe auf den Knopf: Telegram öffnet sich und fragt nach Bestätigung. Kein Code nötig.",
+    "codeViaCall": "Telegram ruft dich mit dem Code an.",
+    "codeViaEmail": "Telegram hat den Code an deine Login-E-Mail geschickt.",
+    "noCode": "Keinen Code bekommen?",
+    "resendSms": "Stattdessen per SMS senden"
   }
 }

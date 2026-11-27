@@ -297,7 +297,8 @@
     "no_account": "Ese número no tiene cuenta de Telegram.",
     "network": "No se pudo conectar con Telegram. Revisa tu conexión.",
     "unknown": "Algo salió mal. Inténtalo de nuevo.",
-    "keys_failed": "No se pudo configurar Telegram automáticamente. Inténtalo de nuevo o añade tus claves API a mano."
+    "keys_failed": "No se pudo configurar Telegram automáticamente. Inténtalo de nuevo o añade tus claves API a mano.",
+    "email_required": "Telegram pide configurar un correo de inicio de sesión antes de enviar un código a una app nueva. Usa \"Iniciar sesión con la app de Telegram de este teléfono\"."
   },
   "onboarding": {
     "steps": {
@@ -358,6 +359,13 @@
     "keysRetryBody": "Tu código funcionó, pero Telegram no creó las claves. Toca Intentar de nuevo; no necesitas otro código.",
     "keysByHand": "O créalas tú y luego elige \"Tengo mis propias claves API\":",
     "connecting": "Conectando con Telegram…",
-    "connectingSlow": "Seguimos intentándolo. Con una red lenta puede tardar hasta un minuto."
+    "connectingSlow": "Seguimos intentándolo. Con una red lenta puede tardar hasta un minuto.",
+    "useApp": "Iniciar sesión con la app de Telegram de este teléfono",
+    "openTelegram": "Abrir Telegram en este teléfono",
+    "openTelegramHint": "¿En este teléfono? Toca el botón: Telegram se abre y te pide confirmar. Sin código.",
+    "codeViaCall": "Telegram te llamará con el código.",
+    "codeViaEmail": "Telegram envió el código a tu correo de inicio de sesión.",
+    "noCode": "¿No te llegó el código?",
+    "resendSms": "Enviar por SMS"
   }
 }

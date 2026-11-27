@@ -312,16 +312,70 @@ export class TelegramManager implements TelegramBackend {
     try {
       const client = await this.freshClient();
       const res = await withTimeout(
-        client.sendCode({ apiId: this.creds.apiId, apiHash: this.creds.apiHash }, digits),
+        client.invoke(
+          new Api.auth.SendCode({
+            phoneNumber: digits,
+            apiId: this.creds.apiId,
+            apiHash: this.creds.apiHash,
+            settings: new Api.CodeSettings({}),
+          }),
+        ),
         CONNECT_TIMEOUT,
       );
       this.phone = digits;
-      this.codeHash = res.phoneCodeHash;
-      this.auth = { step: 'code', codeViaApp: res.isCodeViaApp };
+      return this.afterSendCode(res);
     } catch (err) {
       return this.fail('phone', err);
     }
+  }
+
+  /** Reads how Telegram delivered the code; some answers mean no code was sent at all. */
+  private afterSendCode(res: Api.auth.TypeSentCode): AuthState {
+    if (res instanceof Api.auth.SentCodeSuccess) {
+      void this.afterLogin();
+      return this.auth;
+    }
+    this.codeHash = res.phoneCodeHash;
+    const type = res.type;
+    const canResend = Boolean(res.nextType);
+    if (type instanceof Api.auth.SentCodeTypeSetUpEmailRequired)
+      return this.fail('phone', new Error('EMAIL_SETUP_REQUIRED'));
+    const via: AuthState['codeVia'] =
+      type instanceof Api.auth.SentCodeTypeApp
+        ? 'app'
+        : type instanceof Api.auth.SentCodeTypeSms ||
+            type instanceof Api.auth.SentCodeTypeSmsWord ||
+            type instanceof Api.auth.SentCodeTypeSmsPhrase ||
+            type instanceof Api.auth.SentCodeTypeFragmentSms ||
+            type instanceof Api.auth.SentCodeTypeFirebaseSms
+          ? 'sms'
+          : type instanceof Api.auth.SentCodeTypeCall ||
+              type instanceof Api.auth.SentCodeTypeFlashCall ||
+              type instanceof Api.auth.SentCodeTypeMissedCall
+            ? 'call'
+            : type instanceof Api.auth.SentCodeTypeEmailCode
+              ? 'email'
+              : 'other';
+    console.warn(`[telegram auth] code sent via ${type.className}`);
+    this.auth = { step: 'code', codeViaApp: via === 'app', codeVia: via, canResend };
     return this.auth;
+  }
+
+  /** Asks Telegram to deliver the code another way (usually SMS after the app). */
+  async resendCode(): Promise<AuthState> {
+    const client = this.client;
+    if (!client || !this.codeHash) return this.fail('phone', new Error('PHONE_CODE_EXPIRED'));
+    try {
+      const res = await withTimeout(
+        client.invoke(
+          new Api.auth.ResendCode({ phoneNumber: this.phone, phoneCodeHash: this.codeHash }),
+        ),
+        CONNECT_TIMEOUT,
+      );
+      return this.afterSendCode(res);
+    } catch (err) {
+      return this.fail('code', err);
+    }
   }
 
   async submitCode(code: string): Promise<AuthState> {
@@ -412,7 +466,7 @@ export class TelegramManager implements TelegramBackend {
               margin: 1,
               errorCorrectionLevel: 'M',
             });
-            this.auth = { step: 'qr', qr: { svg, expiresAt: expires * 1000 } };
+            this.auth = { step: 'qr', qr: { svg, expiresAt: expires * 1000, url } };
             for (const l of this.listeners) l();
           },
           ...this.passwordFlowCallbacks(),

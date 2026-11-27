@@ -297,7 +297,8 @@
     "no_account": "That number has no Telegram account.",
     "network": "Couldn't reach Telegram. Check your connection.",
     "unknown": "Something went wrong. Try again.",
-    "keys_failed": "Couldn't set up Telegram automatically. Try again, or add your API keys by hand."
+    "keys_failed": "Couldn't set up Telegram automatically. Try again, or add your API keys by hand.",
+    "email_required": "Telegram wants a login email set up before it sends a code to a new app. Use \"Sign in with the Telegram app on this phone\" instead."
   },
   "onboarding": {
     "steps": {
@@ -358,6 +359,13 @@
     "keysRetryBody": "Your code worked, but Telegram didn't create the keys. Tap Try again; you won't need a new code.",
     "keysByHand": "Or create them yourself, then choose \"I have my own API keys\":",
     "connecting": "Connecting to Telegram…",
-    "connectingSlow": "Still trying. On a slow network this can take up to a minute."
+    "connectingSlow": "Still trying. On a slow network this can take up to a minute.",
+    "useApp": "Sign in with the Telegram app on this phone",
+    "openTelegram": "Open Telegram on this phone",
+    "openTelegramHint": "On this phone? Tap the button: Telegram opens and asks you to confirm the sign-in. No code needed.",
+    "codeViaCall": "Telegram will call you with the code.",
+    "codeViaEmail": "Telegram sent the code to your login email.",
+    "noCode": "Didn't get a code?",
+    "resendSms": "Send by SMS instead"
   }
 }
