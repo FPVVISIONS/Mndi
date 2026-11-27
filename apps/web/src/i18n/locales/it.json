@@ -352,6 +352,8 @@
     "keysCodeBody": "Telegram ha appena inviato un messaggio con un codice alla tua app Telegram. Copialo qui esattamente, lettere comprese.",
     "keysCodeLabel": "Codice di configurazione",
     "manualKeys": "Ho già le mie chiavi API",
-    "useAuto": "Accedi invece con il numero di telefono"
+    "useAuto": "Accedi invece con il numero di telefono",
+    "keysRetryBody": "Il codice ha funzionato, ma Telegram non ha creato le chiavi. Tocca Riprova: non serve un nuovo codice.",
+    "keysByHand": "Oppure creale tu, poi scegli \"Ho già le mie chiavi API\":"
   }
 }

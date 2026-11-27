@@ -352,6 +352,8 @@
     "keysCodeBody": "Telegram az önce Telegram uygulamanıza kod içeren bir mesaj gönderdi. Kodu harfleriyle birlikte aynen buraya kopyalayın.",
     "keysCodeLabel": "Kurulum kodu",
     "manualKeys": "Kendi API anahtarlarım var",
-    "useAuto": "Bunun yerine telefon numarasıyla giriş yap"
+    "useAuto": "Bunun yerine telefon numarasıyla giriş yap",
+    "keysRetryBody": "Kodunuz işe yaradı ama Telegram anahtarları oluşturmadı. Tekrar dene'ye dokunun; yeni koda gerek yok.",
+    "keysByHand": "Ya da kendiniz oluşturup \"Kendi API anahtarlarım var\"ı seçin:"
   }
 }

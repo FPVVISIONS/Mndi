@@ -225,6 +225,10 @@ export interface AuthState {
   error?: AuthErrorCode;
   waitSeconds?: number;
   hint?: string;
+  /** Short technical note (what Telegram answered) shown under an error, for support. */
+  detail?: string;
+  /** On 'keys-code': the code was accepted, so creating the keys can be retried without a new one. */
+  retry?: boolean;
 }
 
 export interface ChatSummary {

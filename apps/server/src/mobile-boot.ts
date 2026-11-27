@@ -1,6 +1,6 @@
 // Runs first inside the Android app, before any other module loads: sets up the startup log,
 // crash capture and environment, so even a failure while loading dependencies is reported.
-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { ensureFetch } from './lib/nodeFetch.js';
 
@@ -35,6 +35,19 @@ step(
 );
 
 if (ensureFetch()) step('using built-in HTTPS client (no WebAssembly)');
+
+// Keys built into this APK (see scripts/bundle-mobile.mjs): sign-in then needs only a phone number.
+const builtInKeys = join(dirname(process.argv[1] ?? '.'), 'telegram.json');
+if (existsSync(builtInKeys)) {
+  try {
+    const k = JSON.parse(readFileSync(builtInKeys, 'utf8')) as { apiId: number; apiHash: string };
+    process.env.TELEGRAM_API_ID = String(k.apiId);
+    process.env.TELEGRAM_API_HASH = k.apiHash;
+    step('built-in Telegram keys present');
+  } catch {
+    step('built-in Telegram keys unreadable; ignoring');
+  }
+}
 
 process.env.DATA_DIR = dataDir;
 process.env.MARQUEE_WEB_DIST = webDir;

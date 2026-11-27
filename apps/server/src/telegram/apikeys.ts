@@ -15,9 +15,24 @@ export type KeysErrorReason =
   'phone_invalid' | 'code_invalid' | 'too_many_tries' | 'network' | 'create_failed';
 
 export class KeysError extends Error {
-  constructor(readonly reason: KeysErrorReason) {
-    super(`my.telegram.org: ${reason}`);
+  constructor(
+    readonly reason: KeysErrorReason,
+    /** A short, secret-free note on what Telegram answered, shown to the person for support. */
+    readonly detail?: string,
+  ) {
+    super(`my.telegram.org: ${reason}${detail ? ` (${detail})` : ''}`);
   }
+}
+
+/** First words of a page or answer, without markup or anything that looks like a token. */
+export function snippet(text: string): string {
+  const title = /<title>([^<]*)<\/title>/i.exec(text)?.[1];
+  const plain = (title ?? text)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[a-f0-9]{16,}/gi, '…')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plain.length > 80 ? `${plain.slice(0, 80)}…` : plain || '(empty)';
 }
 
 export interface ApiKeys {
@@ -76,6 +91,8 @@ export class TelegramKeysClient {
   private readonly jar = new Jar();
   private phone = '';
   private randomHash = '';
+  private loggedIn = false;
+  private lastStatus = 0;
 
   constructor(
     private readonly fetchImpl: typeof fetch = fetch,
@@ -106,6 +123,7 @@ export class TelegramKeysClient {
         redirect: 'follow',
       });
       this.jar.take(res);
+      this.lastStatus = res.status;
       const text = await res.text();
       if (res.status >= 500) throw new KeysError('network');
       return text;
@@ -132,39 +150,70 @@ export class TelegramKeysClient {
     this.randomHash = hash;
   }
 
+  /** True once the code was accepted, so a failed key step can be retried without a new code. */
+  get signedIn(): boolean {
+    return this.loggedIn;
+  }
+
   /** Signs in with the code, then returns existing keys or creates an app and returns its keys. */
   async getKeys(code: string): Promise<ApiKeys> {
-    if (!this.randomHash) throw new KeysError('code_invalid');
-    const text = await this.request('/auth/login', {
-      phone: this.phone,
-      random_hash: this.randomHash,
-      password: code.trim(),
-    });
-    if (/too many tries/i.test(text)) throw new KeysError('too_many_tries');
-    if (text.trim() !== 'true' && !this.jar.has('stel_token')) throw new KeysError('code_invalid');
+    if (!this.loggedIn) {
+      if (!this.randomHash) throw new KeysError('code_invalid');
+      const text = await this.request('/auth/login', {
+        phone: this.phone,
+        random_hash: this.randomHash,
+        password: code.trim(),
+      });
+      if (/too many tries/i.test(text)) throw new KeysError('too_many_tries');
+      if (text.trim() !== 'true' && !this.jar.has('stel_token'))
+        throw new KeysError('code_invalid', snippet(text));
+      this.loggedIn = true;
+    }
 
     let page = await this.request('/apps');
     const existing = parseApps(page);
     if (existing) return existing;
 
     const hash = parseCreateHash(page);
-    if (!hash) throw new KeysError('create_failed');
-    // Short names must be unique across Telegram, so add digits. Telegram may also refuse a title
-    // it has seen too often; try a couple of variants before giving up.
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const suffix = String(Math.floor(100000 + Math.random() * 899999));
-      await this.request('/apps/create', {
-        hash,
-        app_title: attempt === 0 ? 'Marquee' : `Marquee ${suffix.slice(0, 3)}`,
-        app_shortname: `marquee${suffix}`,
-        app_url: '',
-        app_platform: 'android',
-        app_desc: 'Personal media library',
+    if (!hash) {
+      const where = /send_password|auth\/login|id="my_login/i.test(page)
+        ? 'sign-in page'
+        : snippet(page);
+      // The sign-in did not stick (no cookie): the next attempt needs a new code.
+      if (where === 'sign-in page') this.loggedIn = false;
+      throw new KeysError(
+        'create_failed',
+        `apps ${this.lastStatus}, ${where}, cookie ${this.jar.has('stel_token') ? 'yes' : 'no'}`,
+      );
+    }
+
+    // Short names must be unique across Telegram, so add digits. Telegram sometimes answers
+    // "ERROR" to a title, platform or empty URL it dislikes; try a few variants before giving up.
+    const variants = [
+      { title: 'Marquee', platform: 'android', url: '' },
+      { title: 'Marquee Player', platform: 'other', url: '' },
+      { title: 'My Media Library', platform: 'desktop', url: 'https://github.com' },
+      { title: 'Home Library', platform: 'android', url: 'https://github.com' },
+    ];
+    let answer = '';
+    for (const v of variants) {
+      const digits = String(Math.floor(10000 + Math.random() * 89999));
+      const letters = 'abcdefghijklmnopqrstuvwxyz';
+      const tail = Array.from({ length: 3 }, () => letters[Math.floor(Math.random() * 26)]).join(
+        '',
+      );
+      answer = await this.request('/apps/create', {
+        hash: parseCreateHash(page) ?? hash,
+        app_title: v.title,
+        app_shortname: `mq${tail}${digits}`,
+        app_url: v.url,
+        app_platform: v.platform,
+        app_desc: '',
       });
       page = await this.request('/apps');
       const created = parseApps(page);
       if (created) return created;
     }
-    throw new KeysError('create_failed');
+    throw new KeysError('create_failed', `create said: ${snippet(answer)}`);
   }
 }

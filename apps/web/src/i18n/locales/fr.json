@@ -352,6 +352,8 @@
     "keysCodeBody": "Telegram vient d'envoyer un message avec un code dans votre app Telegram. Copiez-le ici tel quel, lettres comprises.",
     "keysCodeLabel": "Code de configuration",
     "manualKeys": "J'ai mes propres clés API",
-    "useAuto": "Me connecter avec mon numéro plutôt"
+    "useAuto": "Me connecter avec mon numéro plutôt",
+    "keysRetryBody": "Votre code a fonctionné, mais Telegram n'a pas créé les clés. Touchez Réessayer ; pas besoin d'un nouveau code.",
+    "keysByHand": "Ou créez-les vous-même, puis choisissez « J'ai mes propres clés API » :"
   }
 }

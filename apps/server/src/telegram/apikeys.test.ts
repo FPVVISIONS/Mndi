@@ -72,7 +72,7 @@ describe('TelegramKeysClient', () => {
     const create = calls.find((c) => c.url.endsWith('/apps/create'))!;
     expect(create.cookie).toContain('stel_token=tok');
     expect(create.body).toContain('hash=9f8e7d6c5b4a');
-    expect(create.body).toMatch(/app_shortname=marquee\d{6}/);
+    expect(create.body).toMatch(/app_shortname=mq[a-z]{3}\d{5}/);
   });
 
   it('reports a wrong code and rate limiting', async () => {

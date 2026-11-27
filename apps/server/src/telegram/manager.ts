@@ -165,7 +165,7 @@ export class TelegramManager implements TelegramBackend {
 
   // ---- automatic API keys (my.telegram.org) ---------------------------------------------
 
-  private keysFail(step: AuthState['step'], err: unknown): AuthState {
+  private keysFail(step: AuthState['step'], err: unknown, retry = false): AuthState {
     const reason = err instanceof KeysError ? err.reason : 'network';
     const error =
       reason === 'phone_invalid'
@@ -177,7 +177,14 @@ export class TelegramManager implements TelegramBackend {
             : reason === 'network'
               ? 'network'
               : 'keys_failed';
-    this.auth = { step, error };
+    const detail =
+      err instanceof KeysError
+        ? err.detail
+        : err instanceof Error
+          ? err.message.slice(0, 80)
+          : undefined;
+    this.auth = { step, error, detail, retry: retry || undefined };
+    if (detail) console.warn(`[telegram keys] ${reason}: ${detail}`);
     return this.auth;
   }
 
@@ -199,22 +206,28 @@ export class TelegramManager implements TelegramBackend {
     return this.auth;
   }
 
-  /** Step 2: use that code to read or create the keys, then ask Telegram for the sign-in code. */
+  /**
+   * Step 2: use that code to read or create the keys, then ask Telegram for the sign-in code.
+   * When the code was accepted but creating the keys failed, the session is kept so the person can
+   * retry without waiting for another code.
+   */
   async submitKeysCode(code: string): Promise<AuthState> {
-    if (!this.keysClient) return this.keysFail('credentials', new KeysError('code_invalid'));
+    const client = this.keysClient;
+    if (!client) return this.keysFail('credentials', new KeysError('code_invalid'));
     let keys;
     try {
-      keys = await this.keysClient.getKeys(code);
+      keys = await client.getKeys(code);
     } catch (err) {
       const reason = err instanceof KeysError ? err.reason : 'network';
-      // A wrong code can be typed again; anything else starts over.
       if (reason === 'code_invalid') return this.keysFail('keys-code', err);
+      if (client.signedIn) return this.keysFail('keys-code', err, true);
       this.keysClient = null;
       return this.keysFail('credentials', err);
     }
     this.keysClient = null;
     const saved = await this.saveCredentials(keys.apiId, keys.apiHash);
-    if (saved.error) return this.keysFail('credentials', new KeysError('create_failed'));
+    if (saved.error)
+      return this.keysFail('credentials', new KeysError('create_failed', 'keys looked wrong'));
     return this.sendPhone(this.keysPhone);
   }
 

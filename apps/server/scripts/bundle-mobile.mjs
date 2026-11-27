@@ -44,7 +44,9 @@ await build({
 const code = readFileSync(resolve(out, 'main.js'), 'utf8');
 const bad = code.split('\n').findIndex((line) => /(?<!\\)\\[pP]\{/.test(line));
 if (bad >= 0) {
-  console.error(`Unicode property escape on line ${bad + 1} of the bundle; Android's Node cannot parse it:`);
+  console.error(
+    `Unicode property escape on line ${bad + 1} of the bundle; Android's Node cannot parse it:`,
+  );
   console.error(code.split('\n')[bad].trim().slice(0, 200));
   process.exit(1);
 }
@@ -54,4 +56,30 @@ writeFileSync(
   resolve(out, 'package.json'),
   JSON.stringify({ name: 'marquee-mobile', private: true }, null, 2),
 );
+
+// Optional: the app's own Telegram API keys, so people sign in with just a phone number (the way
+// published Telegram apps work). Read from the environment or a gitignored file at build time and
+// written only into the build output, never into the repository.
+const keysFile = resolve(root, 'apps/android/telegram-keys.properties');
+let apiId = process.env.MARQUEE_TG_API_ID ?? '';
+let apiHash = process.env.MARQUEE_TG_API_HASH ?? '';
+if ((!apiId || !apiHash) && existsSync(keysFile)) {
+  const props = Object.fromEntries(
+    readFileSync(keysFile, 'utf8')
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith('#') && l.includes('='))
+      .map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]),
+  );
+  apiId ||= props.api_id ?? '';
+  apiHash ||= props.api_hash ?? '';
+}
+if (apiId || apiHash) {
+  if (!/^\d{3,12}$/.test(apiId) || !/^[a-f0-9]{32}$/i.test(apiHash)) {
+    console.error('Telegram keys look wrong: api_id is digits, api_hash is 32 hex characters.');
+    process.exit(1);
+  }
+  writeFileSync(resolve(out, 'telegram.json'), JSON.stringify({ apiId: Number(apiId), apiHash }));
+  console.log('Built-in Telegram keys included: sign-in needs only a phone number.');
+}
 console.log(`Mobile bundle written to ${out}`);

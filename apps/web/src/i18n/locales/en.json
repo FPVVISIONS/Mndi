@@ -352,6 +352,8 @@
     "keysCodeBody": "Telegram just sent a message with a code to your Telegram app. Copy it here exactly, letters included.",
     "keysCodeLabel": "Setup code",
     "manualKeys": "I have my own API keys",
-    "useAuto": "Sign in with my phone number instead"
+    "useAuto": "Sign in with my phone number instead",
+    "keysRetryBody": "Your code worked, but Telegram didn't create the keys. Tap Try again; you won't need a new code.",
+    "keysByHand": "Or create them yourself, then choose \"I have my own API keys\":"
   }
 }

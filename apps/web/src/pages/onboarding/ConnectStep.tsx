@@ -39,6 +39,11 @@ function ErrorLine({ auth }: { auth: AuthState }) {
           className="mt-3 text-small text-accent"
         >
           {t(`auth.${auth.error}`, { seconds: auth.waitSeconds })}
+          {auth.detail && (
+            <span className="mt-1 block text-caption text-fg-faint" dir="ltr">
+              {auth.detail}
+            </span>
+          )}
         </m.p>
       )}
     </AnimatePresence>
@@ -172,29 +177,37 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             {t('onboarding.keysCodeTitle')}
           </m.h2>
           <m.p variants={fadeUp} className="text-fg-dim">
-            {t('onboarding.keysCodeBody')}
+            {auth.retry ? t('onboarding.keysRetryBody') : t('onboarding.keysCodeBody')}
           </m.p>
-          <m.div variants={fadeUp}>
-            <Field
-              label={t('onboarding.keysCodeLabel')}
-              autoComplete="one-time-code"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              autoFocus
-              value={keysCode}
-              onChange={(e) => setKeysCode(e.target.value.trim())}
-            />
-          </m.div>
+          {!auth.retry && (
+            <m.div variants={fadeUp}>
+              <Field
+                label={t('onboarding.keysCodeLabel')}
+                autoComplete="one-time-code"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                autoFocus
+                value={keysCode}
+                onChange={(e) => setKeysCode(e.target.value.trim())}
+              />
+            </m.div>
+          )}
           <ErrorLine auth={auth} />
           <m.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
             <Button
               type="submit"
               variant="primary"
               size="lg"
-              disabled={keysCode.length < 4 || keysSubmit.isPending}
+              disabled={(!auth.retry && keysCode.length < 4) || keysSubmit.isPending}
             >
-              {keysSubmit.isPending ? <Spinner /> : t('common.continue')}
+              {keysSubmit.isPending ? (
+                <Spinner />
+              ) : auth.retry ? (
+                t('common.retry')
+              ) : (
+                t('common.continue')
+              )}
             </Button>
             <Button
               variant="ghost"
@@ -207,6 +220,17 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
               {t('onboarding.differentNumber')}
             </Button>
           </m.div>
+          {auth.retry && (
+            <m.p variants={fadeUp} className="text-small text-fg-dim">
+              {t('onboarding.keysByHand')}{' '}
+              <a
+                href="https://my.telegram.org/apps"
+                className="text-fg underline underline-offset-4"
+              >
+                my.telegram.org/apps
+              </a>
+            </m.p>
+          )}
         </form>
       )}
 
