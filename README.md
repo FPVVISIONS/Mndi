@@ -66,10 +66,10 @@ npm start                # serves the app and API from one port (default 8787)
 
 ## Keys you need
 
-| What | Where | Env var |
-| --- | --- | --- |
-| Telegram API ID and hash | https://my.telegram.org/apps, "API development tools" | `TELEGRAM_API_ID`, `TELEGRAM_API_HASH` |
-| TMDB API key | https://www.themoviedb.org/settings/api (v3 key or v4 token) | `TMDB_API_KEY` |
+| What                     | Where                                                        | Env var                                |
+| ------------------------ | ------------------------------------------------------------ | -------------------------------------- |
+| Telegram API ID and hash | https://my.telegram.org/apps, "API development tools"        | `TELEGRAM_API_ID`, `TELEGRAM_API_HASH` |
+| TMDB API key             | https://www.themoviedb.org/settings/api (v3 key or v4 token) | `TMDB_API_KEY`                         |
 
 You can also paste the Telegram keys into the first onboarding screen instead of using `.env`; they
 are then stored encrypted. Without a TMDB key the app still works but shows file names without posters
