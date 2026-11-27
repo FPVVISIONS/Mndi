@@ -56,7 +56,8 @@
     "liveNow": "Live now",
     "heroGo": "Show {{title}}",
     "sectionScrollBack": "Scroll back",
-    "sectionScrollForward": "Scroll forward"
+    "sectionScrollForward": "Scroll forward",
+    "featured": "Featured"
   },
   "card": {
     "play": "Play {{title}}"

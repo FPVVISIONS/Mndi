@@ -57,7 +57,8 @@
     "liveNow": "משודר עכשיו",
     "heroGo": "הצג את {{title}}",
     "sectionScrollBack": "גלילה אחורה",
-    "sectionScrollForward": "גלילה קדימה"
+    "sectionScrollForward": "גלילה קדימה",
+    "featured": "מומלצים"
   },
   "card": {
     "play": "הפעלת {{title}}"

@@ -56,7 +56,8 @@
     "liveNow": "Şimdi canlı",
     "heroGo": "{{title}} göster",
     "sectionScrollBack": "Geri kaydır",
-    "sectionScrollForward": "İleri kaydır"
+    "sectionScrollForward": "İleri kaydır",
+    "featured": "Öne çıkanlar"
   },
   "card": {
     "play": "{{title}} oynat"

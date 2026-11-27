@@ -56,7 +56,8 @@
     "liveNow": "Ao vivo agora",
     "heroGo": "Mostrar {{title}}",
     "sectionScrollBack": "Rolar para trás",
-    "sectionScrollForward": "Rolar para a frente"
+    "sectionScrollForward": "Rolar para a frente",
+    "featured": "Em destaque"
   },
   "card": {
     "play": "Assistir a {{title}}"

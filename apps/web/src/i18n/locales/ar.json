@@ -60,7 +60,8 @@
     "liveNow": "مباشر الآن",
     "heroGo": "عرض {{title}}",
     "sectionScrollBack": "تمرير للخلف",
-    "sectionScrollForward": "تمرير للأمام"
+    "sectionScrollForward": "تمرير للأمام",
+    "featured": "مميّز"
   },
   "card": {
     "play": "تشغيل {{title}}"

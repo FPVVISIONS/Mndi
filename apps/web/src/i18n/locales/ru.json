@@ -58,7 +58,8 @@
     "liveNow": "Сейчас в эфире",
     "heroGo": "Показать «{{title}}»",
     "sectionScrollBack": "Прокрутить назад",
-    "sectionScrollForward": "Прокрутить вперёд"
+    "sectionScrollForward": "Прокрутить вперёд",
+    "featured": "Рекомендуем"
   },
   "card": {
     "play": "Смотреть «{{title}}»"

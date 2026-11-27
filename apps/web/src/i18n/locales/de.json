@@ -56,7 +56,8 @@
     "liveNow": "Jetzt live",
     "heroGo": "{{title}} anzeigen",
     "sectionScrollBack": "Zurückblättern",
-    "sectionScrollForward": "Weiterblättern"
+    "sectionScrollForward": "Weiterblättern",
+    "featured": "Empfohlen"
   },
   "card": {
     "play": "{{title}} abspielen"

@@ -300,7 +300,7 @@ export class Library {
           (popularity.get(c.id) ?? 0) + Math.max(0, 30 - (now - c.addedAt) / 86400);
         return score(b) - score(a);
       })
-      .slice(0, 5);
+      .slice(0, 8);
 
     const live = listChannels(this.db, ctx.profileId)
       .sort((a, b) => Number(b.favourite) - Number(a.favourite))

@@ -75,7 +75,7 @@ export default function Home() {
   return (
     <div>
       <Hero items={data.hero} />
-      <div className="relative z-10 -mt-8 space-y-2 sm:-mt-12">
+      <div className="relative z-10 mt-2 space-y-2 sm:mt-4">
         {data.rows.map((row, rowIndex) => {
           const title =
             row.id === 'genre'

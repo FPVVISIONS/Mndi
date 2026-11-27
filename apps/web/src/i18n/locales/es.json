@@ -56,7 +56,8 @@
     "liveNow": "En directo ahora",
     "heroGo": "Mostrar {{title}}",
     "sectionScrollBack": "Desplazar atrás",
-    "sectionScrollForward": "Desplazar adelante"
+    "sectionScrollForward": "Desplazar adelante",
+    "featured": "Destacados"
   },
   "card": {
     "play": "Reproducir {{title}}"

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { blurUp, duration, staggerChildren, stagger } from '../../design/motion';
 import { cn } from '../../lib/cn';
+import { useMedia } from '../../lib/hooks';
 import { useTitle } from '../../queries/hooks';
 import { usePrefs } from '../../stores/prefs';
 import { Crossfade } from '../ui/Crossfade';
@@ -15,7 +16,8 @@ import { MetaLine } from './MetaLine';
 import { TitleLogo } from './TitleLogo';
 import { watchPath } from './QuickActions';
 
-const ROTATE_MS = 10_000;
+/** How long each featured title stays up before the next one takes over while nobody is touching it. */
+const ROTATE_MS = 7_000;
 const PREVIEW_DELAY = 2600;
 
 export function Hero({ items }: { items: TitleCard[] }) {
@@ -72,7 +74,7 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
 
   return (
     <section
-      className="relative isolate min-h-[34rem] overflow-hidden sm:min-h-[38rem] lg:h-[min(48rem,80vh)]"
+      className="relative isolate min-h-[41rem] overflow-hidden sm:min-h-[44rem] lg:h-[min(52rem,88vh)]"
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -124,7 +126,7 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
       <div className="scrim-start absolute inset-0 -z-10" />
       <div className="scrim-fade-bg absolute inset-x-0 bottom-0 -z-10 h-1/3" />
 
-      <div className="page-x relative flex h-full min-h-[inherit] flex-col justify-end pb-28 pt-[calc(var(--nav-h)+3rem)] sm:pb-32">
+      <div className="page-x relative flex h-full min-h-[inherit] flex-col justify-end pb-[12.5rem] pt-[calc(var(--nav-h)+3rem)] sm:pb-[15.5rem]">
         <AnimatePresence mode="wait">
           <m.div
             key={card.id}
@@ -168,48 +170,139 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
         </AnimatePresence>
       </div>
 
-      <div className="page-x absolute inset-x-0 bottom-16 flex items-center justify-between sm:bottom-[4.5rem]">
-        <div className="flex items-center gap-2" role="tablist">
-          {items.map((it, i) => (
-            <button
-              key={it.id}
-              type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={t('home.heroGo', { title: it.title })}
-              onClick={() => setIndex(i)}
-              className="group grid h-6 place-items-center px-0.5"
-            >
-              <span
-                className={cn(
-                  'relative block h-[3px] overflow-hidden rounded-full bg-white/30 transition-[width] duration-300',
-                  i === index ? 'w-10' : 'w-5 group-hover:bg-white/50',
-                )}
-              >
-                {i === index && (
-                  <m.span
-                    key={`${index}-${paused}`}
-                    className="absolute inset-0 origin-left bg-fg [[dir=rtl]_&]:origin-right"
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: paused ? 1 : 1 }}
-                    transition={{ duration: paused ? 0 : ROTATE_MS / 1000, ease: 'linear' }}
-                  />
-                )}
-              </span>
-            </button>
-          ))}
-        </div>
+      <div className="absolute inset-x-0 bottom-4 z-10 sm:bottom-6">
         {showVideo && (
-          <button
-            type="button"
-            onClick={() => setMuted((m) => !m)}
-            aria-label={muted ? t('player.unmute') : t('player.mute')}
-            className="grid size-10 place-items-center rounded-full border border-white/40 bg-black/40 hover:border-fg"
-          >
-            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-          </button>
+          <div className="page-x mb-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setMuted((m) => !m)}
+              aria-label={muted ? t('player.unmute') : t('player.mute')}
+              className="glass grid size-10 place-items-center rounded-full"
+            >
+              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
+          </div>
         )}
+        <Spotlight
+          items={items}
+          index={index}
+          paused={paused}
+          onSelect={setIndex}
+          onOpen={(c) => navigate(`/title/${c.id}`, { state: { background: location } })}
+        />
       </div>
     </section>
+  );
+}
+
+/**
+ * The strip under the featured title: a row of posters where the selected one opens into a wide
+ * card with its logo. Left alone, it moves on to the next title by itself; tapping another poster
+ * picks it, tapping the open card opens the title.
+ */
+function Spotlight({
+  items,
+  index,
+  paused,
+  onSelect,
+  onOpen,
+}: {
+  items: TitleCard[];
+  index: number;
+  paused: boolean;
+  onSelect: (i: number) => void;
+  onOpen: (c: TitleCard) => void;
+}) {
+  const { t } = useTranslation();
+  const wide = useMedia('(min-width: 48rem)');
+  const h = wide ? 176 : 132;
+  const narrow = Math.round((h * 2) / 3);
+  const open = Math.round((h * 16) / 9);
+  const box = useRef<HTMLDivElement>(null);
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Keep the open card centred, scrolling the strip itself (never the page).
+  useEffect(() => {
+    const el = refs.current[index];
+    const c = box.current;
+    if (!el || !c) return;
+    const t = window.setTimeout(() => {
+      const a = el.getBoundingClientRect();
+      const b = c.getBoundingClientRect();
+      c.scrollBy({ left: a.left + a.width / 2 - (b.left + b.width / 2), behavior: 'smooth' });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [index, open]);
+
+  return (
+    <div
+      ref={box}
+      role="tablist"
+      aria-label={t('home.featured')}
+      className="no-scrollbar flex items-end gap-2.5 overflow-x-auto px-[var(--gutter)] py-2"
+      style={{ height: h + 16 }}
+    >
+      {items.map((c, i) => {
+        const on = i === index;
+        return (
+          <m.button
+            key={c.id}
+            ref={(el: HTMLButtonElement | null) => {
+              refs.current[i] = el;
+            }}
+            type="button"
+            role="tab"
+            aria-selected={on}
+            aria-label={c.title}
+            onClick={() => (on ? onOpen(c) : onSelect(i))}
+            initial={false}
+            animate={{ width: on ? open : narrow, y: on ? -4 : 0 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 26, mass: 0.9 }}
+            className={cn(
+              'relative shrink-0 overflow-hidden rounded-[1rem] bg-surface-2 shadow-[var(--shadow-card)]',
+              on ? 'ring-2 ring-white/90' : 'opacity-90 hover:opacity-100',
+            )}
+            style={{ height: h }}
+          >
+            <ArtImage image={c.poster} size="w342" className="absolute inset-0 size-full" />
+            <m.div
+              className="absolute inset-0"
+              initial={false}
+              animate={{ opacity: on ? 1 : 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <ArtImage image={c.backdrop} size="w780" className="absolute inset-0 size-full" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <div className="absolute inset-x-3 bottom-3 flex items-end">
+                {c.logo ? (
+                  <div className="h-9 w-32 sm:h-12 sm:w-44">
+                    <ArtImage
+                      image={c.logo}
+                      size="w500"
+                      fit="contain"
+                      className="!bg-transparent size-full [&_img]:object-[var(--logo-pos,left)]"
+                    />
+                  </div>
+                ) : (
+                  <span className="line-clamp-2 text-start text-small font-bold text-white sm:text-body">
+                    {c.title}
+                  </span>
+                )}
+              </div>
+              {on && (
+                <m.span
+                  key={`${index}-${paused}`}
+                  className="absolute inset-x-0 bottom-0 h-[3px] origin-left bg-white [[dir=rtl]_&]:origin-right"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: paused ? 0 : ROTATE_MS / 1000, ease: 'linear' }}
+                />
+              )}
+            </m.div>
+          </m.button>
+        );
+      })}
+    </div>
   );
 }

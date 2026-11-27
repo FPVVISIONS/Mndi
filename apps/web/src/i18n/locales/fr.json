@@ -56,7 +56,8 @@
     "liveNow": "En direct maintenant",
     "heroGo": "Afficher {{title}}",
     "sectionScrollBack": "Défiler en arrière",
-    "sectionScrollForward": "Défiler en avant"
+    "sectionScrollForward": "Défiler en avant",
+    "featured": "À l'affiche"
   },
   "card": {
     "play": "Lire {{title}}"
