@@ -370,6 +370,9 @@
     "noCode": "Non hai ricevuto il codice?",
     "resendSms": "Invia via SMS",
     "discovering": "Sto esaminando i tuoi gruppi e canali. Film, serie e canali live vengono ordinati automaticamente.",
-    "changeKeys": "Usa le mie chiavi API"
+    "changeKeys": "Usa le mie chiavi API",
+    "nativeSetupTitle": "Collega Telegram",
+    "nativeSetupBody": "Solo una volta: si apre la pagina di Telegram. Accedi con il numero e il codice ricevuto, e Marquee si configura da solo. Poi basta numero e codice.",
+    "nativeSetupButton": "Continua"
   }
 }

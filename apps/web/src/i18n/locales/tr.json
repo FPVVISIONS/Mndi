@@ -370,6 +370,9 @@
     "noCode": "Kod gelmedi mi?",
     "resendSms": "Bunun yerine SMS ile gönder",
     "discovering": "Grup ve kanallarınıza bakılıyor. Filmler, diziler ve canlı kanallar otomatik ayrılır.",
-    "changeKeys": "Kendi API anahtarlarımı kullan"
+    "changeKeys": "Kendi API anahtarlarımı kullan",
+    "nativeSetupTitle": "Telegram'ı bağla",
+    "nativeSetupBody": "Yalnızca bir kez: Telegram'ın kendi sayfası açılır. Numaranız ve gelen kodla giriş yapın, Marquee kendini ayarlar. Sonra yalnızca numara ve kod.",
+    "nativeSetupButton": "Devam"
   }
 }

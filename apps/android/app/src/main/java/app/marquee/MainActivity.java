@@ -241,6 +241,13 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Back from the keys page: reload so the sign-in screen moves on to the phone number.
+        if (requestCode == 41 && web != null) web.reload();
+    }
+
+    @Override
     public void onBackPressed() {
         if (fullscreenCallback != null) {
             fullscreenCallback.onCustomViewHidden();
@@ -254,6 +261,12 @@ public class MainActivity extends Activity {
 
     /** Called from the page as window.MarqueeNative. */
     private final class Bridge {
+        /** Opens Telegram's developer page once so the app can pick up its own Telegram keys. */
+        @JavascriptInterface
+        public void setupKeys() {
+            runOnUiThread(() -> startActivityForResult(new Intent(MainActivity.this, KeysActivity.class), 41));
+        }
+
         /** Plays a library file in the built-in native player. Progress is saved to the local server. */
         @JavascriptInterface
         public void playNative(String url, String title, double startSeconds, int fileId, int profileId) {

@@ -370,6 +370,9 @@
     "noCode": "Didn't get a code?",
     "resendSms": "Send by SMS instead",
     "discovering": "Looking through your groups and channels. Movies, series and live channels are sorted out automatically.",
-    "changeKeys": "Use my own API keys instead"
+    "changeKeys": "Use my own API keys instead",
+    "nativeSetupTitle": "Connect Telegram",
+    "nativeSetupBody": "One time only: Telegram's own page opens. Sign in with your number and the code Telegram sends you, and Marquee sets itself up from there. After that you just use your number and a code.",
+    "nativeSetupButton": "Continue"
   }
 }

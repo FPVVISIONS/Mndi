@@ -370,6 +370,9 @@
     "noCode": "Não recebeu o código?",
     "resendSms": "Enviar por SMS",
     "discovering": "Analisando seus grupos e canais. Filmes, séries e canais ao vivo são organizados automaticamente.",
-    "changeKeys": "Usar minhas próprias chaves de API"
+    "changeKeys": "Usar minhas próprias chaves de API",
+    "nativeSetupTitle": "Conectar o Telegram",
+    "nativeSetupBody": "Só uma vez: abre a página do Telegram. Entre com seu número e o código enviado, e o Marquee se configura sozinho. Depois só número e código.",
+    "nativeSetupButton": "Continuar"
   }
 }

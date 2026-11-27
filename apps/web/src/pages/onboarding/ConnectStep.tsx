@@ -9,6 +9,7 @@ import { Segmented } from '../../components/ui/Segmented';
 import { Spinner } from '../../components/ui/Spinner';
 import { fadeUp, staggerChildren, stagger, t as tokens } from '../../design/motion';
 import { api } from '../../lib/api';
+import { native } from '../../lib/native';
 import { useStatus } from '../../queries/hooks';
 
 function Field({
@@ -160,7 +161,30 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
       animate="show"
       transition={tokens.base}
     >
-      {step === 'credentials' && !manual && (
+      {step === 'credentials' && !manual && native()?.setupKeys && (
+        <div className="space-y-5">
+          <m.h2 variants={fadeUp} className="font-display text-title-l">
+            {t('onboarding.nativeSetupTitle')}
+          </m.h2>
+          <m.p variants={fadeUp} className="text-fg-dim">
+            {t('onboarding.nativeSetupBody')}
+          </m.p>
+          <m.div variants={fadeUp} className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Button variant="primary" size="lg" onClick={() => native()?.setupKeys?.()}>
+              {t('onboarding.nativeSetupButton')}
+            </Button>
+            <button
+              type="button"
+              className="text-small text-fg-dim underline underline-offset-4 hover:text-fg"
+              onClick={() => setManual(true)}
+            >
+              {t('onboarding.manualKeys')}
+            </button>
+          </m.div>
+        </div>
+      )}
+
+      {step === 'credentials' && !manual && !native()?.setupKeys && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
