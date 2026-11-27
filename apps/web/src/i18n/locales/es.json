@@ -95,10 +95,11 @@
     "sortYear": "Año",
     "allGenres": "Todos los géneros",
     "emptyTitle": "Aún no hay nada",
-    "emptyBody": "Elige qué chats indexar y etiquétalos; tu biblioteca se irá llenando sola.",
-    "emptyAction": "Elegir chats",
+    "emptyBody": "Marquee revisa tus chats solo. Si tus vídeos están en un grupo al que te uniste hace poco, busca de nuevo.",
+    "emptyAction": "Buscar de nuevo",
     "noMatchTitle": "No hay títulos en este género",
-    "noMatchBody": "Prueba con otro género o quita el filtro."
+    "noMatchBody": "Prueba con otro género o quita el filtro.",
+    "indexingBody": "Revisando tus chats. Tus películas y series aparecerán aquí a medida que se encuentren."
   },
   "live": {
     "title": "TV en directo",

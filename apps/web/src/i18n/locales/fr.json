@@ -95,10 +95,11 @@
     "sortYear": "Année",
     "allGenres": "Tous les genres",
     "emptyTitle": "Rien ici pour l’instant",
-    "emptyBody": "Choisissez les chats à indexer et étiquetez-les : votre bibliothèque se remplit toute seule.",
-    "emptyAction": "Choisir des chats",
+    "emptyBody": "Marquee parcourt vos discussions tout seul. Si vos vidéos sont dans un groupe rejoint récemment, relancez la recherche.",
+    "emptyAction": "Chercher à nouveau",
     "noMatchTitle": "Aucun titre dans ce genre",
-    "noMatchBody": "Essayez un autre genre ou retirez le filtre."
+    "noMatchBody": "Essayez un autre genre ou retirez le filtre.",
+    "indexingBody": "Exploration de vos discussions. Vos films et séries apparaîtront ici au fur et à mesure."
   },
   "live": {
     "title": "TV en direct",

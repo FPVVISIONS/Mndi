@@ -1,7 +1,6 @@
 import { Clapperboard, Tv } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { TitleCardView } from '../components/media/TitleCardView';
 import { VirtualGrid } from '../components/media/VirtualGrid';
 import { Button } from '../components/ui/Button';
@@ -9,16 +8,20 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Popover, MenuItem } from '../components/ui/Popover';
 import { PillTabs } from '../components/ui/Segmented';
 import { Skeleton } from '../components/ui/Skeleton';
-import { useTitles } from '../queries/hooks';
+import { useMedia } from '../lib/hooks';
+import { api } from '../lib/api';
+import { useStatus, useTitles } from '../queries/hooks';
 import { ArrowDownUp } from 'lucide-react';
 
 type Sort = 'recent' | 'title' | 'rating' | 'year';
 
 export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [genre, setGenre] = useState('');
   const [sort, setSort] = useState<Sort>('recent');
+  const { data: status } = useStatus();
+  const searching = Boolean(status?.index.scanning || status?.index.discovering);
+  const phone = useMedia('(max-width: 39.99rem)');
   const { data, isPending } = useTitles({ kind, genre: genre || undefined, sort });
   const Icon = kind === 'movie' ? Clapperboard : Tv;
 
@@ -81,7 +84,7 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
       ) : data && data.items.length > 0 ? (
         <VirtualGrid
           items={data.items}
-          minWidth={168}
+          minWidth={phone ? 108 : 168}
           aspect={1.5}
           gap={16}
           keyOf={(c) => c.id}
@@ -98,11 +101,13 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
         <EmptyState
           icon={<Icon size={26} />}
           title={t('browse.emptyTitle')}
-          body={t('browse.emptyBody')}
+          body={searching ? t('browse.indexingBody') : t('browse.emptyBody')}
           action={
-            <Button variant="primary" onClick={() => navigate('/settings?tab=library')}>
-              {t('browse.emptyAction')}
-            </Button>
+            searching ? undefined : (
+              <Button variant="primary" onClick={() => void api.discover().then(() => undefined)}>
+                {t('browse.emptyAction')}
+              </Button>
+            )
           }
         />
       )}

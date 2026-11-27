@@ -95,10 +95,11 @@
     "sortYear": "Anno",
     "allGenres": "Tutti i generi",
     "emptyTitle": "Ancora niente qui",
-    "emptyBody": "Scegli quali chat indicizzare e assegna un tag: la libreria si riempie da sola.",
-    "emptyAction": "Scegli le chat",
+    "emptyBody": "Marquee esamina da solo le tue chat. Se i video sono in un gruppo recente, cerca di nuovo.",
+    "emptyAction": "Cerca di nuovo",
     "noMatchTitle": "Nessun titolo in questo genere",
-    "noMatchBody": "Prova un altro genere o rimuovi il filtro."
+    "noMatchBody": "Prova un altro genere o rimuovi il filtro.",
+    "indexingBody": "Sto esaminando le tue chat. Film e serie compariranno qui man mano che vengono trovati."
   },
   "live": {
     "title": "TV in diretta",

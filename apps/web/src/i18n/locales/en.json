@@ -95,10 +95,11 @@
     "sortYear": "Year",
     "allGenres": "All genres",
     "emptyTitle": "Nothing here yet",
-    "emptyBody": "Choose which chats to index and tag them, then your library fills in on its own.",
-    "emptyAction": "Choose chats",
+    "emptyBody": "Marquee looks through your chats by itself. If your videos are in a group you joined recently, look again.",
+    "emptyAction": "Look again",
     "noMatchTitle": "No titles in this genre",
-    "noMatchBody": "Try another genre or clear the filter."
+    "noMatchBody": "Try another genre or clear the filter.",
+    "indexingBody": "Looking through your chats. Your movies and series will appear here as they are found."
   },
   "live": {
     "title": "Live TV",

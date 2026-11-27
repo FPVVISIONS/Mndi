@@ -114,6 +114,7 @@ async function createWasmDb(file: string): Promise<Db> {
 
   let saved = -1;
   const changes = () => Number(sqlite.exec('SELECT total_changes()')[0]?.values[0]?.[0] ?? 0);
+  let lastFlush = 0;
   const flush = () => {
     if (!memory) return;
     const now = changes();
@@ -124,10 +125,15 @@ async function createWasmDb(file: string): Promise<Db> {
     // export() resets the connection; re-apply settings and remember the new baseline.
     sqlite.run('PRAGMA foreign_keys = ON');
     saved = changes();
+    lastFlush = Date.now();
   };
   flush();
   // Exporting the whole database is costly, so write at most every few seconds, and only after changes.
-  setInterval(flush, 5000).unref();
+  // On a phone the database can be tens of megabytes while the library is indexing, and writing it
+  // out blocks everything else. So: at most once every 30 seconds, and on shutdown.
+  setInterval(() => {
+    if (Date.now() - lastFlush >= 30_000) flush();
+  }, 5000).unref();
   for (const sig of ['SIGINT', 'SIGTERM', 'beforeExit'] as const) process.once(sig, flush);
 
   const db = drizzle(sqlite, { schema }) as unknown as Db;

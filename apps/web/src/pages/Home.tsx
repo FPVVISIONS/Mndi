@@ -1,6 +1,5 @@
 import { Film } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Hero } from '../components/media/Hero';
 import { Row } from '../components/media/Row';
 import { TitleCardView } from '../components/media/TitleCardView';
@@ -10,7 +9,8 @@ import { Button } from '../components/ui/Button';
 import { Deferred } from '../components/ui/Deferred';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
-import { useHome } from '../queries/hooks';
+import { api } from '../lib/api';
+import { useHome, useStatus } from '../queries/hooks';
 
 /** Approximate height of one row, used to reserve space for rows that have not mounted yet. */
 const ROW_HEIGHT = 'calc(var(--card-w) * 1.5 + 5rem)';
@@ -37,8 +37,9 @@ function HomeSkeleton() {
 
 export default function Home() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { data, isPending, isError } = useHome();
+  const { data: status } = useStatus();
+  const searching = Boolean(status?.index.scanning || status?.index.discovering);
 
   if (isPending) return <HomeSkeleton />;
   if (isError || !data) {
@@ -61,11 +62,13 @@ export default function Home() {
         <EmptyState
           icon={<Film size={26} />}
           title={t('browse.emptyTitle')}
-          body={t('browse.emptyBody')}
+          body={searching ? t('browse.indexingBody') : t('browse.emptyBody')}
           action={
-            <Button variant="primary" onClick={() => navigate('/settings?tab=library')}>
-              {t('browse.emptyAction')}
-            </Button>
+            searching ? undefined : (
+              <Button variant="primary" onClick={() => void api.discover().then(() => undefined)}>
+                {t('browse.emptyAction')}
+              </Button>
+            )
           }
         />
       </div>

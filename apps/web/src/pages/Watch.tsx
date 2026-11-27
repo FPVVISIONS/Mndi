@@ -31,7 +31,7 @@ function Backdrop({ children }: { children?: React.ReactNode }) {
   );
 }
 
-function Failure() {
+function Failure({ detail }: { detail?: string }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
@@ -39,6 +39,7 @@ function Failure() {
       <div>
         <h2 className="font-display text-title-m">{t('player.errorTitle')}</h2>
         <p className="mt-2 max-w-sm text-fg-dim">{t('player.errorBody')}</p>
+        {detail && <p className="mt-2 text-caption text-fg-faint">{detail}</p>}
         <div className="mt-6 flex justify-center gap-3">
           <Button variant="primary" onClick={() => location.reload()}>
             {t('common.retry')}
@@ -69,6 +70,9 @@ export function WatchFile() {
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: 'always',
+    // Coming back from the native player must not refetch (and possibly fail) behind it.
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   useEffect(() => {
@@ -89,10 +93,25 @@ export function WatchFile() {
     launched.current = true;
     const title = info.subtitle ? `${info.title} · ${info.subtitle}` : info.title;
     playInNativePlayer(info.fileId, title, resumeAt.current ?? info.resume, profileId ?? 0);
-    navigate(-1);
+    leaveWatch();
   }, [q.data, inApp, navigate, profileId]);
 
-  if (q.isError) return <Failure />;
+  // The native player is on screen: this page only has to step out of the way.
+  function leaveWatch() {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/', { replace: true });
+  }
+  useEffect(() => {
+    if (inApp && launched.current && q.isError) leaveWatch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inApp, q.isError]);
+
+  if (q.isError) {
+    const e = q.error as { status?: number; code?: string; detail?: string } | null;
+    return (
+      <Failure detail={e ? `${e.status ?? ''} ${e.detail ?? e.code ?? ''}`.trim() : undefined} />
+    );
+  }
   if (!q.data || !decided || q.isFetching || inApp) return <Backdrop />;
   const info = q.data;
   const startAt = resumeAt.current ?? info.resume;

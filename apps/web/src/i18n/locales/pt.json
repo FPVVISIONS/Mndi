@@ -95,10 +95,11 @@
     "sortYear": "Ano",
     "allGenres": "Todos os gêneros",
     "emptyTitle": "Nada por aqui ainda",
-    "emptyBody": "Escolha quais chats indexar e marque cada um, e a biblioteca se preenche sozinha.",
-    "emptyAction": "Escolher chats",
+    "emptyBody": "O Marquee analisa seus chats sozinho. Se seus vídeos estão num grupo recente, procure de novo.",
+    "emptyAction": "Procurar de novo",
     "noMatchTitle": "Nenhum título neste gênero",
-    "noMatchBody": "Tente outro gênero ou limpe o filtro."
+    "noMatchBody": "Tente outro gênero ou limpe o filtro.",
+    "indexingBody": "Analisando seus chats. Seus filmes e séries aparecerão aqui conforme forem encontrados."
   },
   "live": {
     "title": "TV ao vivo",

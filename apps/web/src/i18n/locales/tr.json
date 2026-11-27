@@ -95,10 +95,11 @@
     "sortYear": "Yıl",
     "allGenres": "Tüm türler",
     "emptyTitle": "Burada henüz bir şey yok",
-    "emptyBody": "Hangi sohbetlerin taranacağını seç ve etiketle; kütüphanen kendiliğinden dolar.",
-    "emptyAction": "Sohbetleri seç",
+    "emptyBody": "Marquee sohbetlerinize kendisi bakar. Videolarınız yeni katıldığınız bir gruptaysa tekrar arayın.",
+    "emptyAction": "Tekrar ara",
     "noMatchTitle": "Bu türde yapım yok",
-    "noMatchBody": "Başka bir tür dene ya da filtreyi temizle."
+    "noMatchBody": "Başka bir tür dene ya da filtreyi temizle.",
+    "indexingBody": "Sohbetlerinize bakılıyor. Filmleriniz ve dizileriniz bulundukça burada görünecek."
   },
   "live": {
     "title": "Canlı TV",

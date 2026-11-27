@@ -166,6 +166,40 @@ export class MetadataService {
   /** Titles already tried this run, so unmatched ones are not searched again on every scan. */
   private readonly tried = new Map<number, number>();
 
+  /** Hebrew spelled out in Latin letters, for titles written phonetically ("שרינגקינג" -> "shringking"). */
+  private transliterate(name: string): string {
+    const map: Record<string, string> = {
+      א: 'a',
+      ב: 'b',
+      ג: 'g',
+      ד: 'd',
+      ה: 'h',
+      ו: 'v',
+      ז: 'z',
+      ח: 'h',
+      ט: 't',
+      י: 'i',
+      כ: 'k',
+      ך: 'k',
+      ל: 'l',
+      מ: 'm',
+      ם: 'm',
+      נ: 'n',
+      ן: 'n',
+      ס: 's',
+      ע: 'a',
+      פ: 'p',
+      ף: 'f',
+      צ: 'ts',
+      ץ: 'ts',
+      ק: 'k',
+      ר: 'r',
+      ש: 'sh',
+      ת: 't',
+    };
+    return [...name].map((c) => map[c] ?? c).join('');
+  }
+
   /** The search language that suits a title's script, so Hebrew or Russian names are found by their own text. */
   private searchLanguages(name: string): string[] {
     if (/[\u0590-\u05FF]/.test(name)) return ['he-IL', 'en-US'];
@@ -188,6 +222,8 @@ export class MetadataService {
     const queries = [row.name];
     if (words.length > 2) queries.push(words.slice(0, -1).join(' '));
     if (words.length > 3) queries.push(words.slice(0, -2).join(' '));
+    // A Hebrew name that is really an English title spelled phonetically: also try it in Latin letters.
+    const phonetic = /[\u0590-\u05FF]/.test(row.name) ? this.transliterate(row.name) : null;
     for (const [i, q] of queries.entries()) {
       for (const lang of this.searchLanguages(row.name)) {
         for (const year of row.year ? [row.year, null] : [null]) {
@@ -195,7 +231,13 @@ export class MetadataService {
           const best = hits
             .map((h) => ({
               h,
-              s: scoreCandidate({ title: q, year: row.year || null }, h, titleKey),
+              // A series' first-air year rarely matches the year in a file name, so it is not held
+              // against it.
+              s: scoreCandidate(
+                { title: q, year: row.kind === 'series' ? null : row.year || null },
+                h,
+                titleKey,
+              ),
             }))
             .sort((a, b) => b.s - a.s)[0];
           // A shortened query must match more closely before it is trusted.
@@ -203,6 +245,13 @@ export class MetadataService {
             return this.setMatch(titleId, best.h.id, false);
         }
       }
+    }
+    if (phonetic) {
+      const hits = await this.search(row.kind, phonetic, null, 'en-US');
+      const best = hits
+        .map((h) => ({ h, s: scoreCandidate({ title: phonetic, year: null }, h, titleKey) }))
+        .sort((a, b) => b.s - a.s)[0];
+      if (best && best.s >= 0.78) return this.setMatch(titleId, best.h.id, false);
     }
     return titleId;
   }

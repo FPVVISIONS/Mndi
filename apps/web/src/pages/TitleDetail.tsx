@@ -224,7 +224,10 @@ export default function TitleDetail() {
   const location = useLocation();
   const nav = location.state as { background?: unknown; art?: string } | null;
   const modal = Boolean(nav?.background);
-  const { data: d, isError, isPending } = useTitle(Number(id));
+  const { data: d, isError, isPending, error } = useTitle(Number(id));
+  const failure = error as { status?: number; detail?: string } | null;
+  // Only a real 404 means the title is gone; anything else is a problem loading it.
+  const gone = !failure || failure.status === 404;
 
   const close = () => (modal ? navigate(-1) : navigate('/'));
 
@@ -255,8 +258,12 @@ export default function TitleDetail() {
         <div className="pt-12">
           <EmptyState
             icon={<X size={26} />}
-            title={t('detail.notFound')}
-            body={t('detail.notFoundBody')}
+            title={gone ? t('detail.notFound') : t('error.title')}
+            body={
+              gone
+                ? t('detail.notFoundBody')
+                : `${t('error.body')}${failure?.detail ? ` (${failure.status}: ${failure.detail})` : ` (${failure?.status ?? 'offline'})`}`
+            }
             action={
               <Button variant="primary" onClick={close}>
                 {t('common.back')}

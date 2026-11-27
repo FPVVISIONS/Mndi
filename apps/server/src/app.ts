@@ -19,9 +19,13 @@ export async function buildApp(svc: Services): Promise<FastifyInstance> {
       return reply.code(400).send({ error: 'bad_request', message: 'Invalid request.' });
     const status = (err as { statusCode?: number }).statusCode ?? 500;
     if (status >= 500) console.error(err);
+    // The first line of the failure travels with the error so the app can show what went wrong.
+    const detail = String((err as Error)?.message ?? '')
+      .split('\n')[0]!
+      .slice(0, 120);
     return reply
       .code(status)
-      .send({ error: 'server_error', message: 'Something went wrong on the server.' });
+      .send({ error: 'server_error', message: 'Something went wrong on the server.', detail });
   });
 
   // Text, JSON, JS, CSS and SVG are compressed; video and JPEG are not compressible and pass through.

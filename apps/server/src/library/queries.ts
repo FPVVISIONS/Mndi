@@ -114,6 +114,9 @@ export class Library {
     lang: LanguageCode,
   ): Map<number, { meta: LocalizedMeta; exact: boolean }> {
     const out = new Map<number, { meta: LocalizedMeta; exact: boolean }>();
+    // Fetching details for a whole library on one request floods the network and the database,
+    // so only the first batch is asked for now; prefetch() brings in the rest in the background.
+    let budget = 60;
     for (const kind of ['movie', 'series'] as const) {
       const ids = rows.filter((r) => r.kind === kind && r.tmdbId).map((r) => r.tmdbId!);
       const exact = this.meta.peekMany(kind, ids, lang);
@@ -124,7 +127,7 @@ export class Library {
         if (e) out.set(r.id, { meta: e, exact: true });
         else {
           if (f) out.set(r.id, { meta: f, exact: false });
-          void this.meta.ensure(kind, r.tmdbId!, lang);
+          if (budget-- > 0) void this.meta.ensure(kind, r.tmdbId!, lang);
         }
       }
     }
@@ -457,19 +460,37 @@ export class Library {
     const row = this.db.select().from(titles).where(eq(titles.id, id)).get();
     if (!row) return null;
     const card = this.cards([row], ctx)[0]!;
-    const m = row.tmdbId
-      ? (this.meta.peek(row.kind, row.tmdbId, ctx.lang) ??
-        this.meta.peek(row.kind, row.tmdbId, 'en'))
-      : null;
-    const target = this.playTarget(row, ctx);
+    // Everything beyond the basics comes from TMDB's data. A title still opens, with less detail,
+    // if some part of that data has an unexpected shape.
+    const safe = <T>(fn: () => T, fallback: T): T => {
+      try {
+        return fn();
+      } catch (err) {
+        console.error(`detail(${id}):`, err);
+        return fallback;
+      }
+    };
+    const m = safe(
+      () =>
+        row.tmdbId
+          ? (this.meta.peek(row.kind, row.tmdbId, ctx.lang) ??
+            this.meta.peek(row.kind, row.tmdbId, 'en'))
+          : null,
+      null,
+    );
+    const target = safe(() => this.playTarget(row, ctx), null);
     const seasonRows = this.db.all<{ season: number; n: number }>(
       sql`SELECT season, COUNT(*) AS n FROM episodes WHERE title_id = ${id} GROUP BY season ORDER BY season`,
     );
-    const prog = target
-      ? this.progressRows(ctx).find(
-          (r) => r.p.fileId === target.fileId && !r.p.completed && r.p.position >= 5,
-        )
-      : undefined;
+    const prog = safe(
+      () =>
+        target
+          ? this.progressRows(ctx).find(
+              (r) => r.p.fileId === target.fileId && !r.p.completed && r.p.position >= 5,
+            )
+          : undefined,
+      undefined,
+    );
     return {
       ...card,
       progress: prog
@@ -483,17 +504,21 @@ export class Library {
       tagline: m?.tagline ?? '',
       certification: m?.certification ?? null,
       originalLanguage: m?.originalLanguage ?? null,
-      cast: (m?.cast ?? []).map((c) => ({
-        name: c.name,
-        role: c.role,
-        photo: c.photo ? { id: c.photo, color: this.meta.colorFor(c.photo), lang: null } : null,
-      })),
+      cast: safe(
+        () =>
+          (m?.cast ?? []).map((c) => ({
+            name: c.name,
+            role: c.role,
+            photo: c.photo ? { id: c.photo, color: this.meta.colorFor(c.photo), lang: null } : null,
+          })),
+        [],
+      ),
       trailer: m?.trailer ?? null,
       seasonList: seasonRows.map((s) => ({ season: s.season, name: '', episodes: s.n })),
-      similar: this.similar(row, card, ctx),
+      similar: safe(() => this.similar(row, card, ctx), []),
       playFileId: target?.fileId ?? null,
       playLabel: target?.label ?? null,
-      versions: row.kind === 'movie' ? this.versionsOf('title', id, ctx) : [],
+      versions: safe(() => (row.kind === 'movie' ? this.versionsOf('title', id, ctx) : []), []),
     };
   }
 

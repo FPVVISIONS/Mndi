@@ -22,6 +22,8 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
+    /** First line of what the server said went wrong, for the error screens. */
+    readonly detail?: string,
   ) {
     super(code);
   }
@@ -49,8 +51,8 @@ async function request<T>(
     throw new ApiError(0, 'offline');
   }
   if (!res.ok) {
-    const data = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new ApiError(res.status, data.error ?? 'error');
+    const data = (await res.json().catch(() => ({}))) as { error?: string; detail?: string };
+    throw new ApiError(res.status, data.error ?? 'error', data.detail);
   }
   return (await res.json()) as T;
 }
