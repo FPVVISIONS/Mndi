@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { duration, ease } from '../../design/motion';
 import { cn } from '../../lib/cn';
@@ -47,7 +47,7 @@ export function Popover({
       {trigger({ open, toggle: () => setOpen((o) => !o) })}
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.96, y: side === 'bottom' ? -6 : 6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: duration.fast } }}
@@ -63,7 +63,7 @@ export function Popover({
             )}
           >
             {children(() => setOpen(false))}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

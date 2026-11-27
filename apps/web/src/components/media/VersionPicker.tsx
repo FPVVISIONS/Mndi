@@ -1,5 +1,5 @@
 import type { FileVersion } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, Film, MessageSquare, Play, Subtitles, Volume2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +56,7 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
           <Skeleton className="h-20" />
         </div>
       ) : (
-        <motion.ul
+        <m.ul
           variants={staggerChildren(stagger.list)}
           initial="hidden"
           animate="show"
@@ -67,7 +67,7 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
           {versions.map((v) => {
             const on = v.id === selected;
             return (
-              <motion.li key={v.id} variants={fadeUp}>
+              <m.li key={v.id} variants={fadeUp}>
                 <button
                   type="button"
                   role="radio"
@@ -137,10 +137,10 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
                     {on && <Check size={12} strokeWidth={3} />}
                   </span>
                 </button>
-              </motion.li>
+              </m.li>
             );
           })}
-        </motion.ul>
+        </m.ul>
       )}
       <div className="mt-5 flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose}>

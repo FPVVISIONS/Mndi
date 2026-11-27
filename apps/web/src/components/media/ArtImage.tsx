@@ -65,13 +65,16 @@ export function ArtImage({
           src={l.src}
           alt={i === layers.length - 1 ? alt : ''}
           loading={eager ? 'eager' : 'lazy'}
+          // React 18 only knows the lowercase attribute.
+          {...(eager ? ({ fetchpriority: 'high' } as object) : {})}
           decoding="async"
           draggable={false}
           onLoad={() => onLoad(l.src)}
           className={cn(
             'absolute inset-0 size-full transition-opacity duration-[var(--dur-slow)] ease-[var(--ease-out)]',
             fit === 'cover' ? 'object-cover' : 'object-contain',
-            l.loaded ? 'opacity-100' : 'opacity-0',
+            // An eager image (hero, detail) is above the fold: paint it the moment it decodes, no fade.
+            l.loaded || (eager && i === 0) ? 'opacity-100' : 'opacity-0',
             imgClassName,
           )}
         />

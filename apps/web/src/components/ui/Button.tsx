@@ -1,4 +1,4 @@
-import { motion, type HTMLMotionProps } from 'framer-motion';
+import { m, type HTMLMotionProps } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { press, spring } from '../../design/motion';
 import { cn } from '../../lib/cn';
@@ -36,7 +36,7 @@ export function Button({
   ...rest
 }: Props) {
   return (
-    <motion.button
+    <m.button
       type={type}
       whileTap={rest.disabled ? undefined : press}
       transition={spring.snappy}
@@ -50,7 +50,7 @@ export function Button({
     >
       {icon}
       {children}
-    </motion.button>
+    </m.button>
   );
 }
 
@@ -71,7 +71,7 @@ export function IconButton({
   ...rest
 }: IconProps) {
   return (
-    <motion.button
+    <m.button
       type={type}
       aria-label={label}
       title={label}
@@ -89,6 +89,6 @@ export function IconButton({
       {...rest}
     >
       {children}
-    </motion.button>
+    </m.button>
   );
 }

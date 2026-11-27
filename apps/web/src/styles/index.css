@@ -203,3 +203,13 @@ input.vol::-moz-range-thumb {
   border-radius: 999px;
   background: var(--color-fg);
 }
+
+/* Hero slide change: the incoming backdrop fades over the outgoing one. */
+.hero-fade-in {
+  animation: hero-in var(--dur-hero, 800ms) var(--ease-out, ease-out) both;
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+  }
+}

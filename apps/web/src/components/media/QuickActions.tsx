@@ -1,5 +1,5 @@
 import type { TitleCard } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, Play, Plus, ThumbsUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,7 @@ function Round({
   solid?: boolean;
 }) {
   return (
-    <motion.button
+    <m.button
       type="button"
       aria-label={label}
       title={label}
@@ -43,7 +43,7 @@ function Round({
       )}
     >
       {children}
-    </motion.button>
+    </m.button>
   );
 }
 
@@ -71,7 +71,7 @@ export function QuickActions({ card, className }: { card: TitleCard; className?:
           push(card.inList ? t('toast.removed') : t('toast.added'));
         }}
       >
-        <motion.span
+        <m.span
           key={String(card.inList)}
           initial={{ scale: 0.4, rotate: -60, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -79,13 +79,13 @@ export function QuickActions({ card, className }: { card: TitleCard; className?:
           className="grid"
         >
           {card.inList ? <Check size={17} /> : <Plus size={17} />}
-        </motion.span>
+        </m.span>
       </Round>
       <Round
         label={card.liked ? t('common.liked') : t('common.like')}
         onClick={() => toggleLike.mutate({ id: card.id, on: !card.liked })}
       >
-        <motion.span
+        <m.span
           key={String(card.liked)}
           initial={{ scale: 0.5 }}
           animate={{ scale: 1 }}
@@ -93,7 +93,7 @@ export function QuickActions({ card, className }: { card: TitleCard; className?:
           className="grid"
         >
           <ThumbsUp size={15} className={card.liked ? 'fill-fg' : ''} />
-        </motion.span>
+        </m.span>
       </Round>
     </div>
   );

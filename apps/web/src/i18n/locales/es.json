@@ -59,8 +59,7 @@
     "sectionScrollForward": "Desplazar adelante"
   },
   "card": {
-    "play": "Reproducir {{title}}",
-    "details": "Detalles de {{title}}"
+    "play": "Reproducir {{title}}"
   },
   "detail": {
     "cast": "Reparto",

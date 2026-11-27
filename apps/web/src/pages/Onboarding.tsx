@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -83,14 +83,14 @@ export default function Onboarding() {
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <aside className="relative hidden flex-col justify-between overflow-hidden border-e border-line bg-surface-1 p-14 lg:flex">
         <Wordmark />
-        <motion.div variants={staggerChildren(stagger.hero, 0.2)} initial="hidden" animate="show">
-          <motion.h1 variants={fadeUp} className="font-display text-display-m text-balance">
+        <m.div variants={staggerChildren(stagger.hero, 0.2)} initial="hidden" animate="show">
+          <m.h1 variants={fadeUp} className="font-display text-display-m text-balance">
             {t('onboarding.tagline')}
-          </motion.h1>
-          <motion.p variants={fadeUp} className="mt-5 max-w-sm text-lead text-fg-dim">
+          </m.h1>
+          <m.p variants={fadeUp} className="mt-5 max-w-sm text-lead text-fg-dim">
             {t('onboarding.taglineBody')}
-          </motion.p>
-        </motion.div>
+          </m.p>
+        </m.div>
         <ol className="space-y-3" aria-label="Setup steps">
           {STEPS.map((s, i) => (
             <li
@@ -122,24 +122,21 @@ export default function Onboarding() {
           <Wordmark />
         </div>
         <div className="mx-auto max-w-xl">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={tokens.base}
-            >
-              {step === 'connect' && <ConnectStep onDone={toChoose} />}
-              {step === 'choose' &&
-                (status?.telegram.state === 'ready' ? (
-                  <ChooseStep onDone={() => setStep('index')} />
-                ) : (
-                  <Skeleton className="h-64" />
-                ))}
-              {step === 'index' && <IndexStep />}
-            </motion.div>
-          </AnimatePresence>
+          <m.div
+            key={step}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={tokens.base}
+          >
+            {step === 'connect' && <ConnectStep onDone={toChoose} />}
+            {step === 'choose' &&
+              (status?.telegram.state === 'ready' ? (
+                <ChooseStep onDone={() => setStep('index')} />
+              ) : (
+                <Skeleton className="h-64" />
+              ))}
+            {step === 'index' && <IndexStep />}
+          </m.div>
         </div>
       </main>
     </div>

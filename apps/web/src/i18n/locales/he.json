@@ -60,8 +60,7 @@
     "sectionScrollForward": "גלילה קדימה"
   },
   "card": {
-    "play": "הפעלת {{title}}",
-    "details": "פרטים על {{title}}"
+    "play": "הפעלת {{title}}"
   },
   "detail": {
     "cast": "שחקנים",

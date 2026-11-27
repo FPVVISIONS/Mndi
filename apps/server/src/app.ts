@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fastifyCompress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
@@ -22,6 +23,9 @@ export async function buildApp(svc: Services): Promise<FastifyInstance> {
       .code(status)
       .send({ error: 'server_error', message: 'Something went wrong on the server.' });
   });
+
+  // Text, JSON, JS, CSS and SVG are compressed; video and JPEG are not compressible and pass through.
+  await app.register(fastifyCompress, { global: true, threshold: 1024, encodings: ['br', 'gzip'] });
 
   coreRoutes(app, svc);
   libraryRoutes(app, svc);

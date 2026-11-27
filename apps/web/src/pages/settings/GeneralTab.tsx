@@ -1,5 +1,5 @@
 import { LANGUAGES, type LanguageCode } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ export function GeneralTab() {
                 )}
               >
                 {on && (
-                  <motion.span
+                  <m.span
                     layoutId={`lang-${id}`}
                     transition={spring.snappy}
                     className="absolute inset-0 rounded-md bg-fg"

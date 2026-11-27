@@ -5,34 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0b0b0c" />
     <meta name="color-scheme" content="dark" />
-    <meta
-      name="description"
-      content="Marquee turns your Telegram groups and channels into a clean library of movies, series and live TV."
-    />
+    <meta name="description" content="Marquee turns your Telegram groups and channels into a clean library of movies, series and live TV." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <title>Marquee</title>
     <script>
-      // Set language and direction before first paint so RTL never flashes as LTR.
+      // Runs before first paint. It sets language and direction so RTL never flashes as LTR, and it
+      // starts the home request and the hero image now, in parallel with the app code instead of after it.
       try {
-        var s = JSON.parse(localStorage.getItem('marquee.prefs') || '{}');
-        var l = (s.state && s.state.language) || 'en';
-        document.documentElement.lang = l;
-        document.documentElement.dir = ['he', 'ar'].indexOf(l) >= 0 ? 'rtl' : 'ltr';
+        var P = (JSON.parse(localStorage.getItem('marquee.prefs') || '{}').state) || {};
+        var U = (JSON.parse(localStorage.getItem('marquee.profile') || '{}').state) || {};
+        var L = P.language || 'en';
+        document.documentElement.lang = L;
+        document.documentElement.dir = ['he', 'ar'].indexOf(L) >= 0 ? 'rtl' : 'ltr';
+        var H = { 'x-quality': P.quality || 'best' };
+        if (U.profileId) H['x-profile'] = String(U.profileId);
+        var early = (window.__early = { lang: L, profile: U.profileId || null });
+        early.home = fetch('/api/home?lang=' + L, { headers: H })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+        early.home.then(function (d) {
+          var b = d && d.hero && d.hero[0] && d.hero[0].backdrop;
+          if (!b) return;
+          // Paint the hero as soon as its image decodes; the app then renders the same image in place.
+          var img = new Image();
+          img.alt = '';
+          img.decoding = 'async';
+          img.fetchPriority = 'high';
+          img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+          img.onload = function () {
+            var box = document.getElementById('boot');
+            if (box) box.insertBefore(img, box.firstChild);
+          };
+          img.src = '/api/img/w1280/' + b.id.replace(/^\//, '');
+        });
       } catch (e) {}
     </script>
     <style>
-      html {
-        background: #0b0b0c;
-      }
-      body {
-        margin: 0;
-        background: #0b0b0c;
-      }
+      html { background: #0b0b0c; }
+      body { margin: 0; background: #0b0b0c; }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="boot" style="position:relative;overflow:hidden;min-height:100vh;display:grid;place-items:center"><span style="position:relative;font:400 1.9rem/1 'Instrument Serif',Georgia,serif;color:#f3f1ec;letter-spacing:-.02em">Marquee<i style="display:inline-block;width:.4rem;height:.4rem;margin-inline-start:.15rem;border-radius:50%;background:#ff5a36"></i></span></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

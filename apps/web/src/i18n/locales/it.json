@@ -59,8 +59,7 @@
     "sectionScrollForward": "Scorri avanti"
   },
   "card": {
-    "play": "Riproduci {{title}}",
-    "details": "Dettagli di {{title}}"
+    "play": "Riproduci {{title}}"
   },
   "detail": {
     "cast": "Cast",

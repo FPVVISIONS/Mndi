@@ -1,4 +1,5 @@
 import { createReadStream, existsSync, mkdirSync } from 'node:fs';
+import sharp from 'sharp';
 import { join } from 'node:path';
 import type { FastifyInstance } from 'fastify';
 import { eq } from 'drizzle-orm';
@@ -21,6 +22,8 @@ import { ctxOf, notFound } from './util.js';
 
 const { files } = schema;
 const fileId = (req: { params: unknown }) => Number((req.params as { id: string }).id);
+
+const backdropCache = new Map<string, Buffer>();
 
 export function streamRoutes(app: FastifyInstance, svc: Services): void {
   const cacheDir = join(svc.config.dataDir, 'cache', 'derived');
@@ -124,7 +127,22 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
       const [, slug = '', kind = 'poster', lang = 'en'] = path.split('/');
       if (kind !== 'poster' && kind !== 'backdrop' && kind !== 'logo') return notFound(reply);
       const svg = renderArt(slug, kind, lang);
-      return svg ? reply.type('image/svg+xml').send(svg) : notFound(reply);
+      if (!svg) return notFound(reply);
+      if (kind === 'backdrop') {
+        // Backdrops carry no text, so serve them as JPEG like TMDB does: same decode path, realistic weight.
+        const width = Number(size.replace(/\D/g, '')) || 1280;
+        const key = `${slug}:${width}`;
+        let jpeg = backdropCache.get(key);
+        if (!jpeg) {
+          jpeg = await sharp(Buffer.from(svg))
+            .resize({ width: Math.min(width, 1280) })
+            .jpeg({ quality: 82, mozjpeg: true })
+            .toBuffer();
+          backdropCache.set(key, jpeg);
+        }
+        return reply.type('image/jpeg').send(jpeg);
+      }
+      return reply.type('image/svg+xml').send(svg);
     }
     const file = await svc.images.get(size, `/${path}`);
     if (!file) return reply.header('Cache-Control', 'no-store').code(404).send();

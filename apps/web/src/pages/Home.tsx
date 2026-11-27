@@ -1,6 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
 import { Film } from 'lucide-react';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Hero } from '../components/media/Hero';
@@ -9,10 +7,13 @@ import { TitleCardView } from '../components/media/TitleCardView';
 import { WideCard } from '../components/media/WideCard';
 import { ChannelTile } from '../components/media/ChannelTile';
 import { Button } from '../components/ui/Button';
+import { Deferred } from '../components/ui/Deferred';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
-import { api } from '../lib/api';
-import { useHome, useScope } from '../queries/hooks';
+import { useHome } from '../queries/hooks';
+
+/** Approximate height of one row, used to reserve space for rows that have not mounted yet. */
+const ROW_HEIGHT = 'calc(var(--card-w) * 1.5 + 5rem)';
 
 function HomeSkeleton() {
   return (
@@ -38,21 +39,6 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data, isPending, isError } = useHome();
-  const { key } = useScope();
-
-  // Trailers live on the detail payload; fetch them for the few hero slides only.
-  const heroIds = useMemo(() => data?.hero.map((h) => h.id) ?? [], [data?.hero]);
-  const details = useQueries({
-    queries: heroIds.map((id) => ({
-      queryKey: ['title', ...key, id],
-      queryFn: () => api.title(id),
-      staleTime: 60_000,
-    })),
-  });
-  const trailers = useMemo(
-    () => new Map(details.map((q, i) => [heroIds[i], q.data?.trailer ?? null])),
-    [details, heroIds],
-  );
 
   if (isPending) return <HomeSkeleton />;
   if (isError || !data) {
@@ -88,28 +74,41 @@ export default function Home() {
 
   return (
     <div>
-      <Hero items={data.hero} trailerFor={(id) => trailers.get(id)} />
+      <Hero items={data.hero} />
       <div className="relative z-10 -mt-8 space-y-2 sm:-mt-12">
-        {data.rows.map((row) => {
+        {data.rows.map((row, rowIndex) => {
           const title =
             row.id === 'genre'
               ? (row.label ?? '')
               : t(`home.${row.id === 'continue' ? 'continueWatching' : row.id}`);
           const wide = row.id === 'continue' || row.id === 'newEpisodes';
-          return (
-            <Row key={`${row.id}-${row.label ?? ''}`} title={title}>
+          const rowEl = (
+            <Row title={title}>
               {row.items.map((c) =>
-                wide ? <WideCard key={c.id} card={c} /> : <TitleCardView key={c.id} card={c} />,
+                wide ? (
+                  <WideCard key={c.id} card={c} eager={rowIndex === 0} />
+                ) : (
+                  <TitleCardView key={c.id} card={c} eager={rowIndex === 0} />
+                ),
               )}
             </Row>
           );
+          return rowIndex < 2 ? (
+            <div key={`${row.id}-${row.label ?? ''}`}>{rowEl}</div>
+          ) : (
+            <Deferred key={`${row.id}-${row.label ?? ''}`} height={ROW_HEIGHT}>
+              {rowEl}
+            </Deferred>
+          );
         })}
         {data.live.length > 0 && (
-          <Row title={t('home.liveNow')}>
-            {data.live.map((c) => (
-              <ChannelTile key={c.id} channel={c} compact />
-            ))}
-          </Row>
+          <Deferred height="12rem">
+            <Row title={t('home.liveNow')}>
+              {data.live.map((c) => (
+                <ChannelTile key={c.id} channel={c} compact />
+              ))}
+            </Row>
+          </Deferred>
         )}
       </div>
     </div>

@@ -59,8 +59,7 @@
     "sectionScrollForward": "Weiterblättern"
   },
   "card": {
-    "play": "{{title}} abspielen",
-    "details": "Details zu {{title}}"
+    "play": "{{title}} abspielen"
   },
   "detail": {
     "cast": "Besetzung",

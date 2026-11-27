@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Children, useRef, type ReactNode } from 'react';
+import { Children, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fadeUp, staggerChildren, stagger } from '../../design/motion';
 import { Crossfade } from '../ui/Crossfade';
@@ -15,9 +15,25 @@ interface Props {
  * A horizontally scrolling row: snap points, edge arrows on hover, mouse drag, native touch scroll.
  * The room below the cards is reserved so hover panels are never clipped.
  */
+/** Cards mounted straight away; the rest follow when the browser is idle. */
+const FIRST_BATCH = 6;
+
 export function Row({ title, children, action }: Props) {
   const { t } = useTranslation();
   const scroller = useRef<HTMLDivElement>(null);
+  const items = Children.toArray(children);
+  const [count, setCount] = useState(FIRST_BATCH);
+
+  useEffect(() => {
+    if (count >= items.length) return;
+    const finish = () => setCount(items.length);
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(finish, { timeout: 800 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(finish, 300);
+    return () => window.clearTimeout(id);
+  }, [count, items.length]);
   const drag = useRef({ active: false, moved: false, x: 0, left: 0 });
 
   const page = (dir: 1 | -1) => {
@@ -67,7 +83,7 @@ export function Row({ title, children, action }: Props) {
   };
 
   return (
-    <motion.section
+    <m.section
       aria-label={title}
       variants={staggerChildren(stagger.row)}
       initial="hidden"
@@ -106,10 +122,10 @@ export function Row({ title, children, action }: Props) {
           onKeyDown={onKeyDown}
           className="no-scrollbar -mb-24 flex snap-x snap-proximity gap-2.5 overflow-x-auto scroll-px-[var(--gutter)] px-[var(--gutter)] pt-5 pb-28 sm:gap-3"
         >
-          {Children.map(children, (child, i) => (
-            <motion.div key={i} variants={fadeUp} className="shrink-0">
+          {items.slice(0, count).map((child, i) => (
+            <m.div key={i} variants={fadeUp} className="shrink-0">
               {child}
-            </motion.div>
+            </m.div>
           ))}
         </div>
         <button
@@ -121,6 +137,6 @@ export function Row({ title, children, action }: Props) {
           <ChevronRight size={28} className="flip-rtl" />
         </button>
       </div>
-    </motion.section>
+    </m.section>
   );
 }

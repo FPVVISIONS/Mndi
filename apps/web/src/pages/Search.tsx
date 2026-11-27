@@ -2,7 +2,7 @@ import { Clock, Search as SearchIcon, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChannelTile } from '../components/media/ChannelTile';
 import { TitleCardView } from '../components/media/TitleCardView';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -14,10 +14,10 @@ import { usePrefs } from '../stores/prefs';
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <motion.section variants={fadeUp} className="mb-10" aria-label={title}>
+    <m.section variants={fadeUp} className="mb-10" aria-label={title}>
       <h2 className="mb-4 font-display text-title-s">{title}</h2>
       {children}
-    </motion.section>
+    </m.section>
   );
 }
 
@@ -120,7 +120,7 @@ export default function Search() {
           body={t('search.noResultsBody')}
         />
       ) : (
-        <motion.div
+        <m.div
           variants={staggerChildren(stagger.row)}
           initial="hidden"
           animate="show"
@@ -159,7 +159,7 @@ export default function Search() {
               </ul>
             </Group>
           )}
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

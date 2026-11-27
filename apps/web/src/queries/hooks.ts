@@ -59,11 +59,12 @@ export function useTitles(params: { kind: 'movie' | 'series'; genre?: string; so
   });
 }
 
-export function useTitle(id: number) {
+export function useTitle(id: number, enabled = true) {
   const { key } = useScope();
   return useQuery({
     queryKey: ['title', ...key, id],
     queryFn: () => api.title(id),
+    enabled,
     placeholderData: keepPreviousData,
     refetchInterval: pendingPoll(),
   });

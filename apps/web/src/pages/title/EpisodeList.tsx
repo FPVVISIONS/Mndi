@@ -1,5 +1,5 @@
 import type { EpisodeItem, SeasonSummary } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChevronDown, Layers, Play } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,7 @@ function EpisodeRow({
   const name = ep.name || t('common.episode', { n: ep.episode });
 
   return (
-    <motion.li
+    <m.li
       variants={fadeUp}
       className="group/ep flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-surface-2 sm:gap-5 sm:p-3"
     >
@@ -91,7 +91,7 @@ function EpisodeRow({
           </button>
         )}
       </div>
-    </motion.li>
+    </m.li>
   );
 }
 
@@ -142,16 +142,11 @@ export function EpisodeList({ titleId, titleName, seasons, initialSeason, onPick
           ))}
         </div>
       ) : data && data.episodes.length ? (
-        <motion.ul
-          key={season}
-          variants={staggerChildren(stagger.list)}
-          initial="hidden"
-          animate="show"
-        >
+        <m.ul key={season} variants={staggerChildren(stagger.list)} initial="hidden" animate="show">
           {data.episodes.map((ep) => (
             <EpisodeRow key={ep.id} ep={ep} titleName={titleName} onPickVersion={onPickVersion} />
           ))}
-        </motion.ul>
+        </m.ul>
       ) : (
         <p className="py-10 text-center text-fg-dim">{t('detail.noEpisodes')}</p>
       )}

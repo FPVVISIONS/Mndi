@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { WifiOff } from 'lucide-react';
 import { lazy, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,12 +8,12 @@ import { EmptyState } from './components/ui/EmptyState';
 import { Spinner } from './components/ui/Spinner';
 import { Toaster } from './components/ui/Toaster';
 import { AppShell } from './layout/AppShell';
+import Home from './pages/Home';
 import { Wordmark } from './layout/Wordmark';
 import { ScrollRestoration } from './lib/scroll';
 import { useProfiles, useStatus } from './queries/hooks';
 import { useProfile } from './stores/profile';
 
-const Home = lazy(() => import('./pages/Home'));
 const Browse = lazy(() => import('./pages/Browse'));
 const Live = lazy(() => import('./pages/Live'));
 const Search = lazy(() => import('./pages/Search'));
@@ -31,7 +31,7 @@ const Watch = {
 function Splash() {
   return (
     <div className="grid min-h-dvh place-items-center">
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.15 }}
@@ -39,7 +39,7 @@ function Splash() {
       >
         <Wordmark />
         <Spinner />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

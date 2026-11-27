@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { CircleAlert, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +55,7 @@ export function StatusBanner() {
     <div className="pointer-events-none fixed inset-x-0 top-[calc(var(--nav-h)+0.5rem)] z-[calc(var(--z-nav)-1)] flex justify-center px-4">
       <AnimatePresence>
         {message && (
-          <motion.div
+          <m.div
             key={message}
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ export function StatusBanner() {
                 {t('status.fix')}
               </button>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

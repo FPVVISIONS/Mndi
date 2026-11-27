@@ -2,7 +2,7 @@ import { Radio, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChannelTile } from '../components/media/ChannelTile';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -88,7 +88,7 @@ export default function Live() {
           body={cat === FAV && !q ? t('live.noFavBody') : t('live.noMatchBody')}
         />
       ) : (
-        <motion.ul
+        <m.ul
           variants={staggerChildren(stagger.list)}
           initial="hidden"
           animate="show"
@@ -96,11 +96,11 @@ export default function Live() {
           className="grid gap-3 pb-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           {shown.map((c) => (
-            <motion.li key={c.id} variants={fadeUp} layout>
+            <m.li key={c.id} variants={fadeUp} layout>
               <ChannelTile channel={c} />
-            </motion.li>
+            </m.li>
           ))}
-        </motion.ul>
+        </m.ul>
       )}
     </div>
   );

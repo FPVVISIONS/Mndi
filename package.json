@@ -10,12 +10,13 @@
   "scripts": {
     "dev": "concurrently -n server,web -c gray,white \"npm run dev -w @marquee/server\" \"npm run dev -w @marquee/web\"",
     "dev:mock": "MARQUEE_MOCK=1 npm run dev",
-    "build": "npm run build -w @marquee/web && npm run build -w @marquee/server",
+    "build": "npm run build -w @marquee/web && npm run typecheck -w @marquee/server",
     "start": "npm run start -w @marquee/server",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "demo": "npm run build && MARQUEE_MOCK=1 npm run start"
   },
   "engines": {
     "node": ">=20"

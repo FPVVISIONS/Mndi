@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Settings, UserRoundCog, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -66,7 +66,7 @@ export function Navbar() {
                     {t(`nav.${item.key}`)}
                   </span>
                   {isActive && (
-                    <motion.span
+                    <m.span
                       layoutId="nav-underline"
                       transition={spring.snappy}
                       className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent"

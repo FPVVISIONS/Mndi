@@ -14,6 +14,17 @@ async function loadBundle(code: LanguageCode): Promise<Bundle> {
   return load ? (await load()).default : en;
 }
 
+/** Hebrew, Arabic and Cyrillic faces are only fetched when one of those languages is in use. */
+const fontLoaders: Partial<Record<LanguageCode, () => Promise<unknown>>> = {
+  he: () => import('@fontsource-variable/noto-sans-hebrew/index.css'),
+  ar: () => import('@fontsource-variable/noto-sans-arabic/index.css'),
+  ru: () => import('@fontsource-variable/noto-sans/index.css'),
+};
+
+function loadFonts(code: LanguageCode): void {
+  void fontLoaders[code]?.().catch(() => undefined);
+}
+
 export function applyDocumentLanguage(code: LanguageCode): void {
   const info = languageInfo(code);
   document.documentElement.lang = info.code;
@@ -33,6 +44,7 @@ export async function initI18n(code: LanguageCode): Promise<void> {
     returnNull: false,
   });
   applyDocumentLanguage(code);
+  loadFonts(code);
 }
 
 /** Load the language's strings first, then switch, so nothing renders half-translated. */
@@ -41,6 +53,7 @@ export async function switchI18n(code: LanguageCode): Promise<void> {
     i18n.addResourceBundle(code, 'translation', await loadBundle(code));
   await i18n.changeLanguage(code);
   applyDocumentLanguage(code);
+  loadFonts(code);
 }
 
 export { i18n };

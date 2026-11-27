@@ -59,8 +59,7 @@
     "sectionScrollForward": "Scroll forward"
   },
   "card": {
-    "play": "Play {{title}}",
-    "details": "Details for {{title}}"
+    "play": "Play {{title}}"
   },
   "detail": {
     "cast": "Cast",

@@ -1,5 +1,5 @@
 import type { ChatSummary, SourceKind } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Megaphone, Search, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +51,7 @@ export function ChatPicker({ chats, tags, onChange }: Props) {
           className="h-11 w-full rounded-md border border-line bg-surface-1 ps-11 pe-4 outline-none transition-colors focus:border-fg-dim"
         />
       </label>
-      <motion.ul
+      <m.ul
         variants={staggerChildren(stagger.list)}
         initial="hidden"
         animate="show"
@@ -60,7 +60,7 @@ export function ChatPicker({ chats, tags, onChange }: Props) {
         {shown.map((c) => {
           const tag = tags[c.id] ?? 'skip';
           return (
-            <motion.li
+            <m.li
               key={c.id}
               variants={fadeUp}
               layout
@@ -90,10 +90,10 @@ export function ChatPicker({ chats, tags, onChange }: Props) {
                 onChange={(v) => onChange({ ...tags, [c.id]: v })}
                 className="self-start sm:self-auto"
               />
-            </motion.li>
+            </m.li>
           );
         })}
-      </motion.ul>
+      </m.ul>
       {chats.length === 0 && (
         <p className="py-12 text-center text-fg-dim">{t('onboarding.noChats')}</p>
       )}

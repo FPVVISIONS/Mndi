@@ -49,6 +49,18 @@ export async function createServices(config: Config, dbFile?: string): Promise<S
       .onConflictDoUpdate({ target: schema.settings.key, set: { value } })
       .run();
 
+  // Every install needs at least one profile; people can rename it or add more from the app.
+  if (!db.select().from(schema.profiles).get()) {
+    db.insert(schema.profiles)
+      .values({
+        name: 'Me',
+        color: '#E8913A',
+        avatar: 'clapperboard',
+        createdAt: Math.floor(Date.now() / 1000),
+      })
+      .run();
+  }
+
   const limitMb = Number(getSetting('cache_limit_mb')) || config.streamCacheMb;
   const chunkCache = new ChunkCache(join(config.dataDir, 'cache', 'stream'), limitMb);
   const provider = config.mock

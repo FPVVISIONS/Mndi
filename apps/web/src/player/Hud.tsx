@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { FastForward, Gauge, Rewind, Volume1, Volume2, VolumeX } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { spring } from '../design/motion';
@@ -40,7 +40,7 @@ export function Hud({ event }: { event: HudEvent }) {
     <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center" aria-hidden>
       <AnimatePresence>
         {event && (
-          <motion.div
+          <m.div
             key={event.id}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -50,7 +50,7 @@ export function Hud({ event }: { event: HudEvent }) {
           >
             {icon}
             <span className="text-lead font-semibold tabular-nums">{label}</span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

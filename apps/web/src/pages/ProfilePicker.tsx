@@ -1,5 +1,5 @@
 import type { Profile } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Pencil, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +48,7 @@ export default function ProfilePicker() {
   return (
     <main className="grid min-h-dvh place-items-center px-6 py-16">
       <div className="w-full max-w-4xl text-center">
-        <motion.h1
+        <m.h1
           variants={fadeUp}
           initial="hidden"
           animate="show"
@@ -57,17 +57,17 @@ export default function ProfilePicker() {
           <Crossfade k={managing ? 'm' : 'w'}>
             {managing ? t('profiles.manage') : t('profiles.who')}
           </Crossfade>
-        </motion.h1>
+        </m.h1>
         {managing && <p className="mt-3 text-fg-dim">{t('profiles.manageHint')}</p>}
 
-        <motion.ul
+        <m.ul
           variants={staggerChildren(stagger.hero, 0.1)}
           initial="hidden"
           animate="show"
           className="mt-12 flex flex-wrap items-start justify-center gap-x-6 gap-y-10 sm:gap-x-10"
         >
           {profiles.map((p) => (
-            <motion.li key={p.id} variants={fadeUp} layout transition={spring.soft}>
+            <m.li key={p.id} variants={fadeUp} layout transition={spring.soft}>
               <button
                 type="button"
                 onClick={() => pick(p)}
@@ -75,7 +75,7 @@ export default function ProfilePicker() {
                 className="group flex w-28 flex-col items-center gap-3 sm:w-36"
               >
                 <span className="relative block">
-                  <motion.span
+                  <m.span
                     whileHover={{ scale: 1.06 }}
                     whileTap={{ scale: 0.97 }}
                     transition={spring.soft}
@@ -91,37 +91,37 @@ export default function ProfilePicker() {
                         <Pencil size={32} />
                       </span>
                     )}
-                  </motion.span>
+                  </m.span>
                 </span>
                 <span className="max-w-full truncate text-lead text-fg-dim transition-colors group-hover:text-fg group-focus-visible:text-fg">
                   {p.name}
                 </span>
               </button>
-            </motion.li>
+            </m.li>
           ))}
           {(managing || profiles.length === 0) && profiles.length < MAX_PROFILES && (
-            <motion.li variants={fadeUp} layout transition={spring.soft}>
+            <m.li variants={fadeUp} layout transition={spring.soft}>
               <button
                 type="button"
                 onClick={add}
                 className="group flex w-28 flex-col items-center gap-3 sm:w-36"
                 aria-label={t('profiles.create')}
               >
-                <motion.span
+                <m.span
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.97 }}
                   transition={spring.soft}
                   className="grid size-28 place-items-center rounded-lg border-2 border-dashed border-line-strong text-fg-dim group-hover:border-fg group-hover:text-fg sm:size-36"
                 >
                   <Plus size={48} strokeWidth={1.5} />
-                </motion.span>
+                </m.span>
                 <span className="text-lead text-fg-dim group-hover:text-fg">
                   {t('profiles.create')}
                 </span>
               </button>
-            </motion.li>
+            </m.li>
           )}
-        </motion.ul>
+        </m.ul>
 
         <div className="mt-14">
           <Button

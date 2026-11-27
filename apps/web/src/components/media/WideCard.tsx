@@ -1,5 +1,5 @@
 import type { TitleCard } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -13,14 +13,14 @@ import { TitleLogo } from './TitleLogo';
 import { watchPath } from './QuickActions';
 
 /** Landscape card for Continue watching and New episodes. Click resumes; the info link opens details. */
-export function WideCard({ card }: { card: TitleCard }) {
+export function WideCard({ card, eager }: { card: TitleCard; eager?: boolean }) {
   const { t } = useTranslation();
   const location = useLocation();
   const p = card.progress;
   const left = p ? p.duration - p.position : 0;
 
   return (
-    <motion.div
+    <m.div
       className="relative shrink-0 snap-start"
       style={{ width: 'var(--card-w-wide)' }}
       whileHover={{ y: -4 }}
@@ -36,6 +36,7 @@ export function WideCard({ card }: { card: TitleCard }) {
           <ArtImage
             image={card.backdrop}
             size="w500"
+            eager={eager}
             className="size-full"
             fallback={<PosterFallback title={card.title} />}
           />
@@ -78,11 +79,11 @@ export function WideCard({ card }: { card: TitleCard }) {
           to={`/title/${card.id}`}
           state={{ background: location }}
           className="shrink-0 rounded-sm px-1.5 py-0.5 text-caption font-semibold text-fg-dim hover:text-fg"
-          aria-label={t('card.details', { title: card.title })}
+          aria-label={`${t('common.moreInfo')}: ${card.title}`}
         >
           {t('common.moreInfo')}
         </Link>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

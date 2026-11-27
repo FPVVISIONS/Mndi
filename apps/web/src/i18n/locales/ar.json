@@ -63,8 +63,7 @@
     "sectionScrollForward": "تمرير للأمام"
   },
   "card": {
-    "play": "تشغيل {{title}}",
-    "details": "تفاصيل {{title}}"
+    "play": "تشغيل {{title}}"
   },
   "detail": {
     "cast": "طاقم التمثيل",

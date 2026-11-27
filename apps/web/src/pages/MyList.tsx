@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react';
-import { LayoutGroup, motion } from 'framer-motion';
+import { LayoutGroup, m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { TitleCardView } from '../components/media/TitleCardView';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -23,9 +23,9 @@ export default function MyList() {
         <LayoutGroup>
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-4 pb-28 [--card-w:100%]">
             {data.items.map((c) => (
-              <motion.li key={c.id} layout transition={spring.soft}>
+              <m.li key={c.id} layout transition={spring.soft}>
                 <TitleCardView card={c} />
-              </motion.li>
+              </m.li>
             ))}
           </ul>
         </LayoutGroup>

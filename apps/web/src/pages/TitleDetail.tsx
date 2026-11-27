@@ -1,5 +1,5 @@
 import type { TitleDetail as Detail } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, Layers, Link2Off, Play, Plus, ThumbsUp, Wrench, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,16 +42,16 @@ function Body({ d }: { d: Detail }) {
 
   return (
     <>
-      <motion.div
+      <m.div
         variants={staggerChildren(stagger.list, 0.12)}
         initial="hidden"
         animate="show"
         className="relative z-10 -mt-32 px-5 pb-12 sm:px-10"
       >
-        <motion.div variants={fadeUp}>
+        <m.div variants={fadeUp}>
           <TitleLogo logo={d.logo} title={d.title} height="clamp(4.5rem, 12vw, 7.5rem)" />
-        </motion.div>
-        <motion.div variants={fadeUp} className="mt-6 flex flex-wrap items-center gap-3">
+        </m.div>
+        <m.div variants={fadeUp} className="mt-6 flex flex-wrap items-center gap-3">
           <Button
             variant="primary"
             size="lg"
@@ -80,7 +80,7 @@ function Body({ d }: { d: Detail }) {
             }}
             className="size-12"
           >
-            <motion.span
+            <m.span
               key={String(d.inList)}
               initial={{ scale: 0.4, rotate: -60, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -88,7 +88,7 @@ function Body({ d }: { d: Detail }) {
               className="grid"
             >
               {d.inList ? <Check size={22} /> : <Plus size={22} />}
-            </motion.span>
+            </m.span>
           </IconButton>
           <IconButton
             tone="solid"
@@ -98,10 +98,10 @@ function Body({ d }: { d: Detail }) {
           >
             <ThumbsUp size={20} className={d.liked ? 'fill-fg' : ''} />
           </IconButton>
-        </motion.div>
+        </m.div>
 
         <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,1fr)_16rem] md:gap-12">
-          <motion.div variants={fadeUp}>
+          <m.div variants={fadeUp}>
             <MetaLine card={d} />
             {d.tagline && (
               <p className="mt-4 font-display text-title-s text-fg-dim italic">
@@ -113,8 +113,8 @@ function Body({ d }: { d: Detail }) {
                 {d.overview || (d.matched ? '' : t('detail.unmatchedHint'))}
               </Crossfade>
             </p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="space-y-4 text-small">
+          </m.div>
+          <m.div variants={fadeUp} className="space-y-4 text-small">
             {d.cast.length > 0 && (
               <div>
                 <div className="eyebrow">{t('detail.cast')}</div>
@@ -150,11 +150,11 @@ function Body({ d }: { d: Detail }) {
                 {d.matched ? t('detail.fixMatch') : t('detail.unmatched')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {d.kind === 'series' && (
-          <motion.div variants={fadeUp} className="mt-12">
+          <m.div variants={fadeUp} className="mt-12">
             <EpisodeList
               titleId={d.id}
               titleName={d.title}
@@ -162,11 +162,11 @@ function Body({ d }: { d: Detail }) {
               initialSeason={initialSeason}
               onPickVersion={setTarget}
             />
-          </motion.div>
+          </m.div>
         )}
 
         {d.cast.length > 5 && (
-          <motion.section variants={fadeUp} className="mt-12" aria-label={t('detail.cast')}>
+          <m.section variants={fadeUp} className="mt-12" aria-label={t('detail.cast')}>
             <h2 className="mb-4 font-display text-title-m">{t('detail.cast')}</h2>
             <ul className="no-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
               {d.cast.map((c) => (
@@ -187,11 +187,11 @@ function Body({ d }: { d: Detail }) {
                 </li>
               ))}
             </ul>
-          </motion.section>
+          </m.section>
         )}
 
         {d.similar.length > 0 && (
-          <motion.section variants={fadeUp} className="mt-12" aria-label={t('detail.moreLikeThis')}>
+          <m.section variants={fadeUp} className="mt-12" aria-label={t('detail.moreLikeThis')}>
             <h2 className="mb-4 font-display text-title-m">{t('detail.moreLikeThis')}</h2>
             <ul className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-3 pb-24 [--card-w:100%]">
               {d.similar.slice(0, 8).map((c) => (
@@ -200,9 +200,9 @@ function Body({ d }: { d: Detail }) {
                 </li>
               ))}
             </ul>
-          </motion.section>
+          </m.section>
         )}
-      </motion.div>
+      </m.div>
 
       <VersionHost target={target} onClose={() => setTarget(null)} />
       <MatchModal
@@ -241,7 +241,7 @@ export default function TitleDetail() {
   }, [modal, navigate]);
 
   const sheet = (
-    <motion.div
+    <m.div
       initial={modal ? { opacity: 0, y: 40, scale: 0.97 } : false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20 }}
@@ -266,7 +266,7 @@ export default function TitleDetail() {
         </div>
       ) : (
         <>
-          <motion.div
+          <m.div
             layoutId={nav?.art ? `art-${nav.art}` : undefined}
             className="relative aspect-[16/10] max-h-[34rem] w-full overflow-hidden bg-surface-2 sm:aspect-video"
             transition={spring.modal}
@@ -278,7 +278,7 @@ export default function TitleDetail() {
             )}
             <div className="scrim-bottom absolute inset-0" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-1 to-transparent" />
-          </motion.div>
+          </m.div>
           <IconButton
             label={t('common.close')}
             tone="solid"
@@ -298,7 +298,7 @@ export default function TitleDetail() {
           )}
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 
   if (!modal)
@@ -309,7 +309,7 @@ export default function TitleDetail() {
       className="fixed inset-0 z-[var(--z-modal)] overflow-y-auto"
       onPointerDown={(e) => e.target === e.currentTarget && close()}
     >
-      <motion.div
+      <m.div
         className="fixed inset-0 bg-scrim"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

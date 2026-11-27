@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Clapperboard, Home, Radio, Search, Tv } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
@@ -37,7 +37,7 @@ export function BottomTabs() {
                   )}
                 >
                   {isActive && (
-                    <motion.span
+                    <m.span
                       layoutId="tab-dot"
                       transition={spring.snappy}
                       className="absolute top-0 h-0.5 w-8 rounded-full bg-accent"

@@ -59,8 +59,7 @@
     "sectionScrollForward": "İleri kaydır"
   },
   "card": {
-    "play": "{{title}} oynat",
-    "details": "{{title}} ayrıntıları"
+    "play": "{{title}} oynat"
   },
   "detail": {
     "cast": "Oyuncular",

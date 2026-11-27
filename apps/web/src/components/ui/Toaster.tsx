@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Check, CircleAlert } from 'lucide-react';
 import { spring } from '../../design/motion';
 import { useToasts } from '../../stores/toasts';
@@ -13,7 +13,7 @@ export function Toaster() {
     >
       <AnimatePresence>
         {toasts.map((t) => (
-          <motion.div
+          <m.div
             key={t.id}
             layout
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
@@ -28,7 +28,7 @@ export function Toaster() {
               <Check size={16} className="text-accent" />
             )}
             {t.message}
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

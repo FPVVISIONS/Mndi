@@ -1,5 +1,5 @@
 import type { Channel } from '@marquee/shared';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -37,7 +37,7 @@ export function ChannelTile({ channel, compact }: { channel: Channel; compact?: 
   const pct = np ? (now - np.start) / (np.end - np.start) : 0;
 
   return (
-    <motion.div
+    <m.div
       className="relative shrink-0 snap-start"
       style={{ width: compact ? 'var(--card-w-wide)' : undefined }}
       whileHover={{ y: -3 }}
@@ -60,7 +60,7 @@ export function ChannelTile({ channel, compact }: { channel: Channel; compact?: 
           {np && <ProgressBar value={pct} className="mt-2 h-[3px]" />}
         </span>
       </Link>
-      <motion.button
+      <m.button
         type="button"
         whileTap={press}
         aria-label={
@@ -76,7 +76,7 @@ export function ChannelTile({ channel, compact }: { channel: Channel; compact?: 
           size={17}
           className={cn('transition-colors', channel.favourite && 'fill-accent text-accent')}
         />
-      </motion.button>
-    </motion.div>
+      </m.button>
+    </m.div>
   );
 }

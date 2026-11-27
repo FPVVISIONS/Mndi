@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +63,7 @@ export function ChannelSwitcher({ open, currentId, onClose, onPick }: Props) {
   return (
     <AnimatePresence>
       {open && (
-        <motion.aside
+        <m.aside
           initial={{ x: 40, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 40, opacity: 0 }}
@@ -132,7 +132,7 @@ export function ChannelSwitcher({ open, currentId, onClose, onPick }: Props) {
               </li>
             ))}
           </ul>
-        </motion.aside>
+        </m.aside>
       )}
     </AnimatePresence>
   );

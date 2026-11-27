@@ -59,8 +59,7 @@
     "sectionScrollForward": "Rolar para a frente"
   },
   "card": {
-    "play": "Assistir a {{title}}",
-    "details": "Detalhes de {{title}}"
+    "play": "Assistir a {{title}}"
   },
   "detail": {
     "cast": "Elenco",

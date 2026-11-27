@@ -1,5 +1,5 @@
 import type { PlaybackInfo } from '@marquee/shared';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import {
   ArrowLeft,
   Captions,
@@ -447,7 +447,7 @@ export function Player({
 
       <AnimatePresence>
         {(waiting || converting) && !failed && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -461,13 +461,13 @@ export function Player({
                 <span className="text-small text-fg-dim">{t('player.converting')}</span>
               )}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {failed && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -493,7 +493,7 @@ export function Player({
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -522,7 +522,7 @@ export function Player({
       >
         <AnimatePresence>
           {skippable && (
-            <motion.div
+            <m.div
               key="skip"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -537,10 +537,10 @@ export function Player({
               >
                 {skippable.kind === 'recap' ? t('player.skipRecap') : t('player.skipIntro')}
               </Button>
-            </motion.div>
+            </m.div>
           )}
           {nearEnd && info.next && (
-            <motion.div
+            <m.div
               key="next"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -567,7 +567,7 @@ export function Player({
                   </span>
                 )}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

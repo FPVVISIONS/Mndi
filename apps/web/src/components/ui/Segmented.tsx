@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useId } from 'react';
 import { spring } from '../../design/motion';
 import { cn } from '../../lib/cn';
@@ -49,7 +49,7 @@ export function Segmented<T extends string>({
             )}
           >
             {on && (
-              <motion.span
+              <m.span
                 layoutId={`seg-${id}`}
                 transition={spring.snappy}
                 className="absolute inset-0 rounded-full bg-fg"
@@ -95,7 +95,7 @@ export function PillTabs<T extends string>({
             )}
           >
             {on && (
-              <motion.span
+              <m.span
                 layoutId={`pill-${id}`}
                 transition={spring.snappy}
                 className="absolute inset-0 rounded-full bg-fg"

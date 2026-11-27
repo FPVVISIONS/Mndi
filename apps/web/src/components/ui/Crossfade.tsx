@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { duration, ease } from '../../design/motion';
 
@@ -13,7 +13,7 @@ interface Props {
 export function Crossfade({ k, children, className }: Props) {
   return (
     <AnimatePresence mode="popLayout" initial={false}>
-      <motion.span
+      <m.span
         key={k}
         className={className}
         style={{ display: 'block' }}
@@ -22,7 +22,7 @@ export function Crossfade({ k, children, className }: Props) {
         exit={{ opacity: 0, transition: { duration: duration.fast } }}
       >
         {children}
-      </motion.span>
+      </m.span>
     </AnimatePresence>
   );
 }

@@ -1,5 +1,5 @@
 import type { TitleCard } from '@marquee/shared';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useId, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { duration, ease, spring, stagger } from '../../design/motion';
@@ -13,6 +13,8 @@ import { QuickActions } from './QuickActions';
 
 interface Props {
   card: TitleCard;
+  /** Above-the-fold cards load their artwork immediately instead of lazily. */
+  eager?: boolean;
   /** Tilt the card toward the end of the row so the hover panel does not clip. */
   className?: string;
 }
@@ -34,7 +36,7 @@ const panelVariants = {
 const item = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0 } };
 
 /** Poster card. On hover or focus it lifts in place and opens an info panel with quick actions. */
-export function TitleCardView({ card, className }: Props) {
+export function TitleCardView({ card, className, eager }: Props) {
   const location = useLocation();
   // Unique per card: the same title can appear in several rows, and shared ids would hide all but one.
   const art = useId();
@@ -53,7 +55,7 @@ export function TitleCardView({ card, className }: Props) {
   };
 
   return (
-    <motion.div
+    <m.div
       className={`relative shrink-0 snap-start ${className ?? ''}`}
       style={{ width: 'var(--card-w)', zIndex: open ? 30 : 0 }}
       animate={{ scale: open ? 1.1 : 1 }}
@@ -70,13 +72,14 @@ export function TitleCardView({ card, className }: Props) {
         className="block overflow-hidden rounded-md outline-offset-4"
         draggable={false}
       >
-        <motion.div
+        <m.div
           layoutId={`art-${art}`}
           className="relative aspect-[2/3] overflow-hidden rounded-md bg-surface-2 shadow-[var(--shadow-card)]"
         >
           <ArtImage
             image={card.poster}
             size="w342"
+            eager={eager}
             alt=""
             className="size-full"
             fallback={<PosterFallback title={card.title} />}
@@ -87,35 +90,35 @@ export function TitleCardView({ card, className }: Props) {
               className="absolute inset-x-0 bottom-0 h-[3px] rounded-none bg-black/50"
             />
           )}
-        </motion.div>
+        </m.div>
       </Link>
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             variants={panelVariants}
             initial="hidden"
             animate="show"
             exit="exit"
             className="absolute -inset-x-2 top-full -mt-1 rounded-b-md bg-surface-2 p-3 shadow-[var(--shadow-pop)]"
           >
-            <motion.div variants={item}>
+            <m.div variants={item}>
               <QuickActions card={card} />
-            </motion.div>
-            <motion.div variants={item} className="mt-2.5 truncate text-small font-semibold">
+            </m.div>
+            <m.div variants={item} className="mt-2.5 truncate text-small font-semibold">
               <Crossfade k={card.title}>{card.title}</Crossfade>
-            </motion.div>
-            <motion.div variants={item} className="mt-1">
+            </m.div>
+            <m.div variants={item} className="mt-1">
               <MetaLine card={card} compact />
-            </motion.div>
+            </m.div>
             {card.genres.length > 0 && (
-              <motion.div variants={item} className="mt-1.5 truncate text-caption text-fg-faint">
+              <m.div variants={item} className="mt-1.5 truncate text-caption text-fg-faint">
                 <Crossfade k={card.genres.join()}>{card.genres.slice(0, 3).join(' · ')}</Crossfade>
-              </motion.div>
+              </m.div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 }

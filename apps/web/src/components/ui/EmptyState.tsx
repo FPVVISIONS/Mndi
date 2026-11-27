@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { fadeUp } from '../../design/motion';
 
@@ -11,7 +11,7 @@ interface Props {
 
 export function EmptyState({ icon, title, body, action }: Props) {
   return (
-    <motion.div
+    <m.div
       variants={fadeUp}
       initial="hidden"
       animate="show"
@@ -23,6 +23,6 @@ export function EmptyState({ icon, title, body, action }: Props) {
       <h2 className="font-display text-title-m">{title}</h2>
       <p className="mt-2 text-fg-dim">{body}</p>
       {action && <div className="mt-6">{action}</div>}
-    </motion.div>
+    </m.div>
   );
 }

@@ -39,7 +39,11 @@ export function StorageTab() {
     <Section>
       <Row title={t('settings.streamCache')} hint={t('settings.streamCacheHint')} stack>
         <div className="flex items-center gap-4">
-          <ProgressBar value={data ? data.streamBytes / limitBytes : 0} className="flex-1" />
+          <ProgressBar
+            label={t('settings.streamCache')}
+            value={data ? data.streamBytes / limitBytes : 0}
+            className="flex-1"
+          />
           <span className="w-36 shrink-0 text-end text-small tabular-nums text-fg-dim">
             {data ? `${formatBytes(data.streamBytes)} / ${formatBytes(limitBytes)}` : ''}
           </span>

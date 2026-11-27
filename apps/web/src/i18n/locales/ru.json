@@ -61,8 +61,7 @@
     "sectionScrollForward": "Прокрутить вперёд"
   },
   "card": {
-    "play": "Смотреть «{{title}}»",
-    "details": "О «{{title}}»"
+    "play": "Смотреть «{{title}}»"
   },
   "detail": {
     "cast": "В ролях",

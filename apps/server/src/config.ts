@@ -1,5 +1,9 @@
 import { mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** apps/server/src -> repository root, so relative paths mean the same thing however the app is started. */
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
 function num(value: string | undefined, fallback: number): number {
   const n = Number(value);
@@ -20,7 +24,7 @@ export interface Config {
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
-  const dataDir = resolve(env.DATA_DIR || './data');
+  const dataDir = resolve(REPO_ROOT, env.DATA_DIR || './data');
   mkdirSync(dataDir, { recursive: true });
   const apiId = num(env.TELEGRAM_API_ID, 0);
   return {

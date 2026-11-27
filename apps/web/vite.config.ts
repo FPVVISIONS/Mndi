@@ -1,7 +1,43 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+/**
+ * The app boots through a dynamic import after first paint, so the browser would only discover its
+ * chunks once the entry has run. This lists them in the HTML so they download in parallel instead,
+ * without executing anything early.
+ */
+function preloadApp(): Plugin {
+  return {
+    name: 'marquee-preload-app',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const bundle = ctx.bundle;
+        if (!bundle) return html;
+        const boot = Object.values(bundle).find(
+          (c) => c.type === 'chunk' && c.name === 'boot' && c.fileName.endsWith('.js'),
+        );
+        if (!boot || boot.type !== 'chunk') return html;
+        const files = new Set<string>();
+        const walk = (name: string) => {
+          const chunk = bundle[name];
+          if (!chunk || chunk.type !== 'chunk' || files.has(name)) return;
+          files.add(name);
+          chunk.imports.forEach(walk);
+        };
+        walk(boot.fileName);
+        const css = boot.viteMetadata?.importedCss ?? new Set<string>();
+        const links = [
+          ...[...files].map((f) => `<link rel="modulepreload" crossorigin href="/${f}">`),
+          ...[...css].map((f) => `<link rel="preload" as="style" crossorigin href="/${f}">`),
+        ].join('\n    ');
+        return html.replace('</head>', `    ${links}\n  </head>`);
+      },
+    },
+  };
+}
 
 const api = process.env.MARQUEE_API ?? 'http://127.0.0.1:8787';
 
@@ -9,8 +45,10 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    preloadApp(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'script-defer',
       includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Marquee',
@@ -46,11 +84,12 @@ export default defineConfig({
   preview: { port: 4173, proxy: { '/api': { target: api } } },
   build: {
     target: 'es2022',
+    // hls.js is its own chunk and only loads when a live HLS channel is opened.
+    chunkSizeWarningLimit: 650,
     rollupOptions: {
       output: {
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
-          motion: ['framer-motion'],
           query: ['@tanstack/react-query', 'zustand'],
         },
       },

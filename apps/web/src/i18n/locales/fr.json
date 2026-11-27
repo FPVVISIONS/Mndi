@@ -59,8 +59,7 @@
     "sectionScrollForward": "Défiler en avant"
   },
   "card": {
-    "play": "Lire {{title}}",
-    "details": "Détails de {{title}}"
+    "play": "Lire {{title}}"
   },
   "detail": {
     "cast": "Distribution",

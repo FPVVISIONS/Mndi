@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { spring } from '../../design/motion';
 import { cn } from '../../lib/cn';
 
@@ -21,7 +21,7 @@ export function Switch({ checked, onChange, label }: Props) {
         checked ? 'bg-accent' : 'bg-surface-3',
       )}
     >
-      <motion.span
+      <m.span
         layout
         transition={spring.snappy}
         className={cn('size-5 rounded-full', checked ? 'bg-on-accent' : 'bg-fg-dim')}

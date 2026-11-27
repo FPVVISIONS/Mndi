@@ -1,11 +1,12 @@
 import type { TitleCard } from '@marquee/shared';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Info, Play, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { duration, ease, fadeUp, staggerChildren, stagger } from '../../design/motion';
+import { duration, fadeUp, staggerChildren, stagger } from '../../design/motion';
 import { cn } from '../../lib/cn';
+import { useTitle } from '../../queries/hooks';
 import { usePrefs } from '../../stores/prefs';
 import { Crossfade } from '../ui/Crossfade';
 import { Button } from '../ui/Button';
@@ -17,13 +18,11 @@ import { watchPath } from './QuickActions';
 const ROTATE_MS = 10_000;
 const PREVIEW_DELAY = 2600;
 
-interface Props {
-  items: TitleCard[];
-  /** The detail payload is not needed on home; trailers come from a lazy fetch per slide. */
-  trailerFor: (id: number) => { site: 'YouTube' | 'file'; key: string } | null | undefined;
+export function Hero({ items }: { items: TitleCard[] }) {
+  return items.length ? <HeroSlides items={items} /> : null;
 }
 
-export function Hero({ items, trailerFor }: Props) {
+function HeroSlides({ items }: { items: TitleCard[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,7 +32,17 @@ export function Hero({ items, trailerFor }: Props) {
   const [showVideo, setShowVideo] = useState(false);
   const [muted, setMuted] = useState(true);
   const video = useRef<HTMLVideoElement>(null);
-  const card = items[Math.min(index, items.length - 1)];
+  const card = items[Math.min(index, items.length - 1)]!;
+
+  // The outgoing slide stays underneath while the new one fades in, then is dropped.
+  const [layers, setLayers] = useState<number[]>(() => [card.id]);
+  useEffect(() => {
+    setLayers((prev) =>
+      prev[prev.length - 1] === card.id ? prev : [prev[prev.length - 1]!, card.id],
+    );
+    const id = window.setTimeout(() => setLayers([card.id]), duration.hero * 1000 + 100);
+    return () => window.clearTimeout(id);
+  }, [card.id]);
 
   useEffect(() => {
     if (items.length < 2 || paused) return;
@@ -41,7 +50,16 @@ export function Hero({ items, trailerFor }: Props) {
     return () => window.clearTimeout(id);
   }, [index, items.length, paused]);
 
-  const trailer = card ? trailerFor(card.id) : null;
+  // Trailers live on the detail payload. Fetch it only for the visible slide, after the first paint.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    setArmed(false);
+    if (!preview) return;
+    const id = window.setTimeout(() => setArmed(true), 1200);
+    return () => window.clearTimeout(id);
+  }, [card?.id, preview]);
+  const { data: detail } = useTitle(card?.id ?? 0, preview && armed && Boolean(card));
+  const trailer = detail?.id === card?.id ? detail?.trailer : null;
   const trailerKey = trailer?.key;
   useEffect(() => {
     setShowVideo(false);
@@ -50,7 +68,6 @@ export function Hero({ items, trailerFor }: Props) {
     return () => window.clearTimeout(id);
   }, [card?.id, trailerKey, preview]);
 
-  if (!card) return null;
   const hasProgress = Boolean(card.progress);
 
   return (
@@ -60,54 +77,54 @@ export function Hero({ items, trailerFor }: Props) {
       onPointerLeave={() => setPaused(false)}
       aria-roledescription="carousel"
     >
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={card.id}
-          className="absolute inset-0 -z-10"
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            transition: { duration: duration.hero, ease: ease.out },
-          }}
-          exit={{ opacity: 0, transition: { duration: duration.hero } }}
-        >
-          <ArtImage image={card.backdrop} size="w1280" eager className="size-full" />
-          {showVideo && trailer?.site === 'file' && (
-            <motion.video
-              ref={video}
-              src={trailer.key}
-              autoPlay
-              muted={muted}
-              loop
-              playsInline
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-              className="absolute inset-0 size-full object-cover"
-            />
-          )}
-          {showVideo && trailer?.site === 'YouTube' && (
-            <motion.iframe
-              title=""
-              aria-hidden
-              tabIndex={-1}
-              src={`https://www.youtube-nocookie.com/embed/${trailer.key}?autoplay=1&mute=${muted ? 1 : 0}&controls=0&loop=1&playlist=${trailer.key}&modestbranding=1&playsinline=1&rel=0`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-              className="pointer-events-none absolute left-1/2 top-1/2 aspect-video min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
-              allow="autoplay; encrypted-media"
-            />
-          )}
-        </motion.div>
-      </AnimatePresence>
+      {/* Plain elements, not motion components: the first backdrop must be visible on the very first
+          frame (it is the page's largest paint), before any animation code has loaded. */}
+      {layers.map((id) => {
+        const slide = items.find((it) => it.id === id);
+        if (!slide) return null;
+        const current = id === card.id;
+        return (
+          <div
+            key={id}
+            className={cn('absolute inset-0 -z-10', current && layers.length > 1 && 'hero-fade-in')}
+          >
+            <ArtImage image={slide.backdrop} size="w1280" eager className="size-full" />
+            {current && showVideo && trailer?.site === 'file' && (
+              <m.video
+                ref={video}
+                src={trailer.key}
+                autoPlay
+                muted={muted}
+                loop
+                playsInline
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.2 }}
+                className="absolute inset-0 size-full object-cover"
+              />
+            )}
+            {current && showVideo && trailer?.site === 'YouTube' && (
+              <m.iframe
+                title=""
+                aria-hidden
+                tabIndex={-1}
+                src={`https://www.youtube-nocookie.com/embed/${trailer.key}?autoplay=1&mute=${muted ? 1 : 0}&controls=0&loop=1&playlist=${trailer.key}&modestbranding=1&playsinline=1&rel=0`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.2 }}
+                className="pointer-events-none absolute left-1/2 top-1/2 aspect-video min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+                allow="autoplay; encrypted-media"
+              />
+            )}
+          </div>
+        );
+      })}
       <div className="scrim-start absolute inset-0 -z-10" />
       <div className="scrim-fade-bg absolute inset-x-0 bottom-0 -z-10 h-1/3" />
 
       <div className="page-x relative flex h-full min-h-[inherit] flex-col justify-end pb-28 pt-[calc(var(--nav-h)+3rem)] sm:pb-32">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={card.id}
             variants={staggerChildren(stagger.hero, 0.1)}
             initial="hidden"
@@ -115,22 +132,22 @@ export function Hero({ items, trailerFor }: Props) {
             exit={{ opacity: 0, transition: { duration: duration.fast } }}
             className="max-w-xl"
           >
-            <motion.div variants={fadeUp} className="eyebrow mb-4 text-fg-dim">
+            <m.div variants={fadeUp} className="eyebrow mb-4 text-fg-dim">
               {card.kind === 'movie' ? t('nav.movies') : t('nav.series')}
-            </motion.div>
-            <motion.div variants={fadeUp}>
+            </m.div>
+            <m.div variants={fadeUp}>
               <TitleLogo logo={card.logo} title={card.title} height="clamp(5rem, 14vw, 9rem)" />
-            </motion.div>
-            <motion.div variants={fadeUp} className="mt-5">
+            </m.div>
+            <m.div variants={fadeUp} className="mt-5">
               <MetaLine card={card} />
-            </motion.div>
-            <motion.p
+            </m.div>
+            <m.p
               variants={fadeUp}
               className="mt-3 line-clamp-3 max-w-[34rem] text-lead text-fg/90 text-pretty"
             >
               <Crossfade k={card.overview}>{card.overview}</Crossfade>
-            </motion.p>
-            <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
+            </m.p>
+            <m.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
               <Button
                 variant="primary"
                 size="lg"
@@ -144,8 +161,8 @@ export function Hero({ items, trailerFor }: Props) {
                   {t('common.moreInfo')}
                 </Button>
               </Link>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </AnimatePresence>
       </div>
 
@@ -168,7 +185,7 @@ export function Hero({ items, trailerFor }: Props) {
                 )}
               >
                 {i === index && (
-                  <motion.span
+                  <m.span
                     key={`${index}-${paused}`}
                     className="absolute inset-0 origin-left bg-fg [[dir=rtl]_&]:origin-right"
                     initial={{ scaleX: 0 }}

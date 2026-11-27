@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
@@ -15,14 +15,14 @@ function SkipLabel() {
 export function PageTransition({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   return (
-    <motion.div
+    <m.div
       key={pathname}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={tokens.base}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
