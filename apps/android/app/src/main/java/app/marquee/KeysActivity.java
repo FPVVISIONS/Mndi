@@ -27,20 +27,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class KeysActivity extends Activity {
     private static final String BASE = "http://127.0.0.1:" + BuildConfigInfo.PORT;
-    private static final String SCRIPT =
-        "(function(){"
-            + "var t=document.body?document.body.innerText:'';"
-            + "var id=/App\\s+api_id:?\\s*(\\d{4,12})/i.exec(t),h=/App\\s+api_hash:?\\s*([a-f0-9]{32})/i.exec(t);"
-            + "if(id&&h)return JSON.stringify({ok:1,id:id[1],hash:h[1]});"
-            + "var ti=document.getElementById('app_title'),sh=document.getElementById('app_shortname');"
-            + "if(ti&&sh&&!window.__mqSubmitted){"
-            + "ti.value='Marquee';"
-            + "sh.value='mq'+Math.random().toString(36).replace(/[^a-z]/g,'').slice(0,6)+Math.floor(Math.random()*90000+10000);"
-            + "var p=document.querySelector('input[name=app_platform][value=android]');if(p){p.checked=true;p.click();}"
-            + "var d=document.getElementById('app_desc');if(d)d.value='Personal media library';"
-            + "var b=document.getElementById('app_save_btn')||document.querySelector('form button[type=submit]')||document.querySelector('form input[type=submit]');"
-            + "if(b){window.__mqSubmitted=true;b.click();return JSON.stringify({ok:0,submitted:1});}}"
-            + "return JSON.stringify({ok:0});})()";
+    private String script = "";
+    private int rounds;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private WebView web;
@@ -49,15 +37,16 @@ public class KeysActivity extends Activity {
         @Override
         public void run() {
             if (done) return;
-            web.evaluateJavascript(SCRIPT, value -> {
+            rounds++;
+            web.evaluateJavascript(script, value -> {
                 if (value == null || done) return;
-                String v = value.replace("\\\"", "\"");
-                if (v.startsWith("\"")) v = v.substring(1, v.length() - 1);
                 java.util.regex.Matcher m = java.util.regex.Pattern
-                    .compile("\"id\":\"(\\d+)\",\"hash\":\"([a-f0-9]{32})\"").matcher(v);
+                    .compile("\"id\":\"(\\d+)\",\"hash\":\"([a-f0-9]{32})\"").matcher(value);
                 if (m.find()) {
                     done = true;
                     save(m.group(1), m.group(2));
+                } else if (value.contains("needHash") && rounds % 8 == 0) {
+                    Toast.makeText(this, "Tap the eye icon next to api_hash", Toast.LENGTH_LONG).show();
                 }
             });
             handler.postDelayed(this, 1200);
@@ -96,6 +85,11 @@ public class KeysActivity extends Activity {
         root.addView(col);
         setContentView(root);
 
+        try (java.io.InputStream in = getAssets().open("keys.js")) {
+            script = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            Toast.makeText(this, "Setup script missing", Toast.LENGTH_LONG).show();
+        }
         web.loadUrl("https://my.telegram.org/apps");
         handler.postDelayed(poll, 2000);
     }
