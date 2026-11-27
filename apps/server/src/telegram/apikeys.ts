@@ -40,12 +40,34 @@ export interface ApiKeys {
   apiHash: string;
 }
 
+/** The page as plain text: tags removed, and the values of inputs kept as text. */
+function pageText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<input[^>]*value=["']([^"']*)["'][^>]*>/gi, ' $1 ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Reads api_id and api_hash from the /apps page, or null when no app exists yet. */
 export function parseApps(html: string): ApiKeys | null {
-  const id = /api_id[\s\S]{0,400}?<strong>\s*(\d{3,12})\s*<\/strong>/i.exec(html);
-  const hash = /api_hash[\s\S]{0,400}?>\s*([a-f0-9]{32})\s*</i.exec(html);
+  const text = pageText(html);
+  const id = /api[_ ]?id:?\s*(\d{4,12})\b/i.exec(text);
+  const hash = /api[_ ]?hash:?\s*([a-f0-9]{32})\b/i.exec(text);
   if (!id || !hash) return null;
   return { apiId: Number(id[1]), apiHash: hash[1]!.toLowerCase() };
+}
+
+/** What the page says around "api_id", with every number and key hidden, for error messages. */
+export function maskedPage(html: string): string {
+  const text = pageText(html);
+  const at = Math.max(0, text.search(/api[_ ]?id/i));
+  return text
+    .slice(Math.max(0, at - 30), at + 170)
+    .replace(/[0-9a-f]{8,}/gi, '#')
+    .replace(/\d/g, '#');
 }
 
 /** The hidden form token the create-app form needs. */
@@ -214,6 +236,9 @@ export class TelegramKeysClient {
       const created = parseApps(page);
       if (created) return created;
     }
-    throw new KeysError('create_failed', `create said: ${snippet(answer)}`);
+    throw new KeysError(
+      'create_failed',
+      `create said: ${snippet(answer)} | page: ${maskedPage(page)}`,
+    );
   }
 }

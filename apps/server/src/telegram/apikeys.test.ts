@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { KeysError, TelegramKeysClient, parseApps, parseCreateHash } from './apikeys.js';
+import {
+  KeysError,
+  TelegramKeysClient,
+  maskedPage,
+  parseApps,
+  parseCreateHash,
+} from './apikeys.js';
 
 const APPS_PAGE = `
 <form class="form-horizontal" id="app_edit_form">
@@ -35,6 +41,19 @@ describe('my.telegram.org parsing', () => {
       apiId: 2471139,
       apiHash: '0f1e2d3c4b5a69788796a5b4c3d2e1f0',
     });
+  });
+
+  it('reads keys from other page layouts', () => {
+    const plain =
+      '<h2>App configuration</h2><p>App api_id: 2471139</p><p>App api_hash: 0F1E2D3C4B5A69788796a5b4c3d2e1f0</p>';
+    expect(parseApps(plain)?.apiId).toBe(2471139);
+    const inputs =
+      '<label>App api_id:</label><input readonly value="2471139"><label>App api_hash:</label><input readonly value="0f1e2d3c4b5a69788796a5b4c3d2e1f0">';
+    expect(parseApps(inputs)?.apiHash).toBe('0f1e2d3c4b5a69788796a5b4c3d2e1f0');
+  });
+
+  it('hides numbers in the page summary', () => {
+    expect(maskedPage(APPS_PAGE)).not.toMatch(/2471139|0f1e2d3c/i);
   });
 
   it('returns null when no app exists and finds the create token', () => {
