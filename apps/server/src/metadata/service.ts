@@ -53,30 +53,67 @@ export class MetadataService {
     return this.provider !== null;
   }
 
+  /**
+   * Localized metadata already read from the database. Parsing the stored JSON for every title on
+   * every request is what made lists and search crawl on a phone; each entry is parsed once.
+   */
+  private readonly memo = new Map<string, LocalizedMeta>();
+
+  private memoKey(kind: string, id: number, lang: string): string {
+    return `${kind}:${id}:${lang}`;
+  }
+
+  private remember(kind: string, id: number, lang: string, meta: LocalizedMeta): void {
+    if (this.memo.size > 12_000) this.memo.clear();
+    this.memo.set(this.memoKey(kind, id, lang), meta);
+  }
+
   peek(kind: TitleKind, tmdbId: number, lang: string): LocalizedMeta | null {
+    const hit = this.memo.get(this.memoKey(kind, tmdbId, lang));
+    if (hit) return hit;
     const row = this.db
       .select()
       .from(metaCache)
       .where(and(eq(metaCache.kind, kind), eq(metaCache.tmdbId, tmdbId), eq(metaCache.lang, lang)))
       .get();
-    return row ? (JSON.parse(row.data) as LocalizedMeta) : null;
+    if (!row) return null;
+    const meta = JSON.parse(row.data) as LocalizedMeta;
+    this.remember(kind, tmdbId, lang, meta);
+    return meta;
   }
 
   peekMany(kind: TitleKind, ids: number[], lang: string): Map<number, LocalizedMeta> {
     const out = new Map<number, LocalizedMeta>();
-    if (!ids.length) return out;
-    const rows = this.db
-      .select()
-      .from(metaCache)
-      .where(
-        and(eq(metaCache.kind, kind), eq(metaCache.lang, lang), inArray(metaCache.tmdbId, ids)),
-      )
-      .all();
-    for (const r of rows) out.set(r.tmdbId, JSON.parse(r.data) as LocalizedMeta);
+    const missing: number[] = [];
+    for (const id of ids) {
+      const hit = this.memo.get(this.memoKey(kind, id, lang));
+      if (hit) out.set(id, hit);
+      else missing.push(id);
+    }
+    // Only what is not remembered yet goes to the database, in modest batches.
+    for (let at = 0; at < missing.length; at += 400) {
+      const rows = this.db
+        .select()
+        .from(metaCache)
+        .where(
+          and(
+            eq(metaCache.kind, kind),
+            eq(metaCache.lang, lang),
+            inArray(metaCache.tmdbId, missing.slice(at, at + 400)),
+          ),
+        )
+        .all();
+      for (const r of rows) {
+        const meta = JSON.parse(r.data) as LocalizedMeta;
+        this.remember(kind, r.tmdbId, lang, meta);
+        out.set(r.tmdbId, meta);
+      }
+    }
     return out;
   }
 
   private store(kind: TitleKind, id: number, lang: string, meta: LocalizedMeta): void {
+    this.remember(kind, id, lang, meta);
     const values = { kind, tmdbId: id, lang, data: JSON.stringify(meta), fetchedAt: Date.now() };
     this.db
       .insert(metaCache)

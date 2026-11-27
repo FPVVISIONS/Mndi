@@ -566,33 +566,33 @@ export class Library {
     const needle = titleKey(q);
     if (!needle) return { movies: [], series: [], channels: [] };
     const all = this.allTitles();
-    const cards = this.cards(all, ctx);
-    const rank = (c: TitleCard, row: TitleRow): number => {
-      const names = [titleKey(c.title), titleKey(row.name)];
+    // Rank on names alone, then build cards only for the few that will be shown. Building a card
+    // for every title in the library on each keystroke is far too slow on a phone.
+    const metas = this.metaFor(all, ctx.lang);
+    const rank = (row: TitleRow): number => {
+      const names = [titleKey(metas.get(row.id)?.meta.title ?? ''), titleKey(row.name)];
       if (names.some((n) => n === needle)) return 3;
       if (names.some((n) => n.startsWith(needle))) return 2;
       if (names.some((n) => n.includes(needle))) return 1;
       return 0;
     };
-    const rowById = new Map(all.map((r) => [r.id, r]));
-    const hits = cards
-      .map((c) => ({ c, s: rank(c, rowById.get(c.id)!) }))
+    const scored = all
+      .map((row) => ({ row, s: rank(row), r: metas.get(row.id)?.meta.rating ?? 0 }))
       .filter((x) => x.s > 0)
-      .sort((a, b) => b.s - a.s || (b.c.rating ?? 0) - (a.c.rating ?? 0));
+      .sort((a, b) => b.s - a.s || b.r - a.r);
+    const top = (kind: 'movie' | 'series') =>
+      this.cards(
+        scored
+          .filter((x) => x.row.kind === kind)
+          .slice(0, 14)
+          .map((x) => x.row),
+        ctx,
+      );
+    const hits = { movies: top('movie'), series: top('series') };
     const channels: Channel[] = listChannels(this.db, ctx.profileId)
       .filter((c) => titleKey(c.name).includes(needle) || titleKey(c.group).includes(needle))
       .slice(0, 12);
-    return {
-      movies: hits
-        .filter((h) => h.c.kind === 'movie')
-        .slice(0, 14)
-        .map((h) => h.c),
-      series: hits
-        .filter((h) => h.c.kind === 'series')
-        .slice(0, 14)
-        .map((h) => h.c),
-      channels,
-    };
+    return { movies: hits.movies, series: hits.series, channels };
   }
 
   // --- profile state -------------------------------------------------------------------------

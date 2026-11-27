@@ -264,6 +264,9 @@ export class Indexer {
             // Skip a message that cannot be read and keep going.
           }
           this.scanned++;
+          // Hand the event loop back regularly so the app's own requests are answered while a
+          // large chat is being read.
+          if (this.scanned % 8 === 0) await new Promise<void>((r) => setImmediate(r));
         }
         offsetId = page[page.length - 1]!.id;
         if (page.length < PAGE) break;
