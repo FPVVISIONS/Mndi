@@ -63,7 +63,7 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
       ) : data && data.items.length > 0 ? (
         <VirtualGrid
           items={data.items}
-          minWidth={140}
+          minWidth={168}
           aspect={1.5}
           gap={16}
           keyOf={(c) => c.id}

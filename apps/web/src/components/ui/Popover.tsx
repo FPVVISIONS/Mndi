@@ -21,7 +21,12 @@ export function Popover({ trigger, children, align = 'end', side = 'bottom', cla
     const onDown = (e: PointerEvent) => {
       if (!root.current?.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      // Close the menu only; the player's own Escape handler (leave) must not also fire.
+      e.stopPropagation();
+      setOpen(false);
+    };
     document.addEventListener('pointerdown', onDown);
     document.addEventListener('keydown', onKey);
     return () => {

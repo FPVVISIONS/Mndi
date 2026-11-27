@@ -119,7 +119,7 @@ function wrap(text: string, max: number): string[] {
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 function textBlock(lines: string[], x: number, y: number, size: number, fill: string, rtl: boolean, anchor = 'middle') {
-  const dir = rtl ? ' direction="rtl" unicode-bidi="plaintext"' : '';
+  const dir = rtl ? ' direction="rtl"' : '';
   return lines
     .map((l, i) => `<text x="${x}" y="${y + i * size * 1.05}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-weight="400"${dir}>${esc(l)}</text>`)
     .join('');
@@ -141,10 +141,13 @@ export function renderArt(slug: string, kind: 'poster' | 'backdrop' | 'logo', la
   }
   if (kind === 'logo') {
     const lines = wrap(title, 16);
-    const size = lines.length > 1 ? 120 : 150;
+    const longest = Math.max(...lines.map((l) => l.length));
+    // Scale the type to the longest line so no title is ever clipped by the canvas.
+    const size = Math.min(lines.length > 1 ? 120 : 150, Math.floor(860 / (longest * 0.54)));
     const h = 60 + lines.length * size * 1.05;
     // Logos hug the reading-direction edge so they line up with the text beside them.
-    return `${head(900, h)}${textBlock(lines, info.rtl ? 900 : 0, size + 10, size, '#F2F0EC', info.rtl, info.rtl ? 'end' : 'start')}</svg>`;
+    // SVG text-anchor is direction-aware: in RTL, "start" is the right edge.
+    return `${head(900, h)}${textBlock(lines, info.rtl ? 900 : 0, size + 10, size, '#F2F0EC', info.rtl, 'start')}</svg>`;
   }
   const w = 500;
   const h = 750;

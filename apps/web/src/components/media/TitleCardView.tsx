@@ -74,7 +74,7 @@ export function TitleCardView({ card, className }: Props) {
             initial="hidden"
             animate="show"
             exit="exit"
-            className="absolute inset-x-0 top-full -mt-1 rounded-b-md bg-surface-2 p-3 shadow-[var(--shadow-pop)]"
+            className="absolute -inset-x-2 top-full -mt-1 rounded-b-md bg-surface-2 p-3 shadow-[var(--shadow-pop)]"
           >
             <motion.div variants={item}>
               <QuickActions card={card} />
@@ -83,7 +83,7 @@ export function TitleCardView({ card, className }: Props) {
               <Crossfade k={card.title}>{card.title}</Crossfade>
             </motion.div>
             <motion.div variants={item} className="mt-1">
-              <MetaLine card={card} />
+              <MetaLine card={card} compact />
             </motion.div>
             {card.genres.length > 0 && (
               <motion.div variants={item} className="mt-1.5 truncate text-caption text-fg-faint">

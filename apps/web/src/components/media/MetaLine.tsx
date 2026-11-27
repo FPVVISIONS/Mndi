@@ -12,10 +12,12 @@ export function useRuntime() {
 interface Props {
   card: Pick<TitleCard, 'kind' | 'year' | 'runtime' | 'seasons' | 'rating'> & { certification?: string | null };
   className?: string;
+  /** Single row, no wrapping: for tight spaces such as the hover panel. */
+  compact?: boolean;
 }
 
 /** Year, rating, length: the quiet line under a title. */
-export function MetaLine({ card, className }: Props) {
+export function MetaLine({ card, className, compact }: Props) {
   const { t } = useTranslation();
   const runtime = useRuntime();
   const parts: React.ReactNode[] = [];
@@ -32,9 +34,9 @@ export function MetaLine({ card, className }: Props) {
   if (card.kind === 'series' && card.seasons) parts.push(<span key="s">{t('common.seasonsCount', { count: card.seasons })}</span>);
   else if (card.runtime) parts.push(<span key="t">{runtime(card.runtime)}</span>);
   return (
-    <div className={cn('flex flex-wrap items-center gap-x-2.5 gap-y-1 text-small text-fg-dim', className)}>
+    <div className={cn('flex items-center text-small text-fg-dim', compact ? 'flex-nowrap gap-x-2 overflow-hidden whitespace-nowrap' : 'flex-wrap gap-x-2.5 gap-y-1', className)}>
       {parts.map((p, i) => (
-        <span key={i} className="inline-flex items-center gap-2.5">
+        <span key={i} className={cn('inline-flex shrink-0 items-center', compact ? 'gap-2' : 'gap-2.5')}>
           {i > 0 && <span className="size-[3px] rounded-full bg-fg-faint" aria-hidden />}
           {p}
         </span>
