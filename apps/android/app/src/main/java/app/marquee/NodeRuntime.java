@@ -16,9 +16,17 @@ public final class NodeRuntime {
     private static final String TAG = "Marquee";
     private static boolean started;
 
+    /** Why Node could not load or start, shown on screen instead of closing silently. */
+    public static volatile String error;
+
     static {
-        System.loadLibrary("node");
-        System.loadLibrary("native-lib");
+        try {
+            System.loadLibrary("node");
+            System.loadLibrary("native-lib");
+        } catch (Throwable t) {
+            error = "Could not load Node.js on this phone: " + t;
+            Log.e(TAG, error, t);
+        }
     }
 
     private NodeRuntime() {}
@@ -26,7 +34,7 @@ public final class NodeRuntime {
     private static native int startNode(String[] arguments);
 
     public static synchronized void ensureStarted(Context context) {
-        if (started) return;
+        if (started || error != null) return;
         started = true;
         final Context app = context.getApplicationContext();
         // Node and V8 need a far bigger stack than Android gives a thread by default.
@@ -43,9 +51,11 @@ public final class NodeRuntime {
                     new File(project, "web").getAbsolutePath(),
                     String.valueOf(PORT),
                 });
-                Log.e(TAG, "Node exited with code " + code);
-            } catch (Exception e) {
-                Log.e(TAG, "Could not start Node", e);
+                error = "The Marquee server stopped (code " + code + ").";
+                Log.e(TAG, error);
+            } catch (Throwable e) {
+                error = "Could not start the Marquee server: " + e;
+                Log.e(TAG, error, e);
             }
         }, "marquee-node", 16L * 1024 * 1024);
         thread.start();

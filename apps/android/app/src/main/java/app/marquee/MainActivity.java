@@ -96,8 +96,14 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         if (Build.VERSION.SDK_INT >= 33) requestPermissions(new String[] {Manifest.permission.POST_NOTIFICATIONS}, 1);
-        Intent service = new Intent(this, NodeService.class);
-        if (Build.VERSION.SDK_INT >= 26) startForegroundService(service); else startService(service);
+        try {
+            Intent service = new Intent(this, NodeService.class);
+            if (Build.VERSION.SDK_INT >= 26) startForegroundService(service); else startService(service);
+        } catch (Throwable t) {
+            android.util.Log.e("Marquee", "Could not start the background service", t);
+        }
+        // Start Node here too: if the service was refused, the app still works while it is open.
+        NodeRuntime.ensureStarted(this);
         waitForServer();
     }
 
@@ -119,14 +125,26 @@ public class MainActivity extends Activity {
                     }
                 } catch (Exception ignored) {
                 }
+                if (NodeRuntime.error != null) {
+                    String reason = NodeRuntime.error;
+                    runOnUiThread(() -> showError(reason));
+                    return;
+                }
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
                     return;
                 }
             }
-            runOnUiThread(() -> splash.setText("Marquee could not start.\nClose the app and open it again."));
+            runOnUiThread(() -> showError("The Marquee server did not answer within a minute."));
         }).start();
+    }
+
+    private void showError(String reason) {
+        splash.setTextSize(15);
+        splash.setTypeface(android.graphics.Typeface.DEFAULT);
+        splash.setText("Marquee could not start.\n\n" + reason + "\n\nClose the app and open it again. If this keeps happening, send this text to whoever set Marquee up.");
+        splash.setTextIsSelectable(true);
     }
 
     private void setFullscreenUi(boolean on) {

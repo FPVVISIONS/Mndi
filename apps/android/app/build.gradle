@@ -7,19 +7,20 @@ def keystoreFile = file(System.getenv('MARQUEE_KEYSTORE') ?: 'missing.keystore')
 
 android {
     namespace 'app.marquee'
-    compileSdk 35
+    compileSdk 36
     ndkVersion '27.2.12479018'
 
     defaultConfig {
         applicationId 'app.marquee'
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName '0.1.0'
+        versionCode 2
+        versionName '0.1.1'
         externalNativeBuild {
             cmake {
                 // libnode links against the shared C++ runtime, so it must ship with the app.
-                arguments '-DANDROID_STL=c++_shared'
+                // 16 KB-aligned so it loads on phones that use 16 KB memory pages (Android 15+).
+                arguments '-DANDROID_STL=c++_shared', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
                 cppFlags '-std=c++17'
             }
         }

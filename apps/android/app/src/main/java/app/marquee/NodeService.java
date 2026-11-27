@@ -27,11 +27,16 @@ public class NodeService extends Service {
             Process.killProcess(Process.myPid());
             return START_NOT_STICKY;
         }
-        Notification notification = buildNotification();
-        if (Build.VERSION.SDK_INT >= 29) {
-            startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
-        } else {
-            startForeground(1, notification);
+        try {
+            Notification notification = buildNotification();
+            if (Build.VERSION.SDK_INT >= 29) {
+                startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                startForeground(1, notification);
+            }
+        } catch (Throwable t) {
+            // Some phones refuse background services; the server still runs while the app is open.
+            android.util.Log.e("Marquee", "Foreground service refused", t);
         }
         NodeRuntime.ensureStarted(this);
         return START_STICKY;
