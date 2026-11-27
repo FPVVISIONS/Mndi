@@ -54,8 +54,12 @@ function pageText(html: string): string {
 /** Reads api_id and api_hash from the /apps page, or null when no app exists yet. */
 export function parseApps(html: string): ApiKeys | null {
   const text = pageText(html);
-  const id = /api[_ ]?id:?\s*(\d{4,12})\b/i.exec(text);
-  const hash = /api[_ ]?hash:?\s*([a-f0-9]{32})\b/i.exec(text);
+  // The labels on the page read "App api_id:" and "App api_hash:"; prefer those exact ones.
+  const id =
+    /App\s+api[_ ]?id:?\s*(\d{4,12})\b/i.exec(text) ?? /api[_ ]?id:?\s*(\d{4,12})\b/i.exec(text);
+  const hash =
+    /App\s+api[_ ]?hash:?\s*([a-f0-9]{32})\b/i.exec(text) ??
+    /api[_ ]?hash:?\s*([a-f0-9]{32})\b/i.exec(text);
   if (!id || !hash) return null;
   return { apiId: Number(id[1]), apiHash: hash[1]!.toLowerCase() };
 }

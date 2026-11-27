@@ -280,7 +280,10 @@ export class TelegramManager implements TelegramBackend {
   private fail(step: AuthState['step'], err: unknown): AuthState {
     const { code, waitSeconds } = toAuthError(err);
     const e = err as { errorMessage?: string; message?: string };
-    const detail = (e?.errorMessage ?? e?.message ?? String(err)).slice(0, 90);
+    let detail = (e?.errorMessage ?? e?.message ?? String(err)).slice(0, 90);
+    // Wrong keys: say what shape the saved ones have (never the values) so a mistake is visible.
+    if (code === 'credentials_invalid' && this.creds)
+      detail = `saved api_id has ${String(this.creds.apiId).length} digits, api_hash ${this.creds.apiHash.length} characters`;
     this.auth = { step, error: code, waitSeconds, detail };
     console.warn(`[telegram auth] ${step}: ${detail}`);
     return this.auth;
