@@ -71,6 +71,7 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
     fileId,
     channelId: null,
     titleId: row.id,
+    episodeId: file.episodeId,
     title: card.title,
     subtitle,
     duration: info?.duration || file.duration || 0,

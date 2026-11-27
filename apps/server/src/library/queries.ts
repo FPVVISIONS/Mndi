@@ -43,11 +43,16 @@ export function bestFile(list: FileRow[], opts: { chosen?: number; quality?: str
   return [...pool].sort((a, b) => rank(b) - rank(a) || b.size - a.size)[0];
 }
 
+const SOURCE_LABEL: Record<string, string> = {
+  BLURAY: 'BluRay', BDRIP: 'BDRip', BRRIP: 'BRRip', BDREMUX: 'Remux', REMUX: 'Remux', WEBDL: 'WEB-DL', WEBRIP: 'WEBRip',
+  HDTV: 'HDTV', PDTV: 'PDTV', DVDRIP: 'DVDRip', HDRIP: 'HDRip', CAM: 'CAM', HDCAM: 'CAM',
+};
+
 export function toVersion(f: FileRow, chat: string, chosen: boolean): FileVersion {
   const res = f.width && f.height ? `${f.width}×${f.height}` : null;
   return {
     id: f.id,
-    label: [f.quality, f.source, f.codec === 'hevc' ? 'HEVC' : f.codec === 'h264' ? 'H.264' : f.codec].filter(Boolean).join(' · ') || f.container.toUpperCase(),
+    label: [f.quality, f.source ? (SOURCE_LABEL[f.source] ?? f.source) : null, f.codec === 'hevc' ? 'HEVC' : f.codec === 'h264' ? 'H.264' : f.codec].filter(Boolean).join(' · ') || f.container.toUpperCase(),
     quality: f.quality ?? '',
     source: f.source,
     codec: f.codec,
@@ -332,8 +337,10 @@ export class Library {
     const seasonRows = this.db.all<{ season: number; n: number }>(
       sql`SELECT season, COUNT(*) AS n FROM episodes WHERE title_id = ${id} GROUP BY season ORDER BY season`,
     );
+    const prog = target ? this.progressRows(ctx).find((r) => r.p.fileId === target.fileId && !r.p.completed && r.p.position >= 5) : undefined;
     return {
       ...card,
+      progress: prog ? { fileId: prog.p.fileId, position: prog.p.position, duration: prog.p.duration, updatedAt: prog.p.updatedAt } : undefined,
       tagline: m?.tagline ?? '',
       certification: m?.certification ?? null,
       originalLanguage: m?.originalLanguage ?? null,

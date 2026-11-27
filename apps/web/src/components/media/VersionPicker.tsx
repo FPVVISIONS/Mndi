@@ -71,7 +71,7 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
                     on ? 'border-accent bg-accent-dim/60' : 'border-line bg-surface-2 hover:border-line-strong',
                   )}
                 >
-                  <span className={cn('mt-0.5 grid h-9 min-w-12 place-items-center rounded-md px-2 text-small font-bold tracking-tight', on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-fg')}>
+                  <span className={cn('mt-0.5 grid h-9 w-[3.75rem] shrink-0 place-items-center rounded-md text-small font-bold tracking-tight', on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-fg')}>
                     {qualityBadge(v.quality)}
                   </span>
                   <span className="min-w-0 flex-1">

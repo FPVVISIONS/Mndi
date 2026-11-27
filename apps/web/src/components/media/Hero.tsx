@@ -54,7 +54,7 @@ export function Hero({ items, trailerFor }: Props) {
 
   return (
     <section
-      className="relative isolate min-h-[34rem] overflow-hidden sm:min-h-[40rem] lg:h-[min(52rem,86vh)]"
+      className="relative isolate min-h-[34rem] overflow-hidden sm:min-h-[38rem] lg:h-[min(48rem,80vh)]"
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -100,7 +100,7 @@ export function Hero({ items, trailerFor }: Props) {
       <div className="scrim-start absolute inset-0 -z-10" />
       <div className="scrim-fade-bg absolute inset-x-0 bottom-0 -z-10 h-1/3" />
 
-      <div className="page-x relative flex h-full min-h-[inherit] flex-col justify-end pb-24 pt-[calc(var(--nav-h)+3rem)] sm:pb-32">
+      <div className="page-x relative flex h-full min-h-[inherit] flex-col justify-end pb-28 pt-[calc(var(--nav-h)+3rem)] sm:pb-32">
         <AnimatePresence mode="wait">
           <motion.div
             key={card.id}
@@ -136,7 +136,7 @@ export function Hero({ items, trailerFor }: Props) {
         </AnimatePresence>
       </div>
 
-      <div className="page-x absolute inset-x-0 bottom-8 flex items-center justify-between sm:bottom-12">
+      <div className="page-x absolute inset-x-0 bottom-16 flex items-center justify-between sm:bottom-[4.5rem]">
         <div className="flex items-center gap-2" role="tablist">
           {items.map((it, i) => (
             <button

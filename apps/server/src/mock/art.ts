@@ -143,14 +143,15 @@ export function renderArt(slug: string, kind: 'poster' | 'backdrop' | 'logo', la
     const lines = wrap(title, 16);
     const size = lines.length > 1 ? 120 : 150;
     const h = 60 + lines.length * size * 1.05;
-    return `${head(900, h)}${textBlock(lines, 450, size + 10, size, '#F2F0EC', info.rtl)}</svg>`;
+    // Logos hug the reading-direction edge so they line up with the text beside them.
+    return `${head(900, h)}${textBlock(lines, info.rtl ? 900 : 0, size + 10, size, '#F2F0EC', info.rtl, info.rtl ? 'end' : 'start')}</svg>`;
   }
   const w = 500;
   const h = 750;
   const lines = wrap(title, 12);
   const size = lines.length > 2 ? 58 : 70;
   const base = h - 58 - (lines.length - 1) * size * 1.05;
-  return `${head(w, h)}<rect width="${w}" height="${h}" fill="${p.bg}"/>${motifShapes(t, w, h * 0.78)}<rect y="${h * 0.58}" width="${w}" height="${h * 0.42}" fill="${p.bg}" opacity="0.88"/>${textBlock(lines, w / 2, base, size, '#F2F0EC', info.rtl)}<rect x="${w / 2 - 18}" y="${h - 34}" width="36" height="3" fill="${p.accent}"/></svg>`;
+  return `${head(w, h)}<rect width="${w}" height="${h}" fill="${p.bg}"/>${motifShapes(t, w, h * 0.78)}<defs><linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.bg}" stop-opacity="0"/><stop offset="0.55" stop-color="${p.bg}" stop-opacity="0.92"/><stop offset="1" stop-color="${p.bg}"/></linearGradient></defs><rect y="${h * 0.5}" width="${w}" height="${h * 0.5}" fill="url(#f)"/>${textBlock(lines, w / 2, base, size, '#F2F0EC', info.rtl)}<rect x="${w / 2 - 18}" y="${h - 34}" width="36" height="3" fill="${p.accent}"/></svg>`;
 }
 
 /** Dominant colour for a mock image path such as `mock/long-harbour/poster/he`. */

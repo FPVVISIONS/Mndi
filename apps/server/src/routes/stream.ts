@@ -52,7 +52,7 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
     const info = await probeFile(svc, id);
     const copyVideo = q.mode === 'remux' && (info ? canCopyVideo(info.video?.codec ?? null, q.hevc) : true);
     const audioCodec = info?.audio[q.audio]?.codec;
-    const copyAudio = Boolean(audioCodec && ['aac', 'mp3'].includes(audioCodec));
+    const copyAudio = Boolean(audioCodec && ['aac', 'mp3', 'opus'].includes(audioCodec));
     const child = spawnRemux({ input: inputFor(svc, id), start: q.start, audioIndex: q.audio, copyVideo, copyAudio });
     req.raw.on('close', () => child.kill('SIGKILL'));
     reply.header('Content-Type', 'video/mp4').header('Cache-Control', 'no-store');

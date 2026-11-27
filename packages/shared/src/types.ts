@@ -159,6 +159,7 @@ export interface PlaybackInfo {
   fileId: number | null;
   channelId: number | null;
   titleId: number | null;
+  episodeId: number | null;
   title: string;
   subtitle: string | null;
   duration: number;

@@ -172,3 +172,19 @@
     display: none;
   }
 }
+
+/* Volume slider thumb */
+input.vol::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--color-fg);
+}
+input.vol::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-fg);
+}

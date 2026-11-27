@@ -67,7 +67,7 @@ export async function ensureSampleMedia(dir: string): Promise<string[]> {
       'ffmpeg',
       [
         '-hide_banner', '-loglevel', 'error', '-y',
-        '-f', 'lavfi', '-i', `gradients=s=854x480:c0=${c[0]}:c1=${c[1]}:c2=${c[2]}:c3=${c[3]}:nb_colors=4:speed=0.012:rate=24:duration=${SAMPLE_SECONDS},noise=alls=4:allf=t,vignette=PI/4`,
+        '-f', 'lavfi', '-i', `gradients=s=854x480:c0=${c[0]}:c1=${c[1]}:c2=${c[2]}:c3=${c[3]}:nb_colors=4:speed=0.012:rate=24:duration=${SAMPLE_SECONDS},gblur=sigma=6,vignette=PI/4`,
         '-f', 'lavfi', '-i', `sine=frequency=${110 + i * 20}:duration=${SAMPLE_SECONDS}`,
         '-f', 'lavfi', '-i', `sine=frequency=${165 + i * 20}:duration=${SAMPLE_SECONDS}`,
         '-i', vtt, '-i', meta,

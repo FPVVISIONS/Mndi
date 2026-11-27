@@ -50,7 +50,7 @@ export function liveRoutes(app: FastifyInstance, svc: Services): void {
       url = `/api/live/${ch.id}/remux`;
     }
     const info: PlaybackInfo = {
-      fileId: null, channelId: ch.id, titleId: null, title: ch.name,
+      fileId: null, channelId: ch.id, titleId: null, episodeId: null, title: ch.name,
       subtitle: ch.grp || null, duration: 0, mode, url, audioTracks: [], subtitleTracks: [],
       chapters: [], resume: 0, next: null, versions: [], thumbs: false, backdrop: null,
     };
