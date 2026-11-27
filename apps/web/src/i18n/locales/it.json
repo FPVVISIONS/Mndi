@@ -356,6 +356,8 @@
     "manualKeys": "Ho già le mie chiavi API",
     "useAuto": "Accedi invece con il numero di telefono",
     "keysRetryBody": "Il codice ha funzionato, ma Telegram non ha creato le chiavi. Tocca Riprova: non serve un nuovo codice.",
-    "keysByHand": "Oppure creale tu, poi scegli \"Ho già le mie chiavi API\":"
+    "keysByHand": "Oppure creale tu, poi scegli \"Ho già le mie chiavi API\":",
+    "connecting": "Connessione a Telegram…",
+    "connectingSlow": "Sto ancora provando. Su una rete lenta può volerci fino a un minuto."
   }
 }

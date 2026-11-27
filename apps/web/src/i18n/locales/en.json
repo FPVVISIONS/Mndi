@@ -356,6 +356,8 @@
     "manualKeys": "I have my own API keys",
     "useAuto": "Sign in with my phone number instead",
     "keysRetryBody": "Your code worked, but Telegram didn't create the keys. Tap Try again; you won't need a new code.",
-    "keysByHand": "Or create them yourself, then choose \"I have my own API keys\":"
+    "keysByHand": "Or create them yourself, then choose \"I have my own API keys\":",
+    "connecting": "Connecting to Telegram…",
+    "connectingSlow": "Still trying. On a slow network this can take up to a minute."
   }
 }

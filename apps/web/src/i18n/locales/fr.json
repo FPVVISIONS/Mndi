@@ -356,6 +356,8 @@
     "manualKeys": "J'ai mes propres clés API",
     "useAuto": "Me connecter avec mon numéro plutôt",
     "keysRetryBody": "Votre code a fonctionné, mais Telegram n'a pas créé les clés. Touchez Réessayer ; pas besoin d'un nouveau code.",
-    "keysByHand": "Ou créez-les vous-même, puis choisissez « J'ai mes propres clés API » :"
+    "keysByHand": "Ou créez-les vous-même, puis choisissez « J'ai mes propres clés API » :",
+    "connecting": "Connexion à Telegram…",
+    "connectingSlow": "On essaie encore. Sur un réseau lent, cela peut prendre une minute."
   }
 }

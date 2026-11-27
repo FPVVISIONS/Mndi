@@ -15,6 +15,7 @@ import type { ChunkCache } from '../stream/chunkCache.js';
 import { CHUNK_SIZE, ChunkedSource, LocalFileSource } from '../stream/sources.js';
 import type { ByteSource } from '../stream/range.js';
 import { KeysError, TelegramKeysClient } from './apikeys.js';
+import { normalizePhone } from './phone.js';
 import type { FileRow, TelegramBackend } from './backend.js';
 import {
   floodSeconds,
@@ -30,6 +31,8 @@ type MediaLike = Api.TypeMessageMedia;
 
 /** How long a sign-in step may wait for Telegram before telling the person it is unreachable. */
 const CONNECT_TIMEOUT = 25_000;
+/** TCP gets less time, because WebSocket is tried right after it. */
+const CONNECT_TIMEOUT_TCP = 15_000;
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -190,7 +193,7 @@ export class TelegramManager implements TelegramBackend {
 
   /** Step 1 of phone-only sign-in: my.telegram.org sends a code to the Telegram app. */
   async requestKeysCode(phone: string): Promise<AuthState> {
-    const digits = phone.replace(/[^\d+]/g, '');
+    const digits = normalizePhone(phone);
     if (digits.replace(/\D/g, '').length < 7)
       return this.keysFail('credentials', new KeysError('phone_invalid'));
     const normalized = digits.startsWith('+') ? digits : `+${digits}`;
@@ -231,13 +234,28 @@ export class TelegramManager implements TelegramBackend {
     return this.sendPhone(this.keysPhone);
   }
 
-  private newClient(session: string): TelegramClient {
+  /** WebSocket over port 443 instead of raw TCP; used when a network blocks or stalls TCP. */
+  private get useWss(): boolean {
+    const row = this.db.select().from(settings).where(eq(settings.key, 'telegram_wss')).get();
+    return row?.value === '1';
+  }
+
+  private set useWss(on: boolean) {
+    const value = on ? '1' : '0';
+    this.db
+      .insert(settings)
+      .values({ key: 'telegram_wss', value })
+      .onConflictDoUpdate({ target: settings.key, set: { value } })
+      .run();
+  }
+
+  private newClient(session: string, wss = this.useWss): TelegramClient {
     const c = this.creds!;
     const client = new TelegramClient(new StringSession(session), c.apiId, c.apiHash, {
-      connectionRetries: 5,
-      retryDelay: 1500,
+      connectionRetries: 3,
+      retryDelay: 1000,
       autoReconnect: true,
-      useWSS: false,
+      useWSS: wss,
       deviceModel: 'Marquee',
       appVersion: this.cfg.version,
     });
@@ -249,16 +267,18 @@ export class TelegramManager implements TelegramBackend {
 
   private fail(step: AuthState['step'], err: unknown): AuthState {
     const { code, waitSeconds } = toAuthError(err);
-    this.auth = { ...this.auth, step, error: code, waitSeconds };
+    const e = err as { errorMessage?: string; message?: string };
+    const detail = (e?.errorMessage ?? e?.message ?? String(err)).slice(0, 90);
+    this.auth = { step, error: code, waitSeconds, detail };
+    console.warn(`[telegram auth] ${step}: ${detail}`);
     return this.auth;
   }
 
-  private async freshClient(): Promise<TelegramClient> {
-    if (this.client) await this.client.disconnect().catch(() => undefined);
-    const client = this.newClient('');
+  private async connectWith(wss: boolean): Promise<TelegramClient> {
+    const client = this.newClient('', wss);
     this.client = client;
     try {
-      await withTimeout(client.connect(), CONNECT_TIMEOUT);
+      await withTimeout(client.connect(), wss ? CONNECT_TIMEOUT : CONNECT_TIMEOUT_TCP);
     } catch (err) {
       // Stop GramJS from retrying in the background after we have given up on this attempt.
       void client.disconnect().catch(() => undefined);
@@ -267,9 +287,26 @@ export class TelegramManager implements TelegramBackend {
     return client;
   }
 
+  /** Connects over TCP, and if that fails or stalls, over WebSocket (port 443), remembering which worked. */
+  private async freshClient(): Promise<TelegramClient> {
+    if (this.client) await this.client.disconnect().catch(() => undefined);
+    const preferWss = this.useWss;
+    try {
+      return await this.connectWith(preferWss);
+    } catch (first) {
+      try {
+        const client = await this.connectWith(!preferWss);
+        this.useWss = !preferWss;
+        return client;
+      } catch {
+        throw first;
+      }
+    }
+  }
+
   async sendPhone(phone: string): Promise<AuthState> {
     if (!this.creds) return this.fail('credentials', new Error('API_ID_INVALID'));
-    const digits = phone.replace(/[^\d+]/g, '');
+    const digits = normalizePhone(phone);
     if (digits.replace(/\D/g, '').length < 7)
       return this.fail('phone', new Error('PHONE_NUMBER_INVALID'));
     try {

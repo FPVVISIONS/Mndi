@@ -356,6 +356,8 @@
     "manualKeys": "Kendi API anahtarlarım var",
     "useAuto": "Bunun yerine telefon numarasıyla giriş yap",
     "keysRetryBody": "Kodunuz işe yaradı ama Telegram anahtarları oluşturmadı. Tekrar dene'ye dokunun; yeni koda gerek yok.",
-    "keysByHand": "Ya da kendiniz oluşturup \"Kendi API anahtarlarım var\"ı seçin:"
+    "keysByHand": "Ya da kendiniz oluşturup \"Kendi API anahtarlarım var\"ı seçin:",
+    "connecting": "Telegram'a bağlanılıyor…",
+    "connectingSlow": "Hâlâ deneniyor. Yavaş ağda bu bir dakika sürebilir."
   }
 }

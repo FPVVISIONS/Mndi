@@ -50,6 +50,34 @@ function ErrorLine({ auth }: { auth: AuthState }) {
   );
 }
 
+/** Shown while a step waits for Telegram, so a slow network never looks like a frozen button. */
+function Waiting({ active }: { active: boolean }) {
+  const { t } = useTranslation();
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    setSlow(false);
+    if (!active) return;
+    const id = window.setTimeout(() => setSlow(true), 10_000);
+    return () => window.clearTimeout(id);
+  }, [active]);
+  return (
+    <AnimatePresence>
+      {active && (
+        <m.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          role="status"
+          className="flex items-center gap-2.5 text-small text-fg-dim"
+        >
+          <Spinner />
+          {slow ? t('onboarding.connectingSlow') : t('onboarding.connecting')}
+        </m.p>
+      )}
+    </AnimatePresence>
+  );
+}
+
 /** One screen per login step. The server drives which step is current. */
 export function ConnectStep({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
@@ -145,6 +173,7 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             />
           </m.div>
           <ErrorLine auth={auth} />
+          <Waiting active={keysPhone.isPending} />
           <m.div variants={fadeUp} className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <Button
               type="submit"
@@ -194,6 +223,7 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             </m.div>
           )}
           <ErrorLine auth={auth} />
+          <Waiting active={keysSubmit.isPending} />
           <m.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
             <Button
               type="submit"
@@ -328,6 +358,7 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
                 />
               </m.div>
               <ErrorLine auth={auth} />
+              <Waiting active={sendPhone.isPending} />
               {status?.mock && (
                 <m.p
                   variants={fadeUp}
