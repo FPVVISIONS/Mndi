@@ -36,9 +36,16 @@ const PROFILES = [
   { name: 'Kids', color: '#C8E06B', avatar: 'cat' },
 ];
 
-function releaseName(t: (typeof MOCK_CATALOG)[number], quality: string, s?: number, e?: number): string {
+const TAGS = [
+  'WEB-DL.DDP5.1.H.264',
+  'BluRay.x265.10bit.Hebrew.English.HebSubs',
+  'WEBRip.x264.Dual.Audio',
+  'HDTV.x264.Spanish',
+];
+
+function releaseName(t: (typeof MOCK_CATALOG)[number], quality: string, variant: number, s?: number, e?: number): string {
   const base = t.title.en.replace(/ /g, '.');
-  const tag = quality === '2160p' ? 'WEB-DL.DDP5.1.HEVC' : 'WEB-DL.x264';
+  const tag = quality === '2160p' ? 'WEB-DL.DDP5.1.HEVC' : (TAGS[variant % TAGS.length] ?? TAGS[0]);
   return s !== undefined
     ? `${base}.S${String(s).padStart(2, '0')}E${String(e).padStart(2, '0')}.${quality}.${tag}-MRQ.webm`
     : `${base}.${t.year}.${quality}.${tag}-MRQ.webm`;
@@ -61,19 +68,20 @@ export async function seedMock(db: Db, meta: MetadataService, samples: string[],
   for (const t of MOCK_CATALOG) {
     const addedAt = now - t.ageDays * 86400 - 3600;
     const specs: { name: string; q: string; s?: number; e?: number }[] = [];
-    if (t.kind === 'movie') for (const q of t.qualities) specs.push({ name: releaseName(t, q), q });
+    if (t.kind === 'movie') t.qualities.forEach((q, i) => specs.push({ name: releaseName(t, q, i), q }));
     else
       t.seasons.forEach((count, si) => {
         for (let e = 1; e <= count; e++) {
           // The newest season gets only the first few episodes, so "New episodes" has something to show.
           const last = si === t.seasons.length - 1;
           if (last && t.ageDays <= 5 && e > Math.min(count, 4)) continue;
-          specs.push({ name: releaseName(t, t.qualities[0]!, si + 1, e), q: t.qualities[0]!, s: si + 1, e });
-          if (t.qualities.length > 1 && e <= 2) specs.push({ name: releaseName(t, t.qualities[1]!, si + 1, e), q: t.qualities[1]!, s: si + 1, e });
+          specs.push({ name: releaseName(t, t.qualities[0]!, 0, si + 1, e), q: t.qualities[0]!, s: si + 1, e });
+          if (t.qualities.length > 1 && e <= 2) specs.push({ name: releaseName(t, t.qualities[1]!, 1, si + 1, e), q: t.qualities[1]!, s: si + 1, e });
         }
       });
-    for (const spec of specs) {
+    for (const [n, spec] of specs.entries()) {
       const idx = t.id % samples.length;
+      const bump = spec.q === '2160p' ? 3.4 : spec.q === '1080p' ? 1.6 : 0.7;
       const res = ingestVideo(
         db,
         t.kind === 'movie' ? 'movies' : 'series',
@@ -83,10 +91,10 @@ export async function seedMock(db: Db, meta: MetadataService, samples: string[],
           name: spec.name,
           caption: null,
           mime: 'video/webm',
-          size: sizes[idx] ?? 1_000_000,
+          size: Math.round((sizes[idx] ?? 1_000_000) * 120 * bump * (1 + (n % 3) * 0.12)),
           duration: SAMPLE_SECONDS,
-          width: 854,
-          height: 480,
+          width: spec.q === '2160p' ? 3840 : spec.q === '1080p' ? 1920 : 1280,
+          height: spec.q === '2160p' ? 2160 : spec.q === '1080p' ? 1080 : 720,
           date: addedAt,
           localPath: samples[idx],
         },

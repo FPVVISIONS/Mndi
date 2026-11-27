@@ -69,13 +69,27 @@ export interface TitleDetail extends TitleCard {
   versions: FileVersion[];
 }
 
+/** One release of a title or episode. Telegram chats often hold several, so people can choose. */
 export interface FileVersion {
   id: number;
+  /** Short summary such as "2160p · WEB-DL · HEVC". */
   label: string;
   quality: string;
+  source: string | null;
+  codec: string | null;
+  resolution: string | null;
   size: number;
   languages: string[];
+  subtitles: string[];
   container: string;
+  /** Title of the chat the file came from. */
+  chat: string;
+  name: string;
+  date: number;
+  /** True for the version Play will use. */
+  chosen: boolean;
+  /** True when the browser can play the container natively without conversion. */
+  native: boolean;
 }
 
 export interface EpisodeItem {

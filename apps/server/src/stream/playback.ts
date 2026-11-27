@@ -1,9 +1,8 @@
 import { and, eq } from 'drizzle-orm';
 import type { PlaybackInfo } from '@marquee/shared';
 import { schema } from '../db/client.js';
-import { toVersion, episodeLabel, type Ctx } from '../library/queries.js';
+import { episodeLabel, type Ctx } from '../library/queries.js';
 import type { Services } from '../services.js';
-import { bestFile } from '../library/queries.js';
 import { decideMode, ffmpegAvailable, probe, type ProbeInfo } from './ffmpeg.js';
 
 const { files, titles, episodes } = schema;
@@ -45,7 +44,7 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
   const card = svc.library.cards([row], ctx)[0]!;
   let subtitle: string | null = null;
   let next: PlaybackInfo['next'] = null;
-  let versions = svc.library.filesFor(row.id);
+  let versions = svc.library.versionsOf('title', row.id, ctx);
 
   if (file.episodeId) {
     const ep = svc.db.select().from(episodes).where(eq(episodes.id, file.episodeId)).get();
@@ -53,10 +52,10 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
       const season = row.tmdbId ? await svc.meta.season(row.tmdbId, ep.season, ctx.lang) : null;
       const name = season?.episodes.find((e) => e.episode_number === ep.episode)?.name;
       subtitle = [episodeLabel(ep.season, ep.episode), name].filter(Boolean).join(' · ');
-      versions = versions.filter((v) => v.episodeId === ep.id);
+      versions = svc.library.versionsOf('episode', ep.id, ctx);
       const all = svc.db.select().from(episodes).where(eq(episodes.titleId, row.id)).orderBy(episodes.season, episodes.episode).all();
       const following = all[all.findIndex((e) => e.id === ep.id) + 1];
-      const nextFile = following ? bestFile(svc.db.select().from(files).where(and(eq(files.episodeId, following.id))).all()) : undefined;
+      const nextFile = following ? svc.library.pick(svc.db.select().from(files).where(and(eq(files.episodeId, following.id))).all(), ctx, 'episode', following.id) : undefined;
       if (following && nextFile) {
         const nextName = row.tmdbId
           ? (await svc.meta.season(row.tmdbId, following.season, ctx.lang))?.episodes.find((e) => e.episode_number === following.episode)?.name
@@ -82,7 +81,7 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
     chapters: info?.chapters ?? [],
     resume: svc.library.resumeFor(ctx.profileId, fileId),
     next,
-    versions: versions.map(toVersion),
+    versions,
     thumbs: ff,
     backdrop: card.backdrop,
   };

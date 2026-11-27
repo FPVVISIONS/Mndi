@@ -11,7 +11,7 @@ import type { ImagePick, LocalizedMeta } from '../metadata/types.js';
 import { titleKey } from '../parser/filename.js';
 import { QUALITY_RANK } from './titles.js';
 
-const { titles, episodes, files, progress, myList, likes } = schema;
+const { titles, episodes, files, progress, myList, likes, versionChoice, sources } = schema;
 
 type TitleRow = typeof titles.$inferSelect;
 type FileRow = typeof files.$inferSelect;
@@ -19,6 +19,8 @@ type FileRow = typeof files.$inferSelect;
 export interface Ctx {
   lang: LanguageCode;
   profileId: number;
+  /** Preferred maximum quality from settings. */
+  quality?: 'best' | '1080p' | '720p';
 }
 
 const COMPLETE_RATIO = 0.92;
@@ -27,20 +29,38 @@ export function episodeLabel(season: number, episode: number): string {
   return `S${season}:E${episode}`;
 }
 
-export function bestFile(list: FileRow[]): FileRow | undefined {
-  return [...list].sort(
-    (a, b) => (QUALITY_RANK[b.quality ?? ''] ?? 2) - (QUALITY_RANK[a.quality ?? ''] ?? 2) || b.size - a.size,
-  )[0];
+const QUALITY_CAP: Record<string, number> = { best: 99, '1080p': 3, '720p': 2 };
+const NATIVE = new Set(['mp4', 'm4v', 'mov', 'webm']);
+
+/** The file Play should use: the person's saved choice, else the best release within their quality cap. */
+export function bestFile(list: FileRow[], opts: { chosen?: number; quality?: string } = {}): FileRow | undefined {
+  const chosen = opts.chosen ? list.find((f) => f.id === opts.chosen) : undefined;
+  if (chosen) return chosen;
+  const rank = (f: FileRow) => QUALITY_RANK[f.quality ?? ''] ?? 2;
+  const cap = QUALITY_CAP[opts.quality ?? 'best'] ?? 99;
+  const within = list.filter((f) => rank(f) <= cap);
+  const pool = within.length ? within : list;
+  return [...pool].sort((a, b) => rank(b) - rank(a) || b.size - a.size)[0];
 }
 
-export function toVersion(f: FileRow): FileVersion {
+export function toVersion(f: FileRow, chat: string, chosen: boolean): FileVersion {
+  const res = f.width && f.height ? `${f.width}×${f.height}` : null;
   return {
     id: f.id,
-    label: [f.quality, f.source, f.codec].filter(Boolean).join(' · ') || f.container.toUpperCase(),
+    label: [f.quality, f.source, f.codec === 'hevc' ? 'HEVC' : f.codec === 'h264' ? 'H.264' : f.codec].filter(Boolean).join(' · ') || f.container.toUpperCase(),
     quality: f.quality ?? '',
+    source: f.source,
+    codec: f.codec,
+    resolution: res,
     size: f.size,
     languages: JSON.parse(f.audioLangs) as string[],
+    subtitles: JSON.parse(f.subLangs) as string[],
     container: f.container,
+    chat,
+    name: f.name,
+    date: f.date,
+    chosen,
+    native: NATIVE.has(f.container),
   };
 }
 
@@ -231,15 +251,51 @@ export class Library {
     return this.db.select().from(files).where(eq(files.titleId, titleId)).all();
   }
 
+  private chatNames(): Map<string, string> {
+    return new Map(this.db.select().from(sources).all().map((c) => [c.chatId, c.title]));
+  }
+
+  /** The file Play uses for a movie (scope "title") or an episode (scope "episode"). */
+  pick(list: FileRow[], ctx: Ctx, scope: 'title' | 'episode', refId: number): FileRow | undefined {
+    const saved = this.db
+      .select()
+      .from(versionChoice)
+      .where(and(eq(versionChoice.profileId, ctx.profileId), eq(versionChoice.scope, scope), eq(versionChoice.refId, refId)))
+      .get();
+    return bestFile(list, { chosen: saved?.fileId, quality: ctx.quality });
+  }
+
+  /** Every release of a movie or episode, best first, with the one Play will use marked. */
+  versionsOf(scope: 'title' | 'episode', refId: number, ctx: Ctx): FileVersion[] {
+    const list =
+      scope === 'title'
+        ? this.filesFor(refId)
+        : this.db.select().from(files).where(eq(files.episodeId, refId)).all();
+    const chosen = this.pick(list, ctx, scope, refId)?.id;
+    const chats = this.chatNames();
+    return [...list]
+      .sort((a, b) => (QUALITY_RANK[b.quality ?? ''] ?? 2) - (QUALITY_RANK[a.quality ?? ''] ?? 2) || b.size - a.size)
+      .map((f) => toVersion(f, chats.get(f.chatId) ?? '', f.id === chosen));
+  }
+
+  setChoice(ctx: Ctx, scope: 'title' | 'episode', refId: number, fileId: number): void {
+    const values = { profileId: ctx.profileId, scope, refId, fileId };
+    this.db
+      .insert(versionChoice)
+      .values(values)
+      .onConflictDoUpdate({ target: [versionChoice.profileId, versionChoice.scope, versionChoice.refId], set: { fileId } })
+      .run();
+  }
+
   /** The file a Play button should start: the resume point, the next unseen episode, or the first one. */
   playTarget(row: TitleRow, ctx: Ctx): { fileId: number; label: string | null } | null {
     if (row.kind === 'movie') {
-      const f = bestFile(this.filesFor(row.id));
+      const f = this.pick(this.filesFor(row.id), ctx, 'title', row.id);
       return f ? { fileId: f.id, label: null } : null;
     }
     const eps = this.db.select().from(episodes).where(eq(episodes.titleId, row.id)).orderBy(episodes.season, episodes.episode).all();
     if (!eps.length) return null;
-    const fileOf = (epId: number) => bestFile(this.db.select().from(files).where(eq(files.episodeId, epId)).all());
+    const fileOf = (epId: number) => this.pick(this.db.select().from(files).where(eq(files.episodeId, epId)).all(), ctx, 'episode', epId);
     const mine = this.progressRows(ctx).filter((r) => r.p.titleId === row.id && r.e);
     const inProgress = mine.find((r) => !r.p.completed && r.p.position >= 5);
     let target = eps[0]!;
@@ -291,7 +347,7 @@ export class Library {
       similar: this.similar(row, card, ctx),
       playFileId: target?.fileId ?? null,
       playLabel: target?.label ?? null,
-      versions: row.kind === 'movie' ? this.filesFor(id).map(toVersion) : [],
+      versions: row.kind === 'movie' ? this.versionsOf('title', id, ctx) : [],
     };
   }
 
@@ -310,7 +366,7 @@ export class Library {
     );
     return eps.map<EpisodeItem>((e) => {
       const versions = this.db.select().from(files).where(eq(files.episodeId, e.id)).all();
-      const best = bestFile(versions);
+      const best = this.pick(versions, ctx, 'episode', e.id);
       const raw = info?.episodes.find((x) => x.episode_number === e.episode);
       const p = best ? prog.get(best.id) : undefined;
       return {

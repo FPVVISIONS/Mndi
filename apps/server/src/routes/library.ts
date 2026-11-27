@@ -55,6 +55,18 @@ export function libraryRoutes(app: FastifyInstance, svc: Services): void {
   });
   app.delete('/api/progress/:id', async (req) => (lib.clearProgress(ctxOf(req, svc).profileId, idParam(req)), { ok: true }));
 
+  // ---- Versions: choose between the releases found in the chats ---------------------------
+  app.get('/api/titles/:id/versions', async (req) => ({ versions: lib.versionsOf('title', idParam(req), ctxOf(req, svc)) }));
+  app.get('/api/episodes/:id/versions', async (req) => ({ versions: lib.versionsOf('episode', idParam(req), ctxOf(req, svc)) }));
+  app.put('/api/versions/choice', async (req, reply) => {
+    const body = z
+      .object({ scope: z.enum(['title', 'episode']), refId: z.number().int(), fileId: z.number().int() })
+      .safeParse(req.body);
+    if (!body.success) return badRequest(reply);
+    lib.setChoice(ctxOf(req, svc), body.data.scope, body.data.refId, body.data.fileId);
+    return { ok: true };
+  });
+
   // ---- Manual matching -------------------------------------------------------------------
   app.get('/api/titles/:id/matches', async (req, reply) => {
     const row = svc.db.select().from(titles).where(eq(titles.id, idParam(req))).get();

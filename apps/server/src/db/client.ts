@@ -47,6 +47,9 @@ CREATE TABLE IF NOT EXISTS my_list (
   PRIMARY KEY(profile_id, title_id));
 CREATE TABLE IF NOT EXISTS likes (
   profile_id INTEGER NOT NULL, title_id INTEGER NOT NULL, PRIMARY KEY(profile_id, title_id));
+CREATE TABLE IF NOT EXISTS version_choice (
+  profile_id INTEGER NOT NULL, scope TEXT NOT NULL, ref_id INTEGER NOT NULL, file_id INTEGER NOT NULL,
+  PRIMARY KEY(profile_id, scope, ref_id));
 CREATE TABLE IF NOT EXISTS channels (
   id INTEGER PRIMARY KEY AUTOINCREMENT, source_id TEXT NOT NULL, key TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL, logo TEXT, grp TEXT NOT NULL DEFAULT '', url TEXT NOT NULL, tvg_id TEXT,

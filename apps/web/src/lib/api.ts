@@ -1,5 +1,5 @@
 import type {
-  AppStatus, AuthState, CacheInfo, Channel, ChatSummary, EpisodeItem, HomePayload, PlaybackInfo,
+  AppStatus, AuthState, CacheInfo, Channel, ChatSummary, EpisodeItem, FileVersion, HomePayload, PlaybackInfo,
   Profile, SearchResults, SourceInput, TitleCard, TitleDetail, TmdbCandidate,
 } from '@marquee/shared';
 import { usePrefs } from '../stores/prefs';
@@ -20,6 +20,7 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown; la
   const headers = new Headers(init.headers);
   const profile = useProfile.getState().profileId;
   if (profile) headers.set('x-profile', String(profile));
+  headers.set('x-quality', usePrefs.getState().quality);
   let body = init.body;
   if (init.json !== undefined) {
     headers.set('content-type', 'application/json');
@@ -68,6 +69,10 @@ export const api = {
     return get<{ items: TitleCard[]; genres: string[]; pending: boolean }>(`/api/titles?${q}`);
   },
   title: (id: number) => get<TitleDetail>(`/api/titles/${id}`),
+  titleVersions: (id: number) => get<{ versions: FileVersion[] }>(`/api/titles/${id}/versions`),
+  episodeVersions: (id: number) => get<{ versions: FileVersion[] }>(`/api/episodes/${id}/versions`),
+  chooseVersion: (scope: 'title' | 'episode', refId: number, fileId: number) =>
+    send<{ ok: boolean }>('PUT', '/api/versions/choice', { scope, refId, fileId }),
   episodes: (id: number, season: number) => get<{ episodes: EpisodeItem[] }>(`/api/titles/${id}/episodes?season=${season}`),
   search: (q: string) => get<SearchResults>(`/api/search?q=${encodeURIComponent(q)}`),
   myList: () => get<{ items: TitleCard[] }>('/api/my-list'),

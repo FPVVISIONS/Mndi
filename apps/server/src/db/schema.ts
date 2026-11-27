@@ -161,3 +161,14 @@ export const epg = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.channelKey, t.start] })],
 );
+
+export const versionChoice = sqliteTable(
+  'version_choice',
+  {
+    profileId: integer('profile_id').notNull(),
+    scope: text('scope', { enum: ['title', 'episode'] }).notNull(),
+    refId: integer('ref_id').notNull(),
+    fileId: integer('file_id').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.profileId, t.scope, t.refId] })],
+);
