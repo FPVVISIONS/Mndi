@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import { native } from '../../lib/native';
 import { Segmented } from '../../components/ui/Segmented';
 import { Switch } from '../../components/ui/Switch';
 import { usePrefs, type QualityPref } from '../../stores/prefs';
@@ -6,6 +8,8 @@ import { Row, Section } from './parts';
 
 export function PlaybackTab() {
   const { t } = useTranslation();
+  const bridge = native();
+  const [lite, setLite] = useState(() => Boolean(bridge?.isLite?.()));
   const { quality, autoplayNext, heroPreview, skipIntro, reduceMotion, set } = usePrefs();
   const options: { value: QualityPref; label: string }[] = [
     { value: 'best', label: t('settings.qualityBest') },
@@ -44,6 +48,18 @@ export function PlaybackTab() {
           onChange={(v) => set('heroPreview', v)}
         />
       </Row>
+      {bridge?.setLite && (
+        <Row title={t('settings.lite')} hint={t('settings.liteHint')}>
+          <Switch
+            label={t('settings.lite')}
+            checked={lite}
+            onChange={(v) => {
+              setLite(v);
+              bridge.setLite?.(v);
+            }}
+          />
+        </Row>
+      )}
       <Row title={t('settings.reduceMotion')} hint={t('settings.reduceMotionHint')}>
         <Switch
           label={t('settings.reduceMotion')}

@@ -248,7 +248,9 @@
     "tmdbInvalid": "TMDB hat diesen Schlüssel abgelehnt. Kopiere ihn erneut.",
     "tmdbConnected": "Verbunden",
     "reduceMotion": "Bewegung reduzieren",
-    "reduceMotionHint": "Schaltet federnde Animationen, Parallaxe und Glaseffekte aus."
+    "reduceMotionHint": "Schaltet federnde Animationen, Parallaxe und Glaseffekte aus.",
+    "lite": "Leichtmodus",
+    "liteHint": "Schaltet Unschärfe und Glaseffekte aus. Nutze ihn, wenn die App langsam ist oder sich schließt."
   },
   "profiles": {
     "who": "Wer schaut?",

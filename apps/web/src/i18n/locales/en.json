@@ -248,7 +248,9 @@
     "tmdbInvalid": "TMDB rejected that key. Copy it again.",
     "tmdbConnected": "Connected",
     "reduceMotion": "Reduce motion",
-    "reduceMotionHint": "Turns off springy animations, parallax and glass effects."
+    "reduceMotionHint": "Turns off springy animations, parallax and glass effects.",
+    "lite": "Light mode",
+    "liteHint": "Turns off blur and glass effects. Use it if the app is slow or closes on your screen."
   },
   "profiles": {
     "who": "Who's watching?",

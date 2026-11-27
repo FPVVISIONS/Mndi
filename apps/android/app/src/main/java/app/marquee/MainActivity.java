@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.app.UiModeManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -37,6 +40,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        installCrashRecorder();
         root = new FrameLayout(this);
         root.setBackgroundColor(Color.rgb(11, 11, 12));
 
@@ -49,8 +53,27 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(false);
         s.setSupportZoom(false);
+        // Full effects by default, everywhere. Only after a crash (or when chosen in Settings) is the
+        // lighter look used; the page reads this marker from the user agent.
+        if (prefs().getBoolean("lite", false)) {
+            s.setUserAgentString(s.getUserAgentString() + " MarqueeLite");
+        }
         web.addJavascriptInterface(new Bridge(), "MarqueeNative");
         web.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
+                // The page's renderer died (often too heavy for the device). Keep the app alive,
+                // switch to the lighter look and start over instead of closing.
+                writeCrash("The web view process stopped (" + (detail.didCrash() ? "crash" : "killed by the system, low memory") + ")");
+                prefs().edit().putBoolean("lite", true).apply();
+                runOnUiThread(() -> {
+                    root.removeView(web);
+                    web.destroy();
+                    recreate();
+                });
+                return true;
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -96,8 +119,51 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         if (Build.VERSION.SDK_INT >= 33) requestPermissions(new String[] {Manifest.permission.POST_NOTIFICATIONS}, 1);
+        java.io.File crash = crashFile();
+        if (crash.exists()) {
+            String last = readFile(crash);
+            //noinspection ResultOfMethodCallIgnored
+            crash.delete();
+            if (!last.isEmpty()) {
+                showError("Marquee closed unexpectedly last time. The light look is now on.\n\n" + last);
+                startServer();
+                return;
+            }
+        }
         startServer();
         waitForServer();
+    }
+
+    private SharedPreferences prefs() {
+        return getSharedPreferences("marquee", MODE_PRIVATE);
+    }
+
+    private boolean isTelevision() {
+        UiModeManager ui = (UiModeManager) getSystemService(UI_MODE_SERVICE);
+        return (ui != null && ui.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)
+            || !getPackageManager().hasSystemFeature(android.content.pm.PackageManager.FEATURE_TOUCHSCREEN);
+    }
+
+    private java.io.File crashFile() {
+        return new java.io.File(getFilesDir(), "crash.txt");
+    }
+
+    private void writeCrash(String text) {
+        try (java.io.FileWriter w = new java.io.FileWriter(crashFile(), true)) {
+            w.write(new java.util.Date() + "\n" + text + "\n\n");
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** Saves the reason for a crash so the next start can show it instead of just closing. */
+    private void installCrashRecorder() {
+        final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler((thread, error) -> {
+            writeCrash(android.util.Log.getStackTraceString(error));
+            // A crash while the page is up most often means it was too heavy: use the light look next time.
+            prefs().edit().putBoolean("lite", true).apply();
+            if (previous != null) previous.uncaughtException(thread, error);
+        });
     }
 
     /** Poll the local server, then show the app. The first start copies files and can take a few seconds. */
@@ -261,6 +327,18 @@ public class MainActivity extends Activity {
 
     /** Called from the page as window.MarqueeNative. */
     private final class Bridge {
+        @JavascriptInterface
+        public boolean isLite() {
+            return prefs().getBoolean("lite", false);
+        }
+
+        /** Switches the lighter look (no blur effects) on or off and restarts the screen. */
+        @JavascriptInterface
+        public void setLite(boolean on) {
+            prefs().edit().putBoolean("lite", on).apply();
+            runOnUiThread(() -> recreate());
+        }
+
         /** Opens Telegram's developer page once so the app can pick up its own Telegram keys. */
         @JavascriptInterface
         public void setupKeys() {

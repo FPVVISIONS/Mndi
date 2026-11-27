@@ -315,3 +315,24 @@ input.vol::-moz-range-thumb {
   animation: kenburns 18s ease-in-out infinite alternate;
   will-change: transform;
 }
+
+/* Light look for TVs and weak devices: blur and refraction are what overload their graphics chip. */
+html[data-lite='true'] .glass,
+html[data-lite='true'] .glass-strong,
+html[data-lite='true'] .glass-clear {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: rgb(34 34 40 / 0.94) !important;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12) !important;
+}
+html[data-lite='true'] .glass::before,
+html[data-lite='true'] .glass::after {
+  display: none;
+}
+html[data-lite='true'] .kenburns {
+  animation: none;
+  will-change: auto;
+}
+html[data-lite='true'] .shimmer::after {
+  animation: none;
+}

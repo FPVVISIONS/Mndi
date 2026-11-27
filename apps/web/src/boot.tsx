@@ -15,12 +15,13 @@ import { useProfile } from './stores/profile';
 import './styles/index.css';
 
 applyMotionVars();
-document.documentElement.dataset.reduceMotion = String(usePrefs.getState().reduceMotion);
-startGlassLight();
+const lite = document.documentElement.dataset.lite === 'true';
+document.documentElement.dataset.reduceMotion = String(usePrefs.getState().reduceMotion || lite);
+if (!lite) startGlassLight();
 
 /** Full motion unless the person turns on Reduce motion in Settings. */
 function Motion({ children }: { children: ReactNode }) {
-  const reduce = usePrefs((s) => s.reduceMotion);
+  const reduce = usePrefs((s) => s.reduceMotion) || lite;
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = String(reduce);
   }, [reduce]);

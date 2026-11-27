@@ -1,5 +1,8 @@
 /** Methods the Android app exposes to the page. Absent in a normal browser. */
 interface NativeBridge {
+  /** The lighter look (no blur effects) for slow screens. */
+  isLite?(): boolean;
+  setLite?(on: boolean): void;
   /** Opens Telegram's developer page once so the app can pick up its own Telegram keys. */
   setupKeys?(): void;
   /** Plays a library file in the app's built-in player (MKV, surround audio, fast seeking). */

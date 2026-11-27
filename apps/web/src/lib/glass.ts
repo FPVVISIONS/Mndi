@@ -67,7 +67,7 @@ let counter = 0;
 
 function supported(): boolean {
   if (typeof window === 'undefined' || typeof CSS === 'undefined') return false;
-  if (root().dataset.reduceMotion === 'true') return false;
+  if (root().dataset.reduceMotion === 'true' || root().dataset.lite === 'true') return false;
   // SVG filters inside backdrop-filter render only in Chromium-based engines.
   const ua = navigator.userAgent;
   return /Chrome\/|Chromium\//.test(ua) && !/Firefox\//.test(ua);

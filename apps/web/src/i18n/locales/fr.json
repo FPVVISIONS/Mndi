@@ -248,7 +248,9 @@
     "tmdbInvalid": "TMDB a refusé cette clé. Copiez-la à nouveau.",
     "tmdbConnected": "Connecté",
     "reduceMotion": "Réduire les animations",
-    "reduceMotionHint": "Désactive les animations à ressort, la parallaxe et les effets de verre."
+    "reduceMotionHint": "Désactive les animations à ressort, la parallaxe et les effets de verre.",
+    "lite": "Mode léger",
+    "liteHint": "Désactive le flou et les effets de verre. À utiliser si l'app est lente ou se ferme sur votre écran."
   },
   "profiles": {
     "who": "Qui regarde ?",

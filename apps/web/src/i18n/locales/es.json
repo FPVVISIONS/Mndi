@@ -248,7 +248,9 @@
     "tmdbInvalid": "TMDB rechazó esa clave. Cópiala de nuevo.",
     "tmdbConnected": "Conectado",
     "reduceMotion": "Reducir movimiento",
-    "reduceMotionHint": "Desactiva las animaciones elásticas, el paralaje y los efectos de cristal."
+    "reduceMotionHint": "Desactiva las animaciones elásticas, el paralaje y los efectos de cristal.",
+    "lite": "Modo ligero",
+    "liteHint": "Desactiva el desenfoque y los efectos de cristal. Úsalo si la app va lenta o se cierra en tu pantalla."
   },
   "profiles": {
     "who": "¿Quién está viendo?",

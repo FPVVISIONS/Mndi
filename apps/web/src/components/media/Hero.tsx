@@ -28,7 +28,8 @@ function HeroSlides({ items }: { items: TitleCard[] }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const preview = usePrefs((s) => s.heroPreview);
+  const preview =
+    usePrefs((s) => s.heroPreview) && document.documentElement.dataset.lite !== 'true';
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [showVideo, setShowVideo] = useState(false);

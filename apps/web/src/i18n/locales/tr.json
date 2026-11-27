@@ -248,7 +248,9 @@
     "tmdbInvalid": "TMDB bu anahtarı reddetti. Yeniden kopyala.",
     "tmdbConnected": "Bağlı",
     "reduceMotion": "Hareketi azalt",
-    "reduceMotionHint": "Yaylı animasyonları, paralaksı ve cam efektlerini kapatır."
+    "reduceMotionHint": "Yaylı animasyonları, paralaksı ve cam efektlerini kapatır.",
+    "lite": "Hafif mod",
+    "liteHint": "Bulanıklık ve cam efektlerini kapatır. Uygulama yavaşsa veya kapanıyorsa kullanın."
   },
   "profiles": {
     "who": "Kim izliyor?",
