@@ -121,13 +121,28 @@
   }
   /* Subtle legibility scrims. They exist only to keep text readable over artwork. */
   .scrim-bottom {
-    background: linear-gradient(to top, rgb(11 11 12 / 0.92), rgb(11 11 12 / 0.55) 40%, transparent 100%);
+    background: linear-gradient(
+      to top,
+      rgb(11 11 12 / 0.92),
+      rgb(11 11 12 / 0.55) 40%,
+      transparent 100%
+    );
   }
   .scrim-start {
-    background: linear-gradient(to right, rgb(11 11 12 / 0.88), rgb(11 11 12 / 0.4) 45%, transparent 75%);
+    background: linear-gradient(
+      to right,
+      rgb(11 11 12 / 0.88),
+      rgb(11 11 12 / 0.4) 45%,
+      transparent 75%
+    );
   }
   [dir='rtl'] .scrim-start {
-    background: linear-gradient(to left, rgb(11 11 12 / 0.88), rgb(11 11 12 / 0.4) 45%, transparent 75%);
+    background: linear-gradient(
+      to left,
+      rgb(11 11 12 / 0.88),
+      rgb(11 11 12 / 0.4) 45%,
+      transparent 75%
+    );
   }
   .scrim-fade-bg {
     background: linear-gradient(to top, var(--color-bg), transparent);

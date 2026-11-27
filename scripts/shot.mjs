@@ -27,8 +27,27 @@ const ctx = await browser.newContext({
 });
 await ctx.addInitScript(
   ([l, profile]) => {
-    localStorage.setItem('marquee.prefs', JSON.stringify({ state: { language: l, audio: 'original', subtitles: 'auto', quality: 'best', autoplayNext: true, heroPreview: false, skipIntro: false, recentSearches: ['salt line', 'night'] }, version: 1 }));
-    if (profile) localStorage.setItem('marquee.profile', JSON.stringify({ state: { profileId: Number(profile) }, version: 1 }));
+    localStorage.setItem(
+      'marquee.prefs',
+      JSON.stringify({
+        state: {
+          language: l,
+          audio: 'original',
+          subtitles: 'auto',
+          quality: 'best',
+          autoplayNext: true,
+          heroPreview: false,
+          skipIntro: false,
+          recentSearches: ['salt line', 'night'],
+        },
+        version: 1,
+      }),
+    );
+    if (profile)
+      localStorage.setItem(
+        'marquee.profile',
+        JSON.stringify({ state: { profileId: Number(profile) }, version: 1 }),
+      );
   },
   [lang, opt('profile', '1')],
 );

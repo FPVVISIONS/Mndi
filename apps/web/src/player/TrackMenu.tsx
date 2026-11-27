@@ -14,16 +14,42 @@ interface Props {
   onSubtitle: (i: number | null) => void;
 }
 
-function Item({ on, children, onClick }: { on: boolean; children: React.ReactNode; onClick: () => void }) {
+function Item({
+  on,
+  children,
+  onClick,
+}: {
+  on: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
   return (
-    <button type="button" role="menuitemradio" aria-checked={on} onClick={onClick} className={cn('flex w-full items-center gap-3 rounded-md px-3 py-2 text-start text-body transition-colors hover:bg-white/10', on ? 'text-fg' : 'text-fg-dim')}>
-      <span className="grid size-4 shrink-0 place-items-center">{on && <Check size={15} className="text-accent" strokeWidth={3} />}</span>
+    <button
+      type="button"
+      role="menuitemradio"
+      aria-checked={on}
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-center gap-3 rounded-md px-3 py-2 text-start text-body transition-colors hover:bg-white/10',
+        on ? 'text-fg' : 'text-fg-dim',
+      )}
+    >
+      <span className="grid size-4 shrink-0 place-items-center">
+        {on && <Check size={15} className="text-accent" strokeWidth={3} />}
+      </span>
       <span className="truncate">{children}</span>
     </button>
   );
 }
 
-export function TrackMenu({ audio, subtitles, audioIndex, subtitleIndex, onAudio, onSubtitle }: Props) {
+export function TrackMenu({
+  audio,
+  subtitles,
+  audioIndex,
+  subtitleIndex,
+  onAudio,
+  onSubtitle,
+}: Props) {
   const { t } = useTranslation();
   const lang = usePrefs((s) => s.language);
   const name = (x: { lang: string | null; label: string; index: number }) =>
@@ -35,7 +61,8 @@ export function TrackMenu({ audio, subtitles, audioIndex, subtitleIndex, onAudio
           <div className="eyebrow px-3 pt-1 pb-1.5">{t('player.audio')}</div>
           {audio.map((a) => (
             <Item key={a.index} on={a.index === audioIndex} onClick={() => onAudio(a.index)}>
-              {name(a)}{a.channels && a.channels > 2 ? ` · ${a.channels - 1}.1` : ''}
+              {name(a)}
+              {a.channels && a.channels > 2 ? ` · ${a.channels - 1}.1` : ''}
             </Item>
           ))}
         </div>
@@ -43,9 +70,13 @@ export function TrackMenu({ audio, subtitles, audioIndex, subtitleIndex, onAudio
       {subtitles.length > 0 && (
         <div className="flex-1">
           <div className="eyebrow px-3 pt-1 pb-1.5">{t('player.subtitles')}</div>
-          <Item on={subtitleIndex === null} onClick={() => onSubtitle(null)}>{t('player.subtitlesOff')}</Item>
+          <Item on={subtitleIndex === null} onClick={() => onSubtitle(null)}>
+            {t('player.subtitlesOff')}
+          </Item>
           {subtitles.map((s) => (
-            <Item key={s.index} on={s.index === subtitleIndex} onClick={() => onSubtitle(s.index)}>{name(s)}</Item>
+            <Item key={s.index} on={s.index === subtitleIndex} onClick={() => onSubtitle(s.index)}>
+              {name(s)}
+            </Item>
           ))}
         </div>
       )}

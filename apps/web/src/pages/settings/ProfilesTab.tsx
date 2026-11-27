@@ -31,15 +31,38 @@ export function ProfilesTab() {
         {profiles.map((p) => (
           <div key={p.id} className="flex items-center gap-4 p-4 sm:px-5">
             <ProfileAvatar profile={p} className="size-11" iconSize={22} />
-            <span className="flex-1 truncate font-semibold">{p.name}{p.id === current && <span className="ms-3 size-1.5 inline-block rounded-full bg-accent align-middle" aria-hidden />}</span>
-            <Button size="sm" variant="secondary" icon={<Pencil size={14} />} onClick={() => edit(p)} aria-label={t('profiles.edit', { name: p.name })}>{t('common.edit')}</Button>
+            <span className="flex-1 truncate font-semibold">
+              {p.name}
+              {p.id === current && (
+                <span
+                  className="ms-3 size-1.5 inline-block rounded-full bg-accent align-middle"
+                  aria-hidden
+                />
+              )}
+            </span>
+            <Button
+              size="sm"
+              variant="secondary"
+              icon={<Pencil size={14} />}
+              onClick={() => edit(p)}
+              aria-label={t('profiles.edit', { name: p.name })}
+            >
+              {t('common.edit')}
+            </Button>
           </div>
         ))}
         <div className="p-4 sm:px-5">
-          <Button size="sm" variant="ghost" icon={<Plus size={15} />} onClick={() => edit(null)}>{t('profiles.create')}</Button>
+          <Button size="sm" variant="ghost" icon={<Plus size={15} />} onClick={() => edit(null)}>
+            {t('profiles.create')}
+          </Button>
         </div>
       </Section>
-      <ProfileEditor open={open} onClose={() => setOpen(false)} profile={editing} canDelete={profiles.length > 1} />
+      <ProfileEditor
+        open={open}
+        onClose={() => setOpen(false)}
+        profile={editing}
+        canDelete={profiles.length > 1}
+      />
     </>
   );
 }

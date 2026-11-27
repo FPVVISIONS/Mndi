@@ -36,7 +36,10 @@ export class MockBackend implements TelegramBackend {
   }
 
   status(): AppStatus['telegram'] {
-    return { state: this.state, user: this.state === 'ready' ? { name: 'Demo account' } : undefined };
+    return {
+      state: this.state,
+      user: this.state === 'ready' ? { name: 'Demo account' } : undefined,
+    };
   }
   authState(): AuthState {
     return this.auth;
@@ -45,17 +48,21 @@ export class MockBackend implements TelegramBackend {
     return (this.auth = { step: 'phone' });
   }
   async sendPhone(phone: string): Promise<AuthState> {
-    if (phone.replace(/\D/g, '').length < 7) return (this.auth = { step: 'phone', error: 'phone_invalid' });
+    if (phone.replace(/\D/g, '').length < 7)
+      return (this.auth = { step: 'phone', error: 'phone_invalid' });
     this.phone = phone;
     return (this.auth = { step: 'code', codeViaApp: true });
   }
   async submitCode(code: string): Promise<AuthState> {
-    if (code.replace(/\D/g, '') !== '12345') return (this.auth = { ...this.auth, step: 'code', error: 'code_invalid' });
-    if (this.phone.replace(/\D/g, '').endsWith('9')) return (this.auth = { step: 'password', hint: 'First pet' });
+    if (code.replace(/\D/g, '') !== '12345')
+      return (this.auth = { ...this.auth, step: 'code', error: 'code_invalid' });
+    if (this.phone.replace(/\D/g, '').endsWith('9'))
+      return (this.auth = { step: 'password', hint: 'First pet' });
     return this.finish();
   }
   async submitPassword(pw: string): Promise<AuthState> {
-    if (pw !== 'demo') return (this.auth = { step: 'password', hint: 'First pet', error: 'password_invalid' });
+    if (pw !== 'demo')
+      return (this.auth = { step: 'password', hint: 'First pet', error: 'password_invalid' });
     return this.finish();
   }
   private finish(): AuthState {
@@ -80,7 +87,13 @@ export class MockBackend implements TelegramBackend {
     this.emit();
   }
   async listChats(): Promise<ChatSummary[]> {
-    const kinds = new Map(this.db.select().from(sources).all().map((s) => [s.chatId, s.kind]));
+    const kinds = new Map(
+      this.db
+        .select()
+        .from(sources)
+        .all()
+        .map((s) => [s.chatId, s.kind]),
+    );
     return MOCK_CHATS.map((c) => ({
       id: c.id,
       title: c.title,

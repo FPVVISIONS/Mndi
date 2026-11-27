@@ -41,20 +41,47 @@ export default function Home() {
   const { key } = useScope();
 
   // Trailers live on the detail payload; fetch them for the few hero slides only.
-  const heroIds = data?.hero.map((h) => h.id) ?? [];
+  const heroIds = useMemo(() => data?.hero.map((h) => h.id) ?? [], [data?.hero]);
   const details = useQueries({
-    queries: heroIds.map((id) => ({ queryKey: ['title', ...key, id], queryFn: () => api.title(id), staleTime: 60_000 })),
+    queries: heroIds.map((id) => ({
+      queryKey: ['title', ...key, id],
+      queryFn: () => api.title(id),
+      staleTime: 60_000,
+    })),
   });
-  const trailers = useMemo(() => new Map(details.map((q, i) => [heroIds[i], q.data?.trailer ?? null])), [details, heroIds]);
+  const trailers = useMemo(
+    () => new Map(details.map((q, i) => [heroIds[i], q.data?.trailer ?? null])),
+    [details, heroIds],
+  );
 
   if (isPending) return <HomeSkeleton />;
   if (isError || !data) {
-    return <EmptyState icon={<Film size={26} />} title={t('error.title')} body={t('error.body')} action={<Button variant="primary" onClick={() => location.reload()}>{t('common.retry')}</Button>} />;
+    return (
+      <EmptyState
+        icon={<Film size={26} />}
+        title={t('error.title')}
+        body={t('error.body')}
+        action={
+          <Button variant="primary" onClick={() => location.reload()}>
+            {t('common.retry')}
+          </Button>
+        }
+      />
+    );
   }
   if (!data.hero.length && !data.rows.length) {
     return (
       <div className="pt-[var(--nav-h)]">
-        <EmptyState icon={<Film size={26} />} title={t('browse.emptyTitle')} body={t('browse.emptyBody')} action={<Button variant="primary" onClick={() => navigate('/settings?tab=library')}>{t('browse.emptyAction')}</Button>} />
+        <EmptyState
+          icon={<Film size={26} />}
+          title={t('browse.emptyTitle')}
+          body={t('browse.emptyBody')}
+          action={
+            <Button variant="primary" onClick={() => navigate('/settings?tab=library')}>
+              {t('browse.emptyAction')}
+            </Button>
+          }
+        />
       </div>
     );
   }
@@ -64,11 +91,16 @@ export default function Home() {
       <Hero items={data.hero} trailerFor={(id) => trailers.get(id)} />
       <div className="relative z-10 -mt-8 space-y-2 sm:-mt-12">
         {data.rows.map((row) => {
-          const title = row.id === 'genre' ? (row.label ?? '') : t(`home.${row.id === 'continue' ? 'continueWatching' : row.id}`);
+          const title =
+            row.id === 'genre'
+              ? (row.label ?? '')
+              : t(`home.${row.id === 'continue' ? 'continueWatching' : row.id}`);
           const wide = row.id === 'continue' || row.id === 'newEpisodes';
           return (
             <Row key={`${row.id}-${row.label ?? ''}`} title={title}>
-              {row.items.map((c) => (wide ? <WideCard key={c.id} card={c} /> : <TitleCardView key={c.id} card={c} />))}
+              {row.items.map((c) =>
+                wide ? <WideCard key={c.id} card={c} /> : <TitleCardView key={c.id} card={c} />,
+              )}
             </Row>
           );
         })}

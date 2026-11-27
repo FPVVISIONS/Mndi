@@ -25,7 +25,10 @@ export async function initI18n(code: LanguageCode): Promise<void> {
   await i18n.use(initReactI18next).init({
     lng: code,
     fallbackLng: 'en',
-    resources: { en: { translation: en }, ...(code !== 'en' ? { [code]: { translation: bundle } } : {}) },
+    resources: {
+      en: { translation: en },
+      ...(code !== 'en' ? { [code]: { translation: bundle } } : {}),
+    },
     interpolation: { escapeValue: false },
     returnNull: false,
   });
@@ -34,7 +37,8 @@ export async function initI18n(code: LanguageCode): Promise<void> {
 
 /** Load the language's strings first, then switch, so nothing renders half-translated. */
 export async function switchI18n(code: LanguageCode): Promise<void> {
-  if (!i18n.hasResourceBundle(code, 'translation')) i18n.addResourceBundle(code, 'translation', await loadBundle(code));
+  if (!i18n.hasResourceBundle(code, 'translation'))
+    i18n.addResourceBundle(code, 'translation', await loadBundle(code));
   await i18n.changeLanguage(code);
   applyDocumentLanguage(code);
 }

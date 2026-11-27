@@ -6,7 +6,13 @@ import { cn } from '../../lib/cn';
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   const clamped = Math.max(0, Math.min(1, value));
   return (
-    <div className={cn('h-1 overflow-hidden rounded-full bg-white/20', className)} role="progressbar" aria-valuenow={Math.round(clamped * 100)} aria-valuemin={0} aria-valuemax={100}>
+    <div
+      className={cn('h-1 overflow-hidden rounded-full bg-white/20', className)}
+      role="progressbar"
+      aria-valuenow={Math.round(clamped * 100)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <motion.div
         className="h-full origin-[var(--origin,left)] rounded-full bg-accent [[dir=rtl]_&]:origin-right"
         initial={{ scaleX: 0 }}

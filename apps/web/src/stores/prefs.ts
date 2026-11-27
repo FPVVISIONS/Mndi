@@ -17,7 +17,10 @@ export interface Prefs {
   heroPreview: boolean;
   skipIntro: boolean;
   recentSearches: string[];
-  set: <K extends keyof Omit<Prefs, 'set' | 'addSearch' | 'clearSearches'>>(key: K, value: Prefs[K]) => void;
+  set: <K extends keyof Omit<Prefs, 'set' | 'addSearch' | 'clearSearches'>>(
+    key: K,
+    value: Prefs[K],
+  ) => void;
   addSearch: (q: string) => void;
   clearSearches: () => void;
 }
@@ -37,7 +40,10 @@ export const usePrefs = create<Prefs>()(
       addSearch: (q) => {
         const clean = q.trim();
         if (clean.length < 2) return;
-        const next = [clean, ...get().recentSearches.filter((s) => s.toLowerCase() !== clean.toLowerCase())];
+        const next = [
+          clean,
+          ...get().recentSearches.filter((s) => s.toLowerCase() !== clean.toLowerCase()),
+        ];
         set({ recentSearches: next.slice(0, 8) });
       },
       clearSearches: () => set({ recentSearches: [] }),
@@ -46,8 +52,13 @@ export const usePrefs = create<Prefs>()(
       name: 'marquee.prefs',
       version: 1,
       partialize: (s) => ({
-        language: s.language, audio: s.audio, subtitles: s.subtitles, quality: s.quality,
-        autoplayNext: s.autoplayNext, heroPreview: s.heroPreview, skipIntro: s.skipIntro,
+        language: s.language,
+        audio: s.audio,
+        subtitles: s.subtitles,
+        quality: s.quality,
+        autoplayNext: s.autoplayNext,
+        heroPreview: s.heroPreview,
+        skipIntro: s.skipIntro,
         recentSearches: s.recentSearches,
       }),
     },

@@ -325,7 +325,7 @@
     "chooseTitle": "Wähle, was indexiert wird",
     "chooseBody": "Tagge jeden Chat, den du in der Bibliothek willst. Den Rest lässt du auf Überspringen.",
     "filter": "Chats filtern",
-    "members": "{{count}} Mitglieder",
+    "members": "{{count, number}} Mitglieder",
     "skip": "Überspringen",
     "chooseNone": "Wähle mindestens einen Chat",
     "start": "Bibliothek aufbauen",

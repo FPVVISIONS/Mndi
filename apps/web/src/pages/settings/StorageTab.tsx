@@ -15,34 +15,58 @@ export function StorageTab() {
   const qc = useQueryClient();
   const push = useToasts((s) => s.push);
   const { data } = useQuery({ queryKey: ['cache'], queryFn: api.cache });
-  const limit = useMutation({ mutationFn: (mb: number) => api.setCacheLimit(mb), onSuccess: () => void qc.invalidateQueries({ queryKey: ['cache'] }) });
+  const limit = useMutation({
+    mutationFn: (mb: number) => api.setCacheLimit(mb),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['cache'] }),
+  });
   const clear = useMutation({
     mutationFn: api.clearCache,
-    onSuccess: () => { push(t('toast.cacheCleared')); void qc.invalidateQueries({ queryKey: ['cache'] }); },
+    onSuccess: () => {
+      push(t('toast.cacheCleared'));
+      void qc.invalidateQueries({ queryKey: ['cache'] });
+    },
   });
 
   const limitBytes = (data?.limitMb ?? 512) * 1024 * 1024;
-  const options = [...new Set([...LIMITS, data?.limitMb ?? 512])].sort((a, b) => a - b).map((mb) => ({
-    value: String(mb),
-    label: mb >= 1024 ? `${mb / 1024} GB` : `${mb} MB`,
-  }));
+  const options = [...new Set([...LIMITS, data?.limitMb ?? 512])]
+    .sort((a, b) => a - b)
+    .map((mb) => ({
+      value: String(mb),
+      label: mb >= 1024 ? `${mb / 1024} GB` : `${mb} MB`,
+    }));
 
   return (
     <Section>
       <Row title={t('settings.streamCache')} hint={t('settings.streamCacheHint')} stack>
         <div className="flex items-center gap-4">
           <ProgressBar value={data ? data.streamBytes / limitBytes : 0} className="flex-1" />
-          <span className="w-36 shrink-0 text-end text-small tabular-nums text-fg-dim">{data ? `${formatBytes(data.streamBytes)} / ${formatBytes(limitBytes)}` : ''}</span>
+          <span className="w-36 shrink-0 text-end text-small tabular-nums text-fg-dim">
+            {data ? `${formatBytes(data.streamBytes)} / ${formatBytes(limitBytes)}` : ''}
+          </span>
         </div>
       </Row>
       <Row title={t('settings.imageCache')}>
-        <span className="text-small tabular-nums text-fg-dim">{data ? formatBytes(data.imageBytes) : ''}</span>
+        <span className="text-small tabular-nums text-fg-dim">
+          {data ? formatBytes(data.imageBytes) : ''}
+        </span>
       </Row>
       <Row title={t('settings.cacheLimit')}>
-        <Select label={t('settings.cacheLimit')} value={String(data?.limitMb ?? 512)} options={options} onChange={(v) => limit.mutate(Number(v))} />
+        <Select
+          label={t('settings.cacheLimit')}
+          value={String(data?.limitMb ?? 512)}
+          options={options}
+          onChange={(v) => limit.mutate(Number(v))}
+        />
       </Row>
       <Row title={t('settings.clearCache')}>
-        <Button size="sm" variant="danger" icon={<Trash2 size={15} />} onClick={() => clear.mutate()}>{t('settings.clearCache')}</Button>
+        <Button
+          size="sm"
+          variant="danger"
+          icon={<Trash2 size={15} />}
+          onClick={() => clear.mutate()}
+        >
+          {t('settings.clearCache')}
+        </Button>
       </Row>
     </Section>
   );

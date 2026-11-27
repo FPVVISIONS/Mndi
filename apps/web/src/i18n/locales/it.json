@@ -325,7 +325,7 @@
     "chooseTitle": "Scegli cosa indicizzare",
     "chooseBody": "Assegna un tag a ogni chat che vuoi nella libreria. Lascia le altre su Salta.",
     "filter": "Filtra le chat",
-    "members": "{{count}} membri",
+    "members": "{{count, number}} membri",
     "skip": "Salta",
     "chooseNone": "Scegli almeno una chat",
     "start": "Crea la libreria",

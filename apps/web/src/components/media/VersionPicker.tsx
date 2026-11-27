@@ -37,7 +37,8 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
   const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
-    if (open && versions) setSelected(versions.find((v) => v.chosen)?.id ?? versions[0]?.id ?? null);
+    if (open && versions)
+      setSelected(versions.find((v) => v.chosen)?.id ?? versions[0]?.id ?? null);
   }, [open, versions]);
 
   const names = (codes: string[]) => codes.map((c) => languageName(c, lang)).join(', ');
@@ -55,7 +56,14 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
           <Skeleton className="h-20" />
         </div>
       ) : (
-        <motion.ul variants={staggerChildren(stagger.list)} initial="hidden" animate="show" role="radiogroup" aria-label={t('detail.versions')} className="space-y-2">
+        <motion.ul
+          variants={staggerChildren(stagger.list)}
+          initial="hidden"
+          animate="show"
+          role="radiogroup"
+          aria-label={t('detail.versions')}
+          className="space-y-2"
+        >
           {versions.map((v) => {
             const on = v.id === selected;
             return (
@@ -68,32 +76,64 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
                   onDoubleClick={() => onPlay(v)}
                   className={cn(
                     'flex w-full items-start gap-4 rounded-lg border p-3.5 text-start transition-colors duration-150',
-                    on ? 'border-accent bg-accent-dim/60' : 'border-line bg-surface-2 hover:border-line-strong',
+                    on
+                      ? 'border-accent bg-accent-dim/60'
+                      : 'border-line bg-surface-2 hover:border-line-strong',
                   )}
                 >
-                  <span className={cn('mt-0.5 grid h-9 w-[3.75rem] shrink-0 place-items-center rounded-md text-small font-bold tracking-tight', on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-fg')}>
+                  <span
+                    className={cn(
+                      'mt-0.5 grid h-9 w-[3.75rem] shrink-0 place-items-center rounded-md text-small font-bold tracking-tight',
+                      on ? 'bg-accent text-on-accent' : 'bg-surface-3 text-fg',
+                    )}
+                  >
                     {qualityBadge(v.quality)}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2 text-body font-semibold">
                       <span className="truncate">{v.label}</span>
-                      {!v.native && <span className="shrink-0 rounded-xs bg-surface-3 px-1.5 py-0.5 text-caption font-medium text-fg-dim">{v.container.toUpperCase()}</span>}
+                      {!v.native && (
+                        <span className="shrink-0 rounded-xs bg-surface-3 px-1.5 py-0.5 text-caption font-medium text-fg-dim">
+                          {v.container.toUpperCase()}
+                        </span>
+                      )}
                     </span>
                     <span className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-small text-fg-dim">
                       {v.languages.length > 0 && (
-                        <span className="inline-flex items-center gap-1.5"><Volume2 size={13} aria-hidden />{names(v.languages)}</span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Volume2 size={13} aria-hidden />
+                          {names(v.languages)}
+                        </span>
                       )}
                       {v.subtitles.length > 0 && (
-                        <span className="inline-flex items-center gap-1.5"><Subtitles size={13} aria-hidden />{names(v.subtitles)}</span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <Subtitles size={13} aria-hidden />
+                          {names(v.subtitles)}
+                        </span>
                       )}
-                      <span className="inline-flex items-center gap-1.5"><Film size={13} aria-hidden />{formatBytes(v.size)}{v.resolution ? ` · ${v.resolution}` : ''}</span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Film size={13} aria-hidden />
+                        {formatBytes(v.size)}
+                        {v.resolution ? ` · ${v.resolution}` : ''}
+                      </span>
                     </span>
-                    <span className="mt-1.5 flex items-center gap-1.5 truncate text-caption text-fg-faint" title={v.name}>
+                    <span
+                      className="mt-1.5 flex items-center gap-1.5 truncate text-caption text-fg-faint"
+                      title={v.name}
+                    >
                       <MessageSquare size={12} aria-hidden className="shrink-0" />
-                      <span className="truncate">{v.chat ? `${v.chat} · ` : ''}{v.name}</span>
+                      <span className="truncate">
+                        {v.chat ? `${v.chat} · ` : ''}
+                        {v.name}
+                      </span>
                     </span>
                   </span>
-                  <span className={cn('mt-1 grid size-5 shrink-0 place-items-center rounded-full border', on ? 'border-accent bg-accent text-on-accent' : 'border-line-strong')}>
+                  <span
+                    className={cn(
+                      'mt-1 grid size-5 shrink-0 place-items-center rounded-full border',
+                      on ? 'border-accent bg-accent text-on-accent' : 'border-line-strong',
+                    )}
+                  >
                     {on && <Check size={12} strokeWidth={3} />}
                   </span>
                 </button>
@@ -103,8 +143,15 @@ export function VersionPicker({ open, onClose, title, subtitle, versions, onPlay
         </motion.ul>
       )}
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
-        <Button variant="primary" disabled={!current} icon={<Play size={16} className="fill-current" />} onClick={() => current && onPlay(current)}>
+        <Button variant="ghost" onClick={onClose}>
+          {t('common.cancel')}
+        </Button>
+        <Button
+          variant="primary"
+          disabled={!current}
+          icon={<Play size={16} className="fill-current" />}
+          onClick={() => current && onPlay(current)}
+        >
           {t('common.play')}
         </Button>
       </div>

@@ -24,11 +24,36 @@ const AUDIO_TECH =
   /\b(aac|ac3|eac3|dd5\.?1|ddp5\.?1|dts(?:-?hd)?|truehd|atmos|flac|opus|mp3|hdr10?\+?|hdr|dv|dolby|10bit|8bit|imax|extended|unrated|remastered|proper|repack|internal|multi|dual)\b/i;
 
 const LANG_WORDS: Record<string, string> = {
-  english: 'en', eng: 'en', hebrew: 'he', heb: 'he', hebrew_: 'he', arabic: 'ar', ara: 'ar',
-  spanish: 'es', spa: 'es', french: 'fr', fre: 'fr', fra: 'fr', german: 'de', ger: 'de',
-  deu: 'de', russian: 'ru', rus: 'ru', portuguese: 'pt', por: 'pt', turkish: 'tr', tur: 'tr',
-  italian: 'it', ita: 'it', hindi: 'hi', japanese: 'ja', jpn: 'ja', korean: 'ko', kor: 'ko',
-  chinese: 'zh', chi: 'zh',
+  english: 'en',
+  eng: 'en',
+  hebrew: 'he',
+  heb: 'he',
+  hebrew_: 'he',
+  arabic: 'ar',
+  ara: 'ar',
+  spanish: 'es',
+  spa: 'es',
+  french: 'fr',
+  fre: 'fr',
+  fra: 'fr',
+  german: 'de',
+  ger: 'de',
+  deu: 'de',
+  russian: 'ru',
+  rus: 'ru',
+  portuguese: 'pt',
+  por: 'pt',
+  turkish: 'tr',
+  tur: 'tr',
+  italian: 'it',
+  ita: 'it',
+  hindi: 'hi',
+  japanese: 'ja',
+  jpn: 'ja',
+  korean: 'ko',
+  kor: 'ko',
+  chinese: 'zh',
+  chi: 'zh',
 };
 
 const GENERIC_NAME = /^(video|vid|img|file|movie|clip|document|download|untitled|film)[\s_-]*\d*$/i;
@@ -55,7 +80,8 @@ function firstIndex(s: string, ...patterns: RegExp[]): Marker | null {
   let best: Marker | null = null;
   for (const p of patterns) {
     const m = p.exec(s);
-    if (m && (best === null || m.index < best.index)) best = { index: m.index, length: m[0].length };
+    if (m && (best === null || m.index < best.index))
+      best = { index: m.index, length: m[0].length };
   }
   return best;
 }
@@ -145,7 +171,10 @@ export function parseFileName(input: string): ParsedName {
     firstIndex(s, AUDIO_TECH)?.index,
   ].filter((n): n is number => typeof n === 'number' && n > 0);
   let titlePart = cutPoints.length ? s.slice(0, Math.min(...cutPoints)) : s;
-  titlePart = titlePart.replace(/[([{][^)\]}]*$/g, '').replace(/[\s\-–—:,([{.]+$/g, '').trim();
+  titlePart = titlePart
+    .replace(/[([{][^)\]}]*$/g, '')
+    .replace(/[\s\-–—:,([{.]+$/g, '')
+    .trim();
   if (!titlePart) titlePart = s.replace(/[([{].*$/, '').trim();
 
   const audioLangs = new Set<string>();
@@ -186,7 +215,10 @@ export function parseFileName(input: string): ParsedName {
 }
 
 function tidyTitle(t: string): string {
-  const clean = t.replace(/\s+/g, ' ').replace(/^[\s\-–_.]+/, '').trim();
+  const clean = t
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s\-–_.]+/, '')
+    .trim();
   const letters = clean.replace(/[^\p{L}]/gu, '');
   const allLower = letters === letters.toLowerCase() && /\p{Lu}|\p{Ll}/u.test(letters);
   const allUpper = letters.length > 4 && letters === letters.toUpperCase();
@@ -226,7 +258,8 @@ function richness(p: ParsedName): number {
 
 /** Parse a Telegram media message using its file name first and its caption as a fallback. */
 export function parseMedia({ fileName, caption }: MediaNameInput): ParsedName {
-  const fromFile = fileName && !GENERIC_NAME.test(stripExt(fileName)) ? parseFileName(fileName) : null;
+  const fromFile =
+    fileName && !GENERIC_NAME.test(stripExt(fileName)) ? parseFileName(fileName) : null;
   const firstLine = (caption ?? '').split('\n').find((l) => l.trim().length > 1) ?? '';
   const cleanCaption = firstLine.replace(/[*_`#]+/g, '').trim();
   const fromCaption = cleanCaption ? parseFileName(cleanCaption) : null;

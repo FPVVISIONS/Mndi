@@ -48,8 +48,15 @@ export default function ProfilePicker() {
   return (
     <main className="grid min-h-dvh place-items-center px-6 py-16">
       <div className="w-full max-w-4xl text-center">
-        <motion.h1 variants={fadeUp} initial="hidden" animate="show" className="font-display text-title-l sm:text-display-s">
-          <Crossfade k={managing ? 'm' : 'w'}>{managing ? t('profiles.manage') : t('profiles.who')}</Crossfade>
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          className="font-display text-title-l sm:text-display-s"
+        >
+          <Crossfade k={managing ? 'm' : 'w'}>
+            {managing ? t('profiles.manage') : t('profiles.who')}
+          </Crossfade>
         </motion.h1>
         {managing && <p className="mt-3 text-fg-dim">{t('profiles.manageHint')}</p>}
 
@@ -68,8 +75,17 @@ export default function ProfilePicker() {
                 className="group flex w-28 flex-col items-center gap-3 sm:w-36"
               >
                 <span className="relative block">
-                  <motion.span whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }} transition={spring.soft} className="relative block overflow-hidden rounded-lg ring-2 ring-transparent transition-shadow group-hover:ring-fg group-focus-visible:ring-fg">
-                    <ProfileAvatar profile={p} className="size-28 rounded-lg sm:size-36" iconSize={56} />
+                  <motion.span
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={spring.soft}
+                    className="relative block overflow-hidden rounded-lg ring-2 ring-transparent transition-shadow group-hover:ring-fg group-focus-visible:ring-fg"
+                  >
+                    <ProfileAvatar
+                      profile={p}
+                      className="size-28 rounded-lg sm:size-36"
+                      iconSize={56}
+                    />
                     {managing && (
                       <span className="absolute inset-0 grid place-items-center bg-black/55">
                         <Pencil size={32} />
@@ -77,29 +93,52 @@ export default function ProfilePicker() {
                     )}
                   </motion.span>
                 </span>
-                <span className="max-w-full truncate text-lead text-fg-dim transition-colors group-hover:text-fg group-focus-visible:text-fg">{p.name}</span>
+                <span className="max-w-full truncate text-lead text-fg-dim transition-colors group-hover:text-fg group-focus-visible:text-fg">
+                  {p.name}
+                </span>
               </button>
             </motion.li>
           ))}
           {(managing || profiles.length === 0) && profiles.length < MAX_PROFILES && (
             <motion.li variants={fadeUp} layout transition={spring.soft}>
-              <button type="button" onClick={add} className="group flex w-28 flex-col items-center gap-3 sm:w-36" aria-label={t('profiles.create')}>
-                <motion.span whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }} transition={spring.soft} className="grid size-28 place-items-center rounded-lg border-2 border-dashed border-line-strong text-fg-dim group-hover:border-fg group-hover:text-fg sm:size-36">
+              <button
+                type="button"
+                onClick={add}
+                className="group flex w-28 flex-col items-center gap-3 sm:w-36"
+                aria-label={t('profiles.create')}
+              >
+                <motion.span
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={spring.soft}
+                  className="grid size-28 place-items-center rounded-lg border-2 border-dashed border-line-strong text-fg-dim group-hover:border-fg group-hover:text-fg sm:size-36"
+                >
                   <Plus size={48} strokeWidth={1.5} />
                 </motion.span>
-                <span className="text-lead text-fg-dim group-hover:text-fg">{t('profiles.create')}</span>
+                <span className="text-lead text-fg-dim group-hover:text-fg">
+                  {t('profiles.create')}
+                </span>
               </button>
             </motion.li>
           )}
         </motion.ul>
 
         <div className="mt-14">
-          <Button variant={managing ? 'primary' : 'secondary'} size="lg" onClick={() => setManaging((m) => !m)}>
+          <Button
+            variant={managing ? 'primary' : 'secondary'}
+            size="lg"
+            onClick={() => setManaging((m) => !m)}
+          >
             {managing ? t('profiles.done') : t('profiles.manage')}
           </Button>
         </div>
       </div>
-      <ProfileEditor open={open} onClose={() => setOpen(false)} profile={editing} canDelete={profiles.length > 1} />
+      <ProfileEditor
+        open={open}
+        onClose={() => setOpen(false)}
+        profile={editing}
+        canDelete={profiles.length > 1}
+      />
     </main>
   );
 }

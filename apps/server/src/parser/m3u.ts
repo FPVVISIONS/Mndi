@@ -13,7 +13,8 @@ export interface ParsedPlaylist {
 
 function attrs(line: string): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const m of line.matchAll(/([A-Za-z0-9_-]+)="([^"]*)"/g)) out[(m[1] ?? '').toLowerCase()] = m[2] ?? '';
+  for (const m of line.matchAll(/([A-Za-z0-9_-]+)="([^"]*)"/g))
+    out[(m[1] ?? '').toLowerCase()] = m[2] ?? '';
   return out;
 }
 
@@ -23,11 +24,13 @@ export function isHlsStream(text: string): boolean {
 }
 
 export function parseM3U(text: string): ParsedPlaylist {
-  const lines = text.replace(/^﻿/, '').split(/\r?\n/);
+  const body = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const lines = body.split(/\r?\n/);
   const header = lines.find((l) => l.startsWith('#EXTM3U')) ?? '';
   const headerAttrs = attrs(header);
   const channels: ParsedChannel[] = [];
-  let pending: { name: string; logo: string | null; group: string; tvgId: string | null } | null = null;
+  let pending: { name: string; logo: string | null; group: string; tvgId: string | null } | null =
+    null;
   let groupFallback = '';
 
   for (const raw of lines) {
@@ -49,7 +52,8 @@ export function parseM3U(text: string): ParsedPlaylist {
     } else if (!line.startsWith('#')) {
       if (/^https?:\/\//i.test(line)) {
         channels.push({
-          name: pending?.name ?? line.replace(/^https?:\/\/(www\.)?/, '').split(/[/?]/)[0] ?? 'Channel',
+          name:
+            pending?.name ?? line.replace(/^https?:\/\/(www\.)?/, '').split(/[/?]/)[0] ?? 'Channel',
           url: line,
           logo: pending?.logo ?? null,
           group: pending?.group ?? '',
@@ -71,7 +75,13 @@ export function extractStreamLinks(text: string): { url: string; name: string }[
   const hint =
     text
       .split('\n')
-      .map((l) => l.replace(URL_RE, '').replace(/[*_`#>:\-–]+/g, ' ').replace(/\s+/g, ' ').trim())
+      .map((l) =>
+        l
+          .replace(URL_RE, '')
+          .replace(/[*_`#>:\-–]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim(),
+      )
       .find((l) => l.length > 1) ?? '';
   return urls.filter((u) => STREAM_EXT.test(u)).map((url) => ({ url, name: hint }));
 }
@@ -81,8 +91,13 @@ export function nameFromUrl(url: string): string {
   try {
     const u = new URL(url);
     const last = decodeURIComponent(u.pathname.split('/').filter(Boolean).pop() ?? '');
-    const base = last.replace(/\.(m3u8?|ts|mp4|webm)$/i, '').replace(/[_-]+/g, ' ').trim();
-    return base && !/^(index|playlist|master|stream|live|chunklist)$/i.test(base) ? base : u.hostname;
+    const base = last
+      .replace(/\.(m3u8?|ts|mp4|webm)$/i, '')
+      .replace(/[_-]+/g, ' ')
+      .trim();
+    return base && !/^(index|playlist|master|stream|live|chunklist)$/i.test(base)
+      ? base
+      : u.hostname;
   } catch {
     return 'Channel';
   }

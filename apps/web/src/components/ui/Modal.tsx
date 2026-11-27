@@ -15,7 +15,8 @@ interface Props {
   className?: string;
 }
 
-const FOCUSABLE = 'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])';
 
 export function Modal({ open, onClose, title, children, className }: Props) {
   const { t } = useTranslation();
@@ -33,8 +34,13 @@ export function Modal({ open, onClose, title, children, className }: Props) {
       const items = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
       const first = items[0];
       const last = items[items.length - 1];
-      if (e.shiftKey && document.activeElement === first) (e.preventDefault(), last?.focus());
-      else if (!e.shiftKey && document.activeElement === last) (e.preventDefault(), first?.focus());
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => {
@@ -65,7 +71,10 @@ export function Modal({ open, onClose, title, children, className }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 8 }}
             transition={spring.modal}
-            className={cn('relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-t-xl border border-line bg-surface-1 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-modal)] md:rounded-xl md:p-6', className)}
+            className={cn(
+              'relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-t-xl border border-line bg-surface-1 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-modal)] md:rounded-xl md:p-6',
+              className,
+            )}
           >
             {title && (
               <div className="mb-5 flex items-center justify-between gap-4">

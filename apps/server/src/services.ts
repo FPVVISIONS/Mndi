@@ -40,20 +40,37 @@ export async function createServices(config: Config, dbFile?: string): Promise<S
   const db = createDb(dbFile ?? join(config.dataDir, config.mock ? 'demo.db' : 'marquee.db'));
   const key = resolveKey(config.dataDir, config.sessionSecret);
   const images = new ImageStore(join(config.dataDir, 'cache', 'images'));
-  const getSetting = (k: string) => db.select().from(schema.settings).where(eq(schema.settings.key, k)).get()?.value;
+  const getSetting = (k: string) =>
+    db.select().from(schema.settings).where(eq(schema.settings.key, k)).get()?.value;
   const setSetting = (k: string, value: string) =>
-    db.insert(schema.settings).values({ key: k, value }).onConflictDoUpdate({ target: schema.settings.key, set: { value } }).run();
+    db
+      .insert(schema.settings)
+      .values({ key: k, value })
+      .onConflictDoUpdate({ target: schema.settings.key, set: { value } })
+      .run();
 
   const limitMb = Number(getSetting('cache_limit_mb')) || config.streamCacheMb;
   const chunkCache = new ChunkCache(join(config.dataDir, 'cache', 'stream'), limitMb);
-  const provider = config.mock ? new MockProvider() : config.tmdbKey ? new TmdbProvider(config.tmdbKey) : null;
+  const provider = config.mock
+    ? new MockProvider()
+    : config.tmdbKey
+      ? new TmdbProvider(config.tmdbKey)
+      : null;
   const meta = new MetadataService(db, provider, images);
   const library = new Library(db, meta);
   const live = new LiveService(db, key);
   const base: Omit<Services, 'tg' | 'indexer' | 'samples'> = {
-    config, db, key, images, chunkCache, meta, library, live,
+    config,
+    db,
+    key,
+    images,
+    chunkCache,
+    meta,
+    library,
+    live,
     internalBase: () => `http://127.0.0.1:${config.port}`,
-    getSetting, setSetting,
+    getSetting,
+    setSetting,
   };
 
   if (config.mock) {

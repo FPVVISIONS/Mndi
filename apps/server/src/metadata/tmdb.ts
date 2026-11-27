@@ -61,7 +61,12 @@ export class TmdbProvider implements MetadataProvider {
     });
   }
 
-  async search(kind: TitleKind, query: string, year: number | null, lang: string): Promise<SearchHit[]> {
+  async search(
+    kind: TitleKind,
+    query: string,
+    year: number | null,
+    lang: string,
+  ): Promise<SearchHit[]> {
     const params: Record<string, string> = { query, language: lang, include_adult: 'false' };
     if (year) params[kind === 'movie' ? 'year' : 'first_air_date_year'] = String(year);
     const data = await this.get<{ results: SearchRow[] }>(

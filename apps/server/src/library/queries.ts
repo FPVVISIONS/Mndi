@@ -1,7 +1,16 @@
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type {
-  Channel, EpisodeItem, FileVersion, HomePayload, HomeRow, ImageRef, LanguageCode, Progress,
-  SearchResults, TitleCard, TitleDetail,
+  Channel,
+  EpisodeItem,
+  FileVersion,
+  HomePayload,
+  HomeRow,
+  ImageRef,
+  LanguageCode,
+  Progress,
+  SearchResults,
+  TitleCard,
+  TitleDetail,
 } from '@marquee/shared';
 import type { Db } from '../db/client.js';
 import { schema } from '../db/client.js';
@@ -33,7 +42,10 @@ const QUALITY_CAP: Record<string, number> = { best: 99, '1080p': 3, '720p': 2 };
 const NATIVE = new Set(['mp4', 'm4v', 'mov', 'webm']);
 
 /** The file Play should use: the person's saved choice, else the best release within their quality cap. */
-export function bestFile(list: FileRow[], opts: { chosen?: number; quality?: string } = {}): FileRow | undefined {
+export function bestFile(
+  list: FileRow[],
+  opts: { chosen?: number; quality?: string } = {},
+): FileRow | undefined {
   const chosen = opts.chosen ? list.find((f) => f.id === opts.chosen) : undefined;
   if (chosen) return chosen;
   const rank = (f: FileRow) => QUALITY_RANK[f.quality ?? ''] ?? 2;
@@ -44,15 +56,33 @@ export function bestFile(list: FileRow[], opts: { chosen?: number; quality?: str
 }
 
 const SOURCE_LABEL: Record<string, string> = {
-  BLURAY: 'BluRay', BDRIP: 'BDRip', BRRIP: 'BRRip', BDREMUX: 'Remux', REMUX: 'Remux', WEBDL: 'WEB-DL', WEBRIP: 'WEBRip',
-  HDTV: 'HDTV', PDTV: 'PDTV', DVDRIP: 'DVDRip', HDRIP: 'HDRip', CAM: 'CAM', HDCAM: 'CAM',
+  BLURAY: 'BluRay',
+  BDRIP: 'BDRip',
+  BRRIP: 'BRRip',
+  BDREMUX: 'Remux',
+  REMUX: 'Remux',
+  WEBDL: 'WEB-DL',
+  WEBRIP: 'WEBRip',
+  HDTV: 'HDTV',
+  PDTV: 'PDTV',
+  DVDRIP: 'DVDRip',
+  HDRIP: 'HDRip',
+  CAM: 'CAM',
+  HDCAM: 'CAM',
 };
 
 export function toVersion(f: FileRow, chat: string, chosen: boolean): FileVersion {
   const res = f.width && f.height ? `${f.width}×${f.height}` : null;
   return {
     id: f.id,
-    label: [f.quality, f.source ? (SOURCE_LABEL[f.source] ?? f.source) : null, f.codec === 'hevc' ? 'HEVC' : f.codec === 'h264' ? 'H.264' : f.codec].filter(Boolean).join(' · ') || f.container.toUpperCase(),
+    label:
+      [
+        f.quality,
+        f.source ? (SOURCE_LABEL[f.source] ?? f.source) : null,
+        f.codec === 'hevc' ? 'HEVC' : f.codec === 'h264' ? 'H.264' : f.codec,
+      ]
+        .filter(Boolean)
+        .join(' · ') || f.container.toUpperCase(),
     quality: f.quality ?? '',
     source: f.source,
     codec: f.codec,
@@ -79,7 +109,10 @@ export class Library {
     return pick ? { id: pick.path, color: this.meta.colorFor(pick.path), lang: pick.lang } : null;
   }
 
-  private metaFor(rows: TitleRow[], lang: LanguageCode): Map<number, { meta: LocalizedMeta; exact: boolean }> {
+  private metaFor(
+    rows: TitleRow[],
+    lang: LanguageCode,
+  ): Map<number, { meta: LocalizedMeta; exact: boolean }> {
     const out = new Map<number, { meta: LocalizedMeta; exact: boolean }>();
     for (const kind of ['movie', 'series'] as const) {
       const ids = rows.filter((r) => r.kind === kind && r.tmdbId).map((r) => r.tmdbId!);
@@ -103,15 +136,28 @@ export class Library {
     const ids = rows.map((r) => r.id);
     const metas = this.metaFor(rows, ctx.lang);
     const inList = new Set(
-      this.db.select().from(myList).where(eq(myList.profileId, ctx.profileId)).all().map((r) => r.titleId),
+      this.db
+        .select()
+        .from(myList)
+        .where(eq(myList.profileId, ctx.profileId))
+        .all()
+        .map((r) => r.titleId),
     );
     const liked = new Set(
-      this.db.select().from(likes).where(eq(likes.profileId, ctx.profileId)).all().map((r) => r.titleId),
+      this.db
+        .select()
+        .from(likes)
+        .where(eq(likes.profileId, ctx.profileId))
+        .all()
+        .map((r) => r.titleId),
     );
     const seasonCounts = new Map<number, number>(
       this.db
         .all<{ id: number; n: number }>(
-          sql`SELECT title_id AS id, COUNT(DISTINCT season) AS n FROM episodes WHERE title_id IN (${sql.join(ids.map((i) => sql`${i}`), sql`,`)}) GROUP BY title_id`,
+          sql`SELECT title_id AS id, COUNT(DISTINCT season) AS n FROM episodes WHERE title_id IN (${sql.join(
+            ids.map((i) => sql`${i}`),
+            sql`,`,
+          )}) GROUP BY title_id`,
         )
         .map((r) => [r.id, r.n]),
     );
@@ -176,7 +222,11 @@ export class Library {
         },
       });
     }
-    return this.cards(picks.map((p) => p.row), ctx, new Map(picks.map((p) => [p.row.id, p.prog])));
+    return this.cards(
+      picks.map((p) => p.row),
+      ctx,
+      new Map(picks.map((p) => [p.row.id, p.prog])),
+    );
   }
 
   home(ctx: Ctx): HomePayload {
@@ -189,16 +239,26 @@ export class Library {
     const cont = this.continueWatching(ctx);
     if (cont.length) rows.push({ id: 'continue', items: cont });
 
-    const list = this.db.select().from(myList).where(eq(myList.profileId, ctx.profileId)).orderBy(desc(myList.addedAt)).all();
-    const listCards = list.map((l) => byId.get(l.titleId)).filter((c): c is TitleCard => Boolean(c));
+    const list = this.db
+      .select()
+      .from(myList)
+      .where(eq(myList.profileId, ctx.profileId))
+      .orderBy(desc(myList.addedAt))
+      .all();
+    const listCards = list
+      .map((l) => byId.get(l.titleId))
+      .filter((c): c is TitleCard => Boolean(c));
     if (listCards.length) rows.push({ id: 'myList', items: listCards });
 
     const recent = [...cards].sort((a, b) => b.addedAt - a.addedAt).slice(0, 20);
     if (recent.length) rows.push({ id: 'recent', items: recent });
 
     const popularity = new Map(all.map((r) => [r.id, r.popularity]));
-    const trending = [...cards].sort((a, b) => (popularity.get(b.id) ?? 0) - (popularity.get(a.id) ?? 0)).slice(0, 20);
-    if (trending.some((c) => (popularity.get(c.id) ?? 0) > 0)) rows.push({ id: 'trending', items: trending });
+    const trending = [...cards]
+      .sort((a, b) => (popularity.get(b.id) ?? 0) - (popularity.get(a.id) ?? 0))
+      .slice(0, 20);
+    if (trending.some((c) => (popularity.get(c.id) ?? 0) > 0))
+      rows.push({ id: 'trending', items: trending });
 
     const fresh = this.db.all<{ id: number }>(
       sql`SELECT title_id AS id FROM episodes WHERE added_at > ${now - 14 * 86400} GROUP BY title_id ORDER BY MAX(added_at) DESC LIMIT 20`,
@@ -207,7 +267,8 @@ export class Library {
     if (freshCards.length) rows.push({ id: 'newEpisodes', items: freshCards });
 
     const genreCount = new Map<string, TitleCard[]>();
-    for (const c of cards) for (const g of c.genres) genreCount.set(g, [...(genreCount.get(g) ?? []), c]);
+    for (const c of cards)
+      for (const g of c.genres) genreCount.set(g, [...(genreCount.get(g) ?? []), c]);
     [...genreCount.entries()]
       .filter(([, items]) => items.length >= 3)
       .sort((a, b) => b[1].length - a[1].length)
@@ -217,7 +278,8 @@ export class Library {
     const hero = [...cards]
       .filter((c) => c.backdrop)
       .sort((a, b) => {
-        const score = (c: TitleCard) => (popularity.get(c.id) ?? 0) + Math.max(0, 30 - (now - c.addedAt) / 86400);
+        const score = (c: TitleCard) =>
+          (popularity.get(c.id) ?? 0) + Math.max(0, 30 - (now - c.addedAt) / 86400);
         return score(b) - score(a);
       })
       .slice(0, 5);
@@ -230,25 +292,42 @@ export class Library {
   }
 
   list(
-    opts: { kind?: 'movie' | 'series'; genre?: string; sort?: 'recent' | 'title' | 'rating' | 'year' },
+    opts: {
+      kind?: 'movie' | 'series';
+      genre?: string;
+      sort?: 'recent' | 'title' | 'rating' | 'year';
+    },
     ctx: Ctx,
   ): { items: TitleCard[]; genres: string[]; pending: boolean } {
     const rows = this.allTitles().filter((r) => !opts.kind || r.kind === opts.kind);
     const cards = this.cards(rows, ctx);
-    const genres = [...new Set(cards.flatMap((c) => c.genres))].sort((a, b) => a.localeCompare(b, ctx.lang));
+    const genres = [...new Set(cards.flatMap((c) => c.genres))].sort((a, b) =>
+      a.localeCompare(b, ctx.lang),
+    );
     let items = opts.genre ? cards.filter((c) => c.genres.includes(opts.genre!)) : cards;
     const sort = opts.sort ?? 'recent';
     items = [...items].sort((a, b) =>
-      sort === 'title' ? a.title.localeCompare(b.title, ctx.lang)
-      : sort === 'rating' ? (b.rating ?? 0) - (a.rating ?? 0)
-      : sort === 'year' ? (b.year ?? 0) - (a.year ?? 0)
-      : b.addedAt - a.addedAt);
+      sort === 'title'
+        ? a.title.localeCompare(b.title, ctx.lang)
+        : sort === 'rating'
+          ? (b.rating ?? 0) - (a.rating ?? 0)
+          : sort === 'year'
+            ? (b.year ?? 0) - (a.year ?? 0)
+            : b.addedAt - a.addedAt,
+    );
     return { items, genres, pending: cards.some((c) => c.pending) };
   }
 
   myList(ctx: Ctx): TitleCard[] {
-    const list = this.db.select().from(myList).where(eq(myList.profileId, ctx.profileId)).orderBy(desc(myList.addedAt)).all();
-    const rows = list.map((l) => this.db.select().from(titles).where(eq(titles.id, l.titleId)).get()).filter((r): r is TitleRow => Boolean(r));
+    const list = this.db
+      .select()
+      .from(myList)
+      .where(eq(myList.profileId, ctx.profileId))
+      .orderBy(desc(myList.addedAt))
+      .all();
+    const rows = list
+      .map((l) => this.db.select().from(titles).where(eq(titles.id, l.titleId)).get())
+      .filter((r): r is TitleRow => Boolean(r));
     return this.cards(rows, ctx);
   }
 
@@ -257,7 +336,13 @@ export class Library {
   }
 
   private chatNames(): Map<string, string> {
-    return new Map(this.db.select().from(sources).all().map((c) => [c.chatId, c.title]));
+    return new Map(
+      this.db
+        .select()
+        .from(sources)
+        .all()
+        .map((c) => [c.chatId, c.title]),
+    );
   }
 
   /** The file Play uses for a movie (scope "title") or an episode (scope "episode"). */
@@ -265,7 +350,13 @@ export class Library {
     const saved = this.db
       .select()
       .from(versionChoice)
-      .where(and(eq(versionChoice.profileId, ctx.profileId), eq(versionChoice.scope, scope), eq(versionChoice.refId, refId)))
+      .where(
+        and(
+          eq(versionChoice.profileId, ctx.profileId),
+          eq(versionChoice.scope, scope),
+          eq(versionChoice.refId, refId),
+        ),
+      )
       .get();
     return bestFile(list, { chosen: saved?.fileId, quality: ctx.quality });
   }
@@ -279,7 +370,11 @@ export class Library {
     const chosen = this.pick(list, ctx, scope, refId)?.id;
     const chats = this.chatNames();
     return [...list]
-      .sort((a, b) => (QUALITY_RANK[b.quality ?? ''] ?? 2) - (QUALITY_RANK[a.quality ?? ''] ?? 2) || b.size - a.size)
+      .sort(
+        (a, b) =>
+          (QUALITY_RANK[b.quality ?? ''] ?? 2) - (QUALITY_RANK[a.quality ?? ''] ?? 2) ||
+          b.size - a.size,
+      )
       .map((f) => toVersion(f, chats.get(f.chatId) ?? '', f.id === chosen));
   }
 
@@ -288,7 +383,10 @@ export class Library {
     this.db
       .insert(versionChoice)
       .values(values)
-      .onConflictDoUpdate({ target: [versionChoice.profileId, versionChoice.scope, versionChoice.refId], set: { fileId } })
+      .onConflictDoUpdate({
+        target: [versionChoice.profileId, versionChoice.scope, versionChoice.refId],
+        set: { fileId },
+      })
       .run();
   }
 
@@ -298,9 +396,20 @@ export class Library {
       const f = this.pick(this.filesFor(row.id), ctx, 'title', row.id);
       return f ? { fileId: f.id, label: null } : null;
     }
-    const eps = this.db.select().from(episodes).where(eq(episodes.titleId, row.id)).orderBy(episodes.season, episodes.episode).all();
+    const eps = this.db
+      .select()
+      .from(episodes)
+      .where(eq(episodes.titleId, row.id))
+      .orderBy(episodes.season, episodes.episode)
+      .all();
     if (!eps.length) return null;
-    const fileOf = (epId: number) => this.pick(this.db.select().from(files).where(eq(files.episodeId, epId)).all(), ctx, 'episode', epId);
+    const fileOf = (epId: number) =>
+      this.pick(
+        this.db.select().from(files).where(eq(files.episodeId, epId)).all(),
+        ctx,
+        'episode',
+        epId,
+      );
     const mine = this.progressRows(ctx).filter((r) => r.p.titleId === row.id && r.e);
     const inProgress = mine.find((r) => !r.p.completed && r.p.position >= 5);
     let target = eps[0]!;
@@ -331,16 +440,28 @@ export class Library {
     if (!row) return null;
     const card = this.cards([row], ctx)[0]!;
     const m = row.tmdbId
-      ? (this.meta.peek(row.kind, row.tmdbId, ctx.lang) ?? this.meta.peek(row.kind, row.tmdbId, 'en'))
+      ? (this.meta.peek(row.kind, row.tmdbId, ctx.lang) ??
+        this.meta.peek(row.kind, row.tmdbId, 'en'))
       : null;
     const target = this.playTarget(row, ctx);
     const seasonRows = this.db.all<{ season: number; n: number }>(
       sql`SELECT season, COUNT(*) AS n FROM episodes WHERE title_id = ${id} GROUP BY season ORDER BY season`,
     );
-    const prog = target ? this.progressRows(ctx).find((r) => r.p.fileId === target.fileId && !r.p.completed && r.p.position >= 5) : undefined;
+    const prog = target
+      ? this.progressRows(ctx).find(
+          (r) => r.p.fileId === target.fileId && !r.p.completed && r.p.position >= 5,
+        )
+      : undefined;
     return {
       ...card,
-      progress: prog ? { fileId: prog.p.fileId, position: prog.p.position, duration: prog.p.duration, updatedAt: prog.p.updatedAt } : undefined,
+      progress: prog
+        ? {
+            fileId: prog.p.fileId,
+            position: prog.p.position,
+            duration: prog.p.duration,
+            updatedAt: prog.p.updatedAt,
+          }
+        : undefined,
       tagline: m?.tagline ?? '',
       certification: m?.certification ?? null,
       originalLanguage: m?.originalLanguage ?? null,
@@ -369,7 +490,9 @@ export class Library {
       .all();
     const info = row.tmdbId ? await this.meta.season(row.tmdbId, season, ctx.lang) : null;
     const prog = new Map(
-      this.progressRows(ctx).filter((r) => r.p.titleId === titleId).map((r) => [r.p.fileId, r.p]),
+      this.progressRows(ctx)
+        .filter((r) => r.p.titleId === titleId)
+        .map((r) => [r.p.fileId, r.p]),
     );
     return eps.map<EpisodeItem>((e) => {
       const versions = this.db.select().from(files).where(eq(files.episodeId, e.id)).all();
@@ -382,7 +505,9 @@ export class Library {
         episode: e.episode,
         name: raw?.name || '',
         overview: raw?.overview ?? '',
-        still: raw?.still_path ? { id: raw.still_path, color: this.meta.colorFor(raw.still_path), lang: null } : null,
+        still: raw?.still_path
+          ? { id: raw.still_path, color: this.meta.colorFor(raw.still_path), lang: null }
+          : null,
         runtime: raw?.runtime ?? (best?.duration ? Math.round(best.duration / 60) : null),
         airDate: raw?.air_date ?? null,
         fileId: best?.id ?? null,
@@ -415,8 +540,14 @@ export class Library {
       .filter((c) => titleKey(c.name).includes(needle) || titleKey(c.group).includes(needle))
       .slice(0, 12);
     return {
-      movies: hits.filter((h) => h.c.kind === 'movie').slice(0, 14).map((h) => h.c),
-      series: hits.filter((h) => h.c.kind === 'series').slice(0, 14).map((h) => h.c),
+      movies: hits
+        .filter((h) => h.c.kind === 'movie')
+        .slice(0, 14)
+        .map((h) => h.c),
+      series: hits
+        .filter((h) => h.c.kind === 'series')
+        .slice(0, 14)
+        .map((h) => h.c),
       channels,
     };
   }
@@ -424,29 +555,66 @@ export class Library {
   // --- profile state -------------------------------------------------------------------------
 
   setList(ctx: Ctx, titleId: number, on: boolean): void {
-    if (on) this.db.insert(myList).values({ profileId: ctx.profileId, titleId, addedAt: Math.floor(Date.now() / 1000) }).onConflictDoNothing().run();
-    else this.db.delete(myList).where(and(eq(myList.profileId, ctx.profileId), eq(myList.titleId, titleId))).run();
+    if (on)
+      this.db
+        .insert(myList)
+        .values({ profileId: ctx.profileId, titleId, addedAt: Math.floor(Date.now() / 1000) })
+        .onConflictDoNothing()
+        .run();
+    else
+      this.db
+        .delete(myList)
+        .where(and(eq(myList.profileId, ctx.profileId), eq(myList.titleId, titleId)))
+        .run();
   }
 
   setLike(ctx: Ctx, titleId: number, on: boolean): void {
-    if (on) this.db.insert(likes).values({ profileId: ctx.profileId, titleId }).onConflictDoNothing().run();
-    else this.db.delete(likes).where(and(eq(likes.profileId, ctx.profileId), eq(likes.titleId, titleId))).run();
+    if (on)
+      this.db
+        .insert(likes)
+        .values({ profileId: ctx.profileId, titleId })
+        .onConflictDoNothing()
+        .run();
+    else
+      this.db
+        .delete(likes)
+        .where(and(eq(likes.profileId, ctx.profileId), eq(likes.titleId, titleId)))
+        .run();
   }
 
   saveProgress(profileId: number, fileId: number, position: number, duration: number): void {
     const f = this.db.select().from(files).where(eq(files.id, fileId)).get();
     if (!f?.titleId || !(duration > 0)) return;
     const completed = position / duration >= COMPLETE_RATIO || duration - position < 45;
-    const values = { profileId, fileId, titleId: f.titleId, position, duration, completed, updatedAt: Math.floor(Date.now() / 1000) };
-    this.db.insert(progress).values(values).onConflictDoUpdate({ target: [progress.profileId, progress.fileId], set: values }).run();
+    const values = {
+      profileId,
+      fileId,
+      titleId: f.titleId,
+      position,
+      duration,
+      completed,
+      updatedAt: Math.floor(Date.now() / 1000),
+    };
+    this.db
+      .insert(progress)
+      .values(values)
+      .onConflictDoUpdate({ target: [progress.profileId, progress.fileId], set: values })
+      .run();
   }
 
   clearProgress(profileId: number, titleId: number): void {
-    this.db.delete(progress).where(and(eq(progress.profileId, profileId), eq(progress.titleId, titleId))).run();
+    this.db
+      .delete(progress)
+      .where(and(eq(progress.profileId, profileId), eq(progress.titleId, titleId)))
+      .run();
   }
 
   resumeFor(profileId: number, fileId: number): number {
-    const p = this.db.select().from(progress).where(and(eq(progress.profileId, profileId), eq(progress.fileId, fileId))).get();
+    const p = this.db
+      .select()
+      .from(progress)
+      .where(and(eq(progress.profileId, profileId), eq(progress.fileId, fileId)))
+      .get();
     return p && !p.completed ? p.position : 0;
   }
 }

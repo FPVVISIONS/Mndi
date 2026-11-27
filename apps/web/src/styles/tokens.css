@@ -29,9 +29,11 @@
   --color-scrim: rgb(11 11 12 / 0.72);
 
   /* Type families. Display swaps to the sans for scripts the serif does not cover. */
-  --font-sans: 'Instrument Sans Variable', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+  --font-sans:
+    'Instrument Sans Variable', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
     'Noto Sans Arabic Variable', system-ui, sans-serif;
-  --font-display: 'Instrument Serif', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
+  --font-display:
+    'Instrument Serif', 'Noto Sans Variable', 'Noto Sans Hebrew Variable',
     'Noto Sans Arabic Variable', Georgia, serif;
 
   /* Type scale: size / line height. */

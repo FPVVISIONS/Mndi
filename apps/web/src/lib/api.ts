@@ -1,6 +1,19 @@
 import type {
-  AppStatus, AuthState, CacheInfo, Channel, ChatSummary, EpisodeItem, FileVersion, HomePayload, PlaybackInfo,
-  Profile, SearchResults, SourceInput, TitleCard, TitleDetail, TmdbCandidate,
+  AppStatus,
+  AuthState,
+  CacheInfo,
+  Channel,
+  ChatSummary,
+  EpisodeItem,
+  FileVersion,
+  HomePayload,
+  PlaybackInfo,
+  Profile,
+  SearchResults,
+  SourceInput,
+  TitleCard,
+  TitleDetail,
+  TmdbCandidate,
 } from '@marquee/shared';
 import { usePrefs } from '../stores/prefs';
 import { useProfile } from '../stores/profile';
@@ -14,7 +27,10 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init: RequestInit & { json?: unknown; lang?: boolean } = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  init: RequestInit & { json?: unknown; lang?: boolean } = {},
+): Promise<T> {
   const url = new URL(path, window.location.origin);
   if (init.lang !== false) url.searchParams.set('lang', usePrefs.getState().language);
   const headers = new Headers(init.headers);
@@ -40,7 +56,8 @@ async function request<T>(path: string, init: RequestInit & { json?: unknown; la
 }
 
 const get = <T>(path: string) => request<T>(path);
-const send = <T>(method: string, path: string, json?: unknown) => request<T>(path, { method, json });
+const send = <T>(method: string, path: string, json?: unknown) =>
+  request<T>(path, { method, json });
 
 export const api = {
   status: () => request<AppStatus>('/api/status', { lang: false }),
@@ -48,7 +65,8 @@ export const api = {
   resetOnboarding: () => send<AppStatus>('POST', '/api/dev/reset-onboarding'),
 
   auth: () => request<AuthState>('/api/auth', { lang: false }),
-  saveCredentials: (apiId: number, apiHash: string) => send<AuthState>('POST', '/api/auth/credentials', { apiId, apiHash }),
+  saveCredentials: (apiId: number, apiHash: string) =>
+    send<AuthState>('POST', '/api/auth/credentials', { apiId, apiHash }),
   sendPhone: (phone: string) => send<AuthState>('POST', '/api/auth/phone', { phone }),
   sendCode: (code: string) => send<AuthState>('POST', '/api/auth/code', { code }),
   sendPassword: (password: string) => send<AuthState>('POST', '/api/auth/password', { password }),
@@ -57,8 +75,12 @@ export const api = {
   logout: () => send<AppStatus>('POST', '/api/auth/logout'),
 
   chats: () => get<{ chats: ChatSummary[] }>('/api/chats'),
-  saveSources: (sources: SourceInput[]) => send<{ ok: boolean }>('PUT', '/api/sources', { sources }),
-  sources: () => get<{ sources: { chatId: string; title: string; kind: SourceInput['kind'] }[] }>('/api/sources'),
+  saveSources: (sources: SourceInput[]) =>
+    send<{ ok: boolean }>('PUT', '/api/sources', { sources }),
+  sources: () =>
+    get<{ sources: { chatId: string; title: string; kind: SourceInput['kind'] }[] }>(
+      '/api/sources',
+    ),
   scan: (rescan = false) => send<AppStatus['index']>('POST', '/api/library/scan', { rescan }),
   prefetch: (lang: string) => send<{ ok: boolean }>('POST', '/api/library/prefetch', { lang }),
 
@@ -73,15 +95,23 @@ export const api = {
   episodeVersions: (id: number) => get<{ versions: FileVersion[] }>(`/api/episodes/${id}/versions`),
   chooseVersion: (scope: 'title' | 'episode', refId: number, fileId: number) =>
     send<{ ok: boolean }>('PUT', '/api/versions/choice', { scope, refId, fileId }),
-  episodes: (id: number, season: number) => get<{ episodes: EpisodeItem[] }>(`/api/titles/${id}/episodes?season=${season}`),
+  episodes: (id: number, season: number) =>
+    get<{ episodes: EpisodeItem[] }>(`/api/titles/${id}/episodes?season=${season}`),
   search: (q: string) => get<SearchResults>(`/api/search?q=${encodeURIComponent(q)}`),
   myList: () => get<{ items: TitleCard[] }>('/api/my-list'),
-  setList: (id: number, on: boolean) => send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/my-list/${id}`),
-  setLike: (id: number, on: boolean) => send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/likes/${id}`),
-  matches: (id: number, q: string) => get<{ matches: TmdbCandidate[] }>(`/api/titles/${id}/matches?q=${encodeURIComponent(q)}`),
-  setMatch: (id: number, tmdbId: number | null) => send<{ id: number }>('POST', `/api/titles/${id}/match`, { tmdbId }),
+  setList: (id: number, on: boolean) =>
+    send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/my-list/${id}`),
+  setLike: (id: number, on: boolean) =>
+    send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/likes/${id}`),
+  matches: (id: number, q: string) =>
+    get<{ matches: TmdbCandidate[] }>(`/api/titles/${id}/matches?q=${encodeURIComponent(q)}`),
+  setMatch: (id: number, tmdbId: number | null) =>
+    send<{ id: number }>('POST', `/api/titles/${id}/match`, { tmdbId }),
 
-  playback: (fileId: number, opts: { audio?: number; transcode?: boolean; hevc?: boolean } = {}) => {
+  playback: (
+    fileId: number,
+    opts: { audio?: number; transcode?: boolean; hevc?: boolean } = {},
+  ) => {
     const q = new URLSearchParams();
     if (opts.audio) q.set('audio', String(opts.audio));
     if (opts.transcode) q.set('transcode', '1');
@@ -94,11 +124,13 @@ export const api = {
   clearProgress: (titleId: number) => send<{ ok: boolean }>('DELETE', `/api/progress/${titleId}`),
 
   channels: () => get<{ channels: Channel[] }>('/api/live/channels'),
-  setFavourite: (id: number, on: boolean) => send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/live/favourites/${id}`),
+  setFavourite: (id: number, on: boolean) =>
+    send<{ ok: boolean }>(on ? 'PUT' : 'DELETE', `/api/live/favourites/${id}`),
 
   profiles: () => request<{ profiles: Profile[] }>('/api/profiles', { lang: false }),
   createProfile: (p: Omit<Profile, 'id'>) => send<Profile>('POST', '/api/profiles', p),
-  updateProfile: (id: number, p: Partial<Omit<Profile, 'id'>>) => send<Profile>('PATCH', `/api/profiles/${id}`, p),
+  updateProfile: (id: number, p: Partial<Omit<Profile, 'id'>>) =>
+    send<Profile>('PATCH', `/api/profiles/${id}`, p),
   deleteProfile: (id: number) => send<{ ok: boolean }>('DELETE', `/api/profiles/${id}`),
 
   cache: () => request<CacheInfo>('/api/cache', { lang: false }),

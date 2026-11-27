@@ -12,14 +12,21 @@ import { usePrefs } from '../stores/prefs';
 
 function canHevc(): boolean {
   try {
-    return typeof MediaSource !== 'undefined' && MediaSource.isTypeSupported('video/mp4; codecs="hvc1.1.6.L93.B0"');
+    return (
+      typeof MediaSource !== 'undefined' &&
+      MediaSource.isTypeSupported('video/mp4; codecs="hvc1.1.6.L93.B0"')
+    );
   } catch {
     return false;
   }
 }
 
 function Backdrop({ children }: { children?: React.ReactNode }) {
-  return <div className="fixed inset-0 z-[var(--z-player)] grid place-items-center bg-black p-6 text-center">{children ?? <Spinner size={44} />}</div>;
+  return (
+    <div className="fixed inset-0 z-[var(--z-player)] grid place-items-center bg-black p-6 text-center">
+      {children ?? <Spinner size={44} />}
+    </div>
+  );
 }
 
 function Failure() {
@@ -31,8 +38,12 @@ function Failure() {
         <h2 className="font-display text-title-m">{t('player.errorTitle')}</h2>
         <p className="mt-2 max-w-sm text-fg-dim">{t('player.errorBody')}</p>
         <div className="mt-6 flex justify-center gap-3">
-          <Button variant="primary" onClick={() => location.reload()}>{t('common.retry')}</Button>
-          <Button variant="secondary" onClick={() => navigate(-1)}>{t('common.back')}</Button>
+          <Button variant="primary" onClick={() => location.reload()}>
+            {t('common.retry')}
+          </Button>
+          <Button variant="secondary" onClick={() => navigate(-1)}>
+            {t('common.back')}
+          </Button>
         </div>
       </div>
     </Backdrop>
@@ -77,8 +88,14 @@ export function WatchFile() {
       startAt={startAt}
       audioIndex={audio}
       converting={transcode}
-      onAudio={(i, at) => { resumeAt.current = at; setAudio(i); }}
-      onTranscode={(at) => { resumeAt.current = at; setTranscode(true); }}
+      onAudio={(i, at) => {
+        resumeAt.current = at;
+        setAudio(i);
+      }}
+      onTranscode={(at) => {
+        resumeAt.current = at;
+        setTranscode(true);
+      }}
       onSwitchChannel={() => undefined}
     />
   );
@@ -96,7 +113,12 @@ export function WatchTitle() {
 export function WatchLive() {
   const id = Number(useParams().channelId);
   const navigate = useNavigate();
-  const q = useQuery({ queryKey: ['live-playback', id], queryFn: () => api.livePlayback(id), staleTime: 0, gcTime: 0 });
+  const q = useQuery({
+    queryKey: ['live-playback', id],
+    queryFn: () => api.livePlayback(id),
+    staleTime: 0,
+    gcTime: 0,
+  });
   if (q.isError) return <Failure />;
   if (!q.data) return <Backdrop />;
   return (

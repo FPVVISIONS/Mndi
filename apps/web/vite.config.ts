@@ -33,7 +33,10 @@ export default defineConfig({
           {
             urlPattern: /\/api\/img\//,
             handler: 'CacheFirst',
-            options: { cacheName: 'artwork', expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+            options: {
+              cacheName: 'artwork',
+              expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
           },
         ],
       },

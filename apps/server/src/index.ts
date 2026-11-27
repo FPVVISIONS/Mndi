@@ -8,7 +8,11 @@ const app = await buildApp(svc);
 
 try {
   await app.listen({ port: config.port, host: config.host });
-  const mode = config.mock ? 'demo data' : svc.meta.enabled ? 'Telegram + TMDB' : 'Telegram, no TMDB key';
+  const mode = config.mock
+    ? 'demo data'
+    : svc.meta.enabled
+      ? 'Telegram + TMDB'
+      : 'Telegram, no TMDB key';
   console.log(`Marquee server on http://${config.host}:${config.port} (${mode})`);
 } catch (err) {
   console.error(err);

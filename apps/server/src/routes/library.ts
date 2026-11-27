@@ -42,25 +42,55 @@ export function libraryRoutes(app: FastifyInstance, svc: Services): void {
   });
 
   app.get('/api/my-list', async (req) => ({ items: lib.myList(ctxOf(req, svc)) }));
-  app.put('/api/my-list/:id', async (req) => (lib.setList(ctxOf(req, svc), idParam(req), true), { ok: true }));
-  app.delete('/api/my-list/:id', async (req) => (lib.setList(ctxOf(req, svc), idParam(req), false), { ok: true }));
-  app.put('/api/likes/:id', async (req) => (lib.setLike(ctxOf(req, svc), idParam(req), true), { ok: true }));
-  app.delete('/api/likes/:id', async (req) => (lib.setLike(ctxOf(req, svc), idParam(req), false), { ok: true }));
+  app.put(
+    '/api/my-list/:id',
+    async (req) => (lib.setList(ctxOf(req, svc), idParam(req), true), { ok: true }),
+  );
+  app.delete(
+    '/api/my-list/:id',
+    async (req) => (lib.setList(ctxOf(req, svc), idParam(req), false), { ok: true }),
+  );
+  app.put(
+    '/api/likes/:id',
+    async (req) => (lib.setLike(ctxOf(req, svc), idParam(req), true), { ok: true }),
+  );
+  app.delete(
+    '/api/likes/:id',
+    async (req) => (lib.setLike(ctxOf(req, svc), idParam(req), false), { ok: true }),
+  );
 
   app.post('/api/progress', async (req, reply) => {
-    const body = z.object({ fileId: z.number(), position: z.number().min(0), duration: z.number().positive() }).safeParse(req.body);
+    const body = z
+      .object({ fileId: z.number(), position: z.number().min(0), duration: z.number().positive() })
+      .safeParse(req.body);
     if (!body.success) return badRequest(reply);
-    lib.saveProgress(ctxOf(req, svc).profileId, body.data.fileId, body.data.position, body.data.duration);
+    lib.saveProgress(
+      ctxOf(req, svc).profileId,
+      body.data.fileId,
+      body.data.position,
+      body.data.duration,
+    );
     return { ok: true };
   });
-  app.delete('/api/progress/:id', async (req) => (lib.clearProgress(ctxOf(req, svc).profileId, idParam(req)), { ok: true }));
+  app.delete(
+    '/api/progress/:id',
+    async (req) => (lib.clearProgress(ctxOf(req, svc).profileId, idParam(req)), { ok: true }),
+  );
 
   // ---- Versions: choose between the releases found in the chats ---------------------------
-  app.get('/api/titles/:id/versions', async (req) => ({ versions: lib.versionsOf('title', idParam(req), ctxOf(req, svc)) }));
-  app.get('/api/episodes/:id/versions', async (req) => ({ versions: lib.versionsOf('episode', idParam(req), ctxOf(req, svc)) }));
+  app.get('/api/titles/:id/versions', async (req) => ({
+    versions: lib.versionsOf('title', idParam(req), ctxOf(req, svc)),
+  }));
+  app.get('/api/episodes/:id/versions', async (req) => ({
+    versions: lib.versionsOf('episode', idParam(req), ctxOf(req, svc)),
+  }));
   app.put('/api/versions/choice', async (req, reply) => {
     const body = z
-      .object({ scope: z.enum(['title', 'episode']), refId: z.number().int(), fileId: z.number().int() })
+      .object({
+        scope: z.enum(['title', 'episode']),
+        refId: z.number().int(),
+        fileId: z.number().int(),
+      })
       .safeParse(req.body);
     if (!body.success) return badRequest(reply);
     lib.setChoice(ctxOf(req, svc), body.data.scope, body.data.refId, body.data.fileId);
@@ -69,7 +99,11 @@ export function libraryRoutes(app: FastifyInstance, svc: Services): void {
 
   // ---- Manual matching -------------------------------------------------------------------
   app.get('/api/titles/:id/matches', async (req, reply) => {
-    const row = svc.db.select().from(titles).where(eq(titles.id, idParam(req))).get();
+    const row = svc.db
+      .select()
+      .from(titles)
+      .where(eq(titles.id, idParam(req)))
+      .get();
     if (!row) return notFound(reply);
     const q = String((req.query as { q?: string }).q ?? row.name).slice(0, 100);
     const hits = await svc.meta.search(row.kind, q);
@@ -79,7 +113,9 @@ export function libraryRoutes(app: FastifyInstance, svc: Services): void {
         title: h.title,
         year: h.year,
         overview: h.overview,
-        poster: h.posterPath ? { id: h.posterPath, color: svc.meta.colorFor(h.posterPath), lang: null } : null,
+        poster: h.posterPath
+          ? { id: h.posterPath, color: svc.meta.colorFor(h.posterPath), lang: null }
+          : null,
       })),
     };
   });

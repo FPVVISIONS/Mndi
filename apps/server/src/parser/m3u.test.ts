@@ -49,7 +49,9 @@ describe('isHlsStream', () => {
 
 describe('extractStreamLinks', () => {
   it('finds stream links and a name hint', () => {
-    const links = extractStreamLinks('**Harbor News** live\nhttps://s.example/h/index.m3u8.\nhttps://example.com/page');
+    const links = extractStreamLinks(
+      '**Harbor News** live\nhttps://s.example/h/index.m3u8.\nhttps://example.com/page',
+    );
     expect(links).toEqual([{ url: 'https://s.example/h/index.m3u8', name: 'Harbor News live' }]);
   });
   it('ignores messages without stream links', () => {

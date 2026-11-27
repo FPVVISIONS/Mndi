@@ -20,7 +20,9 @@ export function formatBytes(bytes: number): string {
 }
 
 export function formatClock(epochSeconds: number, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(epochSeconds * 1000);
+  return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(
+    epochSeconds * 1000,
+  );
 }
 
 export function formatRelative(epochSeconds: number, locale: string): string {

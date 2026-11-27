@@ -15,7 +15,13 @@ import type { ChunkCache } from '../stream/chunkCache.js';
 import { CHUNK_SIZE, ChunkedSource, LocalFileSource } from '../stream/sources.js';
 import type { ByteSource } from '../stream/range.js';
 import type { FileRow, TelegramBackend } from './backend.js';
-import { floodSeconds, isFileReferenceExpired, isSessionDead, isTransient, toAuthError } from './errors.js';
+import {
+  floodSeconds,
+  isFileReferenceExpired,
+  isSessionDead,
+  isTransient,
+  toAuthError,
+} from './errors.js';
 
 const { settings, files } = schema;
 
@@ -99,7 +105,8 @@ export class TelegramManager implements TelegramBackend {
       const saved = decrypt(readFileSync(this.sessionFile(), 'utf8'), this.key);
       this.client = this.newClient(saved);
       await this.client.connect();
-      if (!(await this.client.checkAuthorization())) throw Object.assign(new Error('AUTH_KEY_UNREGISTERED'), {});
+      if (!(await this.client.checkAuthorization()))
+        throw Object.assign(new Error('AUTH_KEY_UNREGISTERED'), {});
       await this.afterLogin();
     } catch (err) {
       if (isSessionDead(err)) await this.dropSession();
@@ -108,8 +115,13 @@ export class TelegramManager implements TelegramBackend {
   }
 
   private loadCredentials(): { apiId: number; apiHash: string } | null {
-    if (this.cfg.apiId && this.cfg.apiHash) return { apiId: this.cfg.apiId, apiHash: this.cfg.apiHash };
-    const row = this.db.select().from(settings).where(eq(settings.key, 'telegram_credentials')).get();
+    if (this.cfg.apiId && this.cfg.apiHash)
+      return { apiId: this.cfg.apiId, apiHash: this.cfg.apiHash };
+    const row = this.db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, 'telegram_credentials'))
+      .get();
     if (!row) return null;
     try {
       return JSON.parse(decrypt(row.value, this.key));
@@ -167,10 +179,14 @@ export class TelegramManager implements TelegramBackend {
   async sendPhone(phone: string): Promise<AuthState> {
     if (!this.creds) return this.fail('credentials', new Error('API_ID_INVALID'));
     const digits = phone.replace(/[^\d+]/g, '');
-    if (digits.replace(/\D/g, '').length < 7) return this.fail('phone', new Error('PHONE_NUMBER_INVALID'));
+    if (digits.replace(/\D/g, '').length < 7)
+      return this.fail('phone', new Error('PHONE_NUMBER_INVALID'));
     try {
       const client = await this.freshClient();
-      const res = await client.sendCode({ apiId: this.creds.apiId, apiHash: this.creds.apiHash }, digits);
+      const res = await client.sendCode(
+        { apiId: this.creds.apiId, apiHash: this.creds.apiHash },
+        digits,
+      );
       this.phone = digits;
       this.codeHash = res.phoneCodeHash;
       this.auth = { step: 'code', codeViaApp: res.isCodeViaApp };
@@ -191,7 +207,8 @@ export class TelegramManager implements TelegramBackend {
           phoneCode: code.replace(/\D/g, ''),
         }),
       );
-      if (res instanceof Api.auth.AuthorizationSignUpRequired) return this.fail('phone', new Error('NO_ACCOUNT'));
+      if (res instanceof Api.auth.AuthorizationSignUpRequired)
+        return this.fail('phone', new Error('NO_ACCOUNT'));
       await this.afterLogin();
     } catch (err) {
       if (/SESSION_PASSWORD_NEEDED/.test((err as { errorMessage?: string }).errorMessage ?? '')) {
@@ -208,7 +225,11 @@ export class TelegramManager implements TelegramBackend {
     return {
       password: (hint?: string) =>
         new Promise<string>((resolve) => {
-          this.auth = { step: 'password', hint, error: this.auth.error === 'password_invalid' ? 'password_invalid' : undefined };
+          this.auth = {
+            step: 'password',
+            hint,
+            error: this.auth.error === 'password_invalid' ? 'password_invalid' : undefined,
+          };
           this.passwordWaiter = resolve;
           for (const l of this.listeners) l();
         }),
@@ -238,7 +259,12 @@ export class TelegramManager implements TelegramBackend {
     this.auth = { ...this.auth, error: undefined };
     waiter(password);
     // Give the sign-in attempt a moment to settle so the response reflects the outcome.
-    for (let i = 0; i < 40 && this.auth.step === 'password' && !this.auth.error && !this.passwordWaiter; i++) await sleep(250);
+    for (
+      let i = 0;
+      i < 40 && this.auth.step === 'password' && !this.auth.error && !this.passwordWaiter;
+      i++
+    )
+      await sleep(250);
     return this.auth;
   }
 
@@ -253,7 +279,11 @@ export class TelegramManager implements TelegramBackend {
           qrCode: async ({ token, expires }) => {
             if (this.qrCancelled) throw new Error('AUTH_USER_CANCEL');
             const url = `tg://login?token=${token.toString('base64url')}`;
-            const svg = await QRCode.toString(url, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' });
+            const svg = await QRCode.toString(url, {
+              type: 'svg',
+              margin: 1,
+              errorCorrectionLevel: 'M',
+            });
             this.auth = { step: 'qr', qr: { svg, expiresAt: expires * 1000 } };
             for (const l of this.listeners) l();
           },
@@ -283,9 +313,14 @@ export class TelegramManager implements TelegramBackend {
 
   private async afterLogin(): Promise<void> {
     const client = this.client!;
-    writeFileSync(this.sessionFile(), encrypt(String(client.session.save()), this.key), { mode: 0o600 });
+    writeFileSync(this.sessionFile(), encrypt(String(client.session.save()), this.key), {
+      mode: 0o600,
+    });
     const me = await client.getMe();
-    this.userName = me instanceof Api.User ? [me.firstName, me.lastName].filter(Boolean).join(' ') || me.username || undefined : undefined;
+    this.userName =
+      me instanceof Api.User
+        ? [me.firstName, me.lastName].filter(Boolean).join(' ') || me.username || undefined
+        : undefined;
     this.auth = { step: 'done' };
     // Warm the entity cache so chats can be addressed by id.
     await this.call(() => client.getDialogs({ limit: 200 })).catch(() => undefined);
@@ -346,7 +381,10 @@ export class TelegramManager implements TelegramBackend {
       if (!c || this.state === 'logged-out') return;
       if (!c.connected && this.state === 'ready') {
         this.set('reconnecting');
-        void c.connect().then(() => this.set('ready')).catch(() => undefined);
+        void c
+          .connect()
+          .then(() => this.set('ready'))
+          .catch(() => undefined);
       } else if (c.connected && this.state === 'reconnecting') {
         this.set('ready');
       }
@@ -375,9 +413,19 @@ export class TelegramManager implements TelegramBackend {
     const client = this.client;
     if (!client || !this.ready) return [];
     const dialogs = await this.call(() => client.getDialogs({ limit: 500 }));
-    const kinds = new Map(this.db.select().from(schema.sources).all().map((s) => [s.chatId, s.kind]));
+    const kinds = new Map(
+      this.db
+        .select()
+        .from(schema.sources)
+        .all()
+        .map((s) => [s.chatId, s.kind]),
+    );
     const counts = new Map(
-      this.db.all<{ chat: string; n: number }>(sql`SELECT chat_id AS chat, COUNT(*) AS n FROM files GROUP BY chat_id`).map((r) => [r.chat, r.n]),
+      this.db
+        .all<{ chat: string; n: number }>(
+          sql`SELECT chat_id AS chat, COUNT(*) AS n FROM files GROUP BY chat_id`,
+        )
+        .map((r) => [r.chat, r.n]),
     );
     return dialogs
       .filter((d) => d.isChannel || d.isGroup)
@@ -422,7 +470,12 @@ export class TelegramManager implements TelegramBackend {
     const existing = this.sources.get(file.id);
     if (existing) return existing;
     const client = this.client!;
-    const fetcher = async function* (this: TelegramManager, index: number, count: number, signal: AbortSignal) {
+    const fetcher = async function* (
+      this: TelegramManager,
+      index: number,
+      count: number,
+      signal: AbortSignal,
+    ) {
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           const media = await this.mediaFor(file, attempt > 0);
@@ -448,7 +501,13 @@ export class TelegramManager implements TelegramBackend {
         }
       }
     }.bind(this);
-    const source = new ChunkedSource(`f${file.id}`, file.size, file.mime || 'video/mp4', fetcher, this.cache);
+    const source = new ChunkedSource(
+      `f${file.id}`,
+      file.size,
+      file.mime || 'video/mp4',
+      fetcher,
+      this.cache,
+    );
     this.sources.set(file.id, source);
     if (this.sources.size > 24) this.sources.delete(this.sources.keys().next().value as number);
     return source;
@@ -458,4 +517,3 @@ export class TelegramManager implements TelegramBackend {
     return this.db.select().from(files).where(eq(files.id, id)).get();
   }
 }
-

@@ -68,5 +68,6 @@ export function applyMotionVars(root: HTMLElement = document.documentElement): v
   root.style.setProperty('--ease-out', bez(ease.out));
   root.style.setProperty('--ease-inout', bez(ease.inOut));
   root.style.setProperty('--ease-in', bez(ease.in));
-  for (const [k, v] of Object.entries(duration)) root.style.setProperty(`--dur-${k}`, `${v * 1000}ms`);
+  for (const [k, v] of Object.entries(duration))
+    root.style.setProperty(`--dur-${k}`, `${v * 1000}ms`);
 }

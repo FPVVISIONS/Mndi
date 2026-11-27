@@ -28,7 +28,8 @@ export function parseVtt(text: string): Cue[] {
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .trim();
-    if (body) cues.push({ start: seconds(a), end: seconds(b.trim().split(/\s/)[0] ?? b), text: body });
+    if (body)
+      cues.push({ start: seconds(a), end: seconds(b.trim().split(/\s/)[0] ?? b), text: body });
   }
   return cues;
 }

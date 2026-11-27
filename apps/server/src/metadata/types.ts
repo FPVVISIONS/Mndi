@@ -33,8 +33,12 @@ export interface RawDetails {
   popularity?: number;
   original_language?: string;
   images?: TmdbImages;
-  credits?: { cast?: { name: string; character?: string; profile_path?: string | null; order?: number }[] };
-  videos?: { results?: { site: string; type: string; key: string; iso_639_1?: string; official?: boolean }[] };
+  credits?: {
+    cast?: { name: string; character?: string; profile_path?: string | null; order?: number }[];
+  };
+  videos?: {
+    results?: { site: string; type: string; key: string; iso_639_1?: string; official?: boolean }[];
+  };
   release_dates?: {
     results?: { iso_3166_1: string; release_dates: { certification: string; type: number }[] }[];
   };
@@ -66,7 +70,12 @@ export interface SearchHit {
 
 export interface MetadataProvider {
   readonly name: string;
-  search(kind: TitleKind, query: string, year: number | null, tmdbLang: string): Promise<SearchHit[]>;
+  search(
+    kind: TitleKind,
+    query: string,
+    year: number | null,
+    tmdbLang: string,
+  ): Promise<SearchHit[]>;
   details(kind: TitleKind, id: number, tmdbLang: string, uiLang: string): Promise<RawDetails>;
   season(tvId: number, season: number, tmdbLang: string, uiLang: string): Promise<RawSeason>;
 }

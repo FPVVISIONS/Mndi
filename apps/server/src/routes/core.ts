@@ -22,7 +22,8 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
       scanned: 0,
       items: (svc.db.$client.prepare('SELECT COUNT(*) n FROM files').get() as { n: number }).n,
       titles: (svc.db.$client.prepare('SELECT COUNT(*) n FROM titles').get() as { n: number }).n,
-      channels: (svc.db.$client.prepare('SELECT COUNT(*) n FROM channels').get() as { n: number }).n,
+      channels: (svc.db.$client.prepare('SELECT COUNT(*) n FROM channels').get() as { n: number })
+        .n,
     },
     languagesCached: svc.meta.languagesCached(),
   });
@@ -70,7 +71,8 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
 
   // ---- Sources ---------------------------------------------------------------------------
   app.get('/api/chats', async (_req, reply) => {
-    if (svc.tg.status().state !== 'ready') return reply.code(409).send({ error: 'not_ready', message: 'Not connected' });
+    if (svc.tg.status().state !== 'ready')
+      return reply.code(409).send({ error: 'not_ready', message: 'Not connected' });
     return { chats: await svc.tg.listChats() };
   });
 
@@ -78,10 +80,18 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
 
   app.put('/api/sources', async (req, reply) => {
     const body = z
-      .object({ sources: z.array(z.object({ chatId: z.string(), title: z.string(), kind: kinds })) })
+      .object({
+        sources: z.array(z.object({ chatId: z.string(), title: z.string(), kind: kinds })),
+      })
       .safeParse(req.body);
     if (!body.success) return badRequest(reply);
-    const existing = new Map(svc.db.select().from(sources).all().map((s) => [s.chatId, s]));
+    const existing = new Map(
+      svc.db
+        .select()
+        .from(sources)
+        .all()
+        .map((s) => [s.chatId, s]),
+    );
     const next = new Map(body.data.sources.map((s) => [s.chatId, s]));
     const removed = [...existing.keys()].filter((id) => !next.has(id));
     svc.indexer?.forget(removed);
@@ -92,8 +102,20 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
       if (prev && prev.kind !== kind) svc.indexer?.forget([s.chatId]);
       svc.db
         .insert(sources)
-        .values({ chatId: s.chatId, title: s.title, kind, lastMessageId: prev && prev.kind === kind ? prev.lastMessageId : 0 })
-        .onConflictDoUpdate({ target: sources.chatId, set: { title: s.title, kind, lastMessageId: prev && prev.kind === kind ? prev.lastMessageId : 0 } })
+        .values({
+          chatId: s.chatId,
+          title: s.title,
+          kind,
+          lastMessageId: prev && prev.kind === kind ? prev.lastMessageId : 0,
+        })
+        .onConflictDoUpdate({
+          target: sources.chatId,
+          set: {
+            title: s.title,
+            kind,
+            lastMessageId: prev && prev.kind === kind ? prev.lastMessageId : 0,
+          },
+        })
         .run();
     }
     void svc.indexer?.scanAll();
@@ -112,11 +134,17 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     avatar: z.string().min(1).max(24),
   });
-  app.get('/api/profiles', async () => ({ profiles: svc.db.select().from(profiles).orderBy(profiles.id).all() }));
+  app.get('/api/profiles', async () => ({
+    profiles: svc.db.select().from(profiles).orderBy(profiles.id).all(),
+  }));
   app.post('/api/profiles', async (req, reply) => {
     const body = profileBody.safeParse(req.body);
     if (!body.success) return badRequest(reply);
-    return svc.db.insert(profiles).values({ ...body.data, createdAt: Math.floor(Date.now() / 1000) }).returning().get();
+    return svc.db
+      .insert(profiles)
+      .values({ ...body.data, createdAt: Math.floor(Date.now() / 1000) })
+      .returning()
+      .get();
   });
   app.patch('/api/profiles/:id', async (req, reply) => {
     const body = profileBody.partial().safeParse(req.body);
@@ -126,9 +154,11 @@ export function coreRoutes(app: FastifyInstance, svc: Services): void {
   });
   app.delete('/api/profiles/:id', async (req, reply) => {
     const id = Number((req.params as { id: string }).id);
-    const count = (svc.db.$client.prepare('SELECT COUNT(*) n FROM profiles').get() as { n: number }).n;
+    const count = (svc.db.$client.prepare('SELECT COUNT(*) n FROM profiles').get() as { n: number })
+      .n;
     if (count <= 1) return badRequest(reply, 'Keep at least one profile');
-    for (const t of ['progress', 'my_list', 'likes', 'fav_channels']) svc.db.$client.prepare(`DELETE FROM ${t} WHERE profile_id = ?`).run(id);
+    for (const t of ['progress', 'my_list', 'likes', 'fav_channels'])
+      svc.db.$client.prepare(`DELETE FROM ${t} WHERE profile_id = ?`).run(id);
     svc.db.delete(profiles).where(eq(profiles.id, id)).run();
     return { ok: true };
   });

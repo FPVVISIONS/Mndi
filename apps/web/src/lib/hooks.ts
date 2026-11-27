@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 
 /** True on devices with a real pointer. Touch screens skip hover-only UI. */
 export function useCanHover(): boolean {
-  const [can, setCan] = useState(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  const [can, setCan] = useState(
+    () => window.matchMedia('(hover: hover) and (pointer: fine)').matches,
+  );
   useEffect(() => {
     const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
     const on = () => setCan(mq.matches);

@@ -63,7 +63,9 @@ export class MetadataService {
     const rows = this.db
       .select()
       .from(metaCache)
-      .where(and(eq(metaCache.kind, kind), eq(metaCache.lang, lang), inArray(metaCache.tmdbId, ids)))
+      .where(
+        and(eq(metaCache.kind, kind), eq(metaCache.lang, lang), inArray(metaCache.tmdbId, ids)),
+      )
       .all();
     for (const r of rows) out.set(r.tmdbId, JSON.parse(r.data) as LocalizedMeta);
     return out;
@@ -71,8 +73,19 @@ export class MetadataService {
 
   private store(kind: TitleKind, id: number, lang: string, meta: LocalizedMeta): void {
     const values = { kind, tmdbId: id, lang, data: JSON.stringify(meta), fetchedAt: Date.now() };
-    this.db.insert(metaCache).values(values).onConflictDoUpdate({ target: [metaCache.kind, metaCache.tmdbId, metaCache.lang], set: values }).run();
-    this.db.update(titles).set({ popularity: meta.popularity }).where(and(eq(titles.kind, kind), eq(titles.tmdbId, id))).run();
+    this.db
+      .insert(metaCache)
+      .values(values)
+      .onConflictDoUpdate({
+        target: [metaCache.kind, metaCache.tmdbId, metaCache.lang],
+        set: values,
+      })
+      .run();
+    this.db
+      .update(titles)
+      .set({ popularity: meta.popularity })
+      .where(and(eq(titles.kind, kind), eq(titles.tmdbId, id)))
+      .run();
   }
 
   /** Cached metadata, fetching it from the provider the first time a language is requested. */
@@ -104,14 +117,27 @@ export class MetadataService {
     const row = this.db
       .select()
       .from(seasonCache)
-      .where(and(eq(seasonCache.tmdbId, tmdbId), eq(seasonCache.season, season), eq(seasonCache.lang, lang)))
+      .where(
+        and(
+          eq(seasonCache.tmdbId, tmdbId),
+          eq(seasonCache.season, season),
+          eq(seasonCache.lang, lang),
+        ),
+      )
       .get();
     if (row) return JSON.parse(row.data) as RawSeason;
     if (!this.provider) return null;
     try {
       const data = await this.provider.season(tmdbId, season, languageInfo(lang).tmdb, lang);
       const values = { tmdbId, season, lang, data: JSON.stringify(data), fetchedAt: Date.now() };
-      this.db.insert(seasonCache).values(values).onConflictDoUpdate({ target: [seasonCache.tmdbId, seasonCache.season, seasonCache.lang], set: values }).run();
+      this.db
+        .insert(seasonCache)
+        .values(values)
+        .onConflictDoUpdate({
+          target: [seasonCache.tmdbId, seasonCache.season, seasonCache.lang],
+          set: values,
+        })
+        .run();
       return data;
     } catch {
       return null;
@@ -134,7 +160,10 @@ export class MetadataService {
     let hits = await this.search(row.kind, row.name, row.year || null);
     if (!hits.length && row.year) hits = await this.search(row.kind, row.name);
     const scored = hits
-      .map((h) => ({ h, s: scoreCandidate({ title: row.name, year: row.year || null }, h, titleKey) }))
+      .map((h) => ({
+        h,
+        s: scoreCandidate({ title: row.name, year: row.year || null }, h, titleKey),
+      }))
       .sort((a, b) => b.s - a.s);
     const best = scored[0];
     if (!best || best.s < MATCH_THRESHOLD) return titleId;
@@ -150,7 +179,11 @@ export class MetadataService {
       .from(titles)
       .where(and(eq(titles.kind, row.kind), eq(titles.tmdbId, tmdbId)))
       .get();
-    this.db.update(titles).set({ tmdbId, locked, updatedAt: Math.floor(Date.now() / 1000) }).where(eq(titles.id, titleId)).run();
+    this.db
+      .update(titles)
+      .set({ tmdbId, locked, updatedAt: Math.floor(Date.now() / 1000) })
+      .where(eq(titles.id, titleId))
+      .run();
     if (other && other.id !== titleId) {
       const keep = other.id < titleId ? other.id : titleId;
       const drop = keep === titleId ? other.id : titleId;
@@ -175,7 +208,8 @@ export class MetadataService {
         const queue = [...todo];
         await Promise.all(
           Array.from({ length: 3 }, async () => {
-            for (let r = queue.shift(); r; r = queue.shift()) await this.ensure(r.kind, r.tmdbId!, lang);
+            for (let r = queue.shift(); r; r = queue.shift())
+              await this.ensure(r.kind, r.tmdbId!, lang);
           }),
         );
       } finally {

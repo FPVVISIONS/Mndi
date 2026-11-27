@@ -29,7 +29,12 @@ export function Row({ title, children, action }: Props) {
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    drag.current = { active: true, moved: false, x: e.clientX, left: scroller.current?.scrollLeft ?? 0 };
+    drag.current = {
+      active: true,
+      moved: false,
+      x: e.clientX,
+      left: scroller.current?.scrollLeft ?? 0,
+    };
   };
   const onPointerMove = (e: React.PointerEvent) => {
     const d = drag.current;

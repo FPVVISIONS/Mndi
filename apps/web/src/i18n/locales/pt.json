@@ -325,7 +325,7 @@
     "chooseTitle": "Escolha o que indexar",
     "chooseBody": "Marque cada chat que você quer na biblioteca. Deixe o resto em Ignorar.",
     "filter": "Filtrar chats",
-    "members": "{{count}} membros",
+    "members": "{{count, number}} membros",
     "skip": "Ignorar",
     "chooseNone": "Escolha pelo menos um chat",
     "start": "Criar biblioteca",

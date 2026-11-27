@@ -18,7 +18,16 @@ interface Props {
 }
 
 /** Seek bar with buffer ranges, chapter gaps, a drag handle and a thumbnail preview on hover. */
-export function Scrubber({ time, duration, buffered, chapters, fileId, thumbs, onSeek, onScrub }: Props) {
+export function Scrubber({
+  time,
+  duration,
+  buffered,
+  chapters,
+  fileId,
+  thumbs,
+  onSeek,
+  onScrub,
+}: Props) {
   const { t } = useTranslation();
   const track = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<number | null>(null);
@@ -39,7 +48,8 @@ export function Scrubber({ time, duration, buffered, chapters, fileId, thumbs, o
   const shown = drag ?? time;
   const pct = duration > 0 ? (shown / duration) * 100 : 0;
   const preview = drag ?? hover;
-  const chapter = preview !== null ? chapters.find((c) => preview >= c.start && preview < c.end) : undefined;
+  const chapter =
+    preview !== null ? chapters.find((c) => preview >= c.start && preview < c.end) : undefined;
   const showThumb = thumbs && fileId !== null && thumbAt !== null && preview !== null;
 
   return (
@@ -72,14 +82,32 @@ export function Scrubber({ time, duration, buffered, chapters, fileId, thumbs, o
     >
       <div className="relative h-1 w-full rounded-full bg-white/25 transition-[height] duration-150 group-hover/scrub:h-[7px]">
         {buffered.map(([a, b], i) => (
-          <span key={i} className="absolute inset-y-0 rounded-full bg-white/30" style={{ insetInlineStart: `${(a / duration) * 100}%`, width: `${((b - a) / duration) * 100}%` }} />
-        ))}
-        <span className="absolute inset-y-0 start-0 origin-left rounded-full bg-accent transition-transform duration-200 ease-linear [[dir=rtl]_&]:origin-right" style={{ width: '100%', transform: `scaleX(${pct / 100})` }} />
-        {chapters.slice(1).map((c) => (
-          <span key={c.start} className="absolute inset-y-0 w-[2px] bg-bg/80" style={{ insetInlineStart: `${(c.start / duration) * 100}%` }} aria-hidden />
+          <span
+            key={i}
+            className="absolute inset-y-0 rounded-full bg-white/30"
+            style={{
+              insetInlineStart: `${(a / duration) * 100}%`,
+              width: `${((b - a) / duration) * 100}%`,
+            }}
+          />
         ))}
         <span
-          className={cn('absolute top-1/2 size-3.5 -translate-y-1/2 rounded-full bg-accent shadow transition-transform duration-150', drag !== null ? 'scale-125' : 'scale-0 group-hover/scrub:scale-100')}
+          className="absolute inset-y-0 start-0 origin-left rounded-full bg-accent transition-transform duration-200 ease-linear [[dir=rtl]_&]:origin-right"
+          style={{ width: '100%', transform: `scaleX(${pct / 100})` }}
+        />
+        {chapters.slice(1).map((c) => (
+          <span
+            key={c.start}
+            className="absolute inset-y-0 w-[2px] bg-bg/80"
+            style={{ insetInlineStart: `${(c.start / duration) * 100}%` }}
+            aria-hidden
+          />
+        ))}
+        <span
+          className={cn(
+            'absolute top-1/2 size-3.5 -translate-y-1/2 rounded-full bg-accent shadow transition-transform duration-150',
+            drag !== null ? 'scale-125' : 'scale-0 group-hover/scrub:scale-100',
+          )}
           style={{ insetInlineStart: `calc(${pct}% - 7px)` }}
         />
       </div>
@@ -87,7 +115,9 @@ export function Scrubber({ time, duration, buffered, chapters, fileId, thumbs, o
       {preview !== null && (
         <div
           className="pointer-events-none absolute bottom-7 z-10 -translate-x-1/2 text-center [[dir=rtl]_&]:translate-x-1/2"
-          style={{ insetInlineStart: `clamp(5.5rem, ${(preview / duration) * 100}%, calc(100% - 5.5rem))` }}
+          style={{
+            insetInlineStart: `clamp(5.5rem, ${(preview / duration) * 100}%, calc(100% - 5.5rem))`,
+          }}
         >
           {showThumb && (
             <div className="relative mb-1.5 aspect-video w-44 overflow-hidden rounded-md border border-white/20 bg-surface-3 shadow-[var(--shadow-pop)]">
@@ -97,12 +127,19 @@ export function Scrubber({ time, duration, buffered, chapters, fileId, thumbs, o
                 alt=""
                 onLoad={() => setThumbReady(true)}
                 onError={() => setThumbReady(false)}
-                className={cn('size-full object-cover transition-opacity duration-150', thumbReady ? 'opacity-100' : 'opacity-0')}
+                className={cn(
+                  'size-full object-cover transition-opacity duration-150',
+                  thumbReady ? 'opacity-100' : 'opacity-0',
+                )}
               />
             </div>
           )}
-          {chapter?.title && <div className="mb-0.5 max-w-44 truncate text-caption text-fg-dim">{chapter.title}</div>}
-          <span className="rounded bg-black/70 px-2 py-0.5 text-small font-semibold tabular-nums">{formatDuration(preview)}</span>
+          {chapter?.title && (
+            <div className="mb-0.5 max-w-44 truncate text-caption text-fg-dim">{chapter.title}</div>
+          )}
+          <span className="rounded bg-black/70 px-2 py-0.5 text-small font-semibold tabular-nums">
+            {formatDuration(preview)}
+          </span>
         </div>
       )}
     </div>

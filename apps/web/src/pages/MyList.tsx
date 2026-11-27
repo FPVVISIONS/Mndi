@@ -15,7 +15,9 @@ export default function MyList() {
       <h1 className="mb-8 font-display text-title-l">{t('myList.title')}</h1>
       {isPending ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-4">
-          {Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="aspect-[2/3]" />)}
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} className="aspect-[2/3]" />
+          ))}
         </div>
       ) : data && data.items.length ? (
         <LayoutGroup>
@@ -28,7 +30,11 @@ export default function MyList() {
           </ul>
         </LayoutGroup>
       ) : (
-        <EmptyState icon={<Plus size={26} />} title={t('myList.emptyTitle')} body={t('myList.emptyBody')} />
+        <EmptyState
+          icon={<Plus size={26} />}
+          title={t('myList.emptyTitle')}
+          body={t('myList.emptyBody')}
+        />
       )}
     </div>
   );

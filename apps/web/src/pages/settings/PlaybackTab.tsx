@@ -15,16 +15,34 @@ export function PlaybackTab() {
   return (
     <Section>
       <Row title={t('settings.quality')} hint={t('settings.qualityHint')}>
-        <Segmented size="sm" label={t('settings.quality')} value={quality} options={options} onChange={(v) => set('quality', v)} />
+        <Segmented
+          size="sm"
+          label={t('settings.quality')}
+          value={quality}
+          options={options}
+          onChange={(v) => set('quality', v)}
+        />
       </Row>
       <Row title={t('settings.autoplayNext')} hint={t('settings.autoplayNextHint')}>
-        <Switch label={t('settings.autoplayNext')} checked={autoplayNext} onChange={(v) => set('autoplayNext', v)} />
+        <Switch
+          label={t('settings.autoplayNext')}
+          checked={autoplayNext}
+          onChange={(v) => set('autoplayNext', v)}
+        />
       </Row>
       <Row title={t('settings.skipIntro')} hint={t('settings.skipIntroHint')}>
-        <Switch label={t('settings.skipIntro')} checked={skipIntro} onChange={(v) => set('skipIntro', v)} />
+        <Switch
+          label={t('settings.skipIntro')}
+          checked={skipIntro}
+          onChange={(v) => set('skipIntro', v)}
+        />
       </Row>
       <Row title={t('settings.heroPreview')} hint={t('settings.heroPreviewHint')}>
-        <Switch label={t('settings.heroPreview')} checked={heroPreview} onChange={(v) => set('heroPreview', v)} />
+        <Switch
+          label={t('settings.heroPreview')}
+          checked={heroPreview}
+          onChange={(v) => set('heroPreview', v)}
+        />
       </Row>
     </Section>
   );

@@ -6,7 +6,13 @@ import { z } from 'zod';
 import { schema } from '../db/client.js';
 import { createLimiter } from '../lib/async.js';
 import { renderArt } from '../mock/art.js';
-import { canCopyVideo, extractSubtitle, extractThumb, ffmpegAvailable, spawnRemux } from '../stream/ffmpeg.js';
+import {
+  canCopyVideo,
+  extractSubtitle,
+  extractThumb,
+  ffmpegAvailable,
+  spawnRemux,
+} from '../stream/ffmpeg.js';
 import { buildPlayback, inputFor, probeFile } from '../stream/playback.js';
 import { serveRange } from '../stream/range.js';
 import { LocalFileSource } from '../stream/sources.js';
@@ -23,17 +29,28 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
 
   app.get('/api/playback/:id', async (req, reply) => {
     const q = z
-      .object({ audio: z.coerce.number().int().min(0).default(0), hevc: z.coerce.boolean().default(false), transcode: z.coerce.boolean().default(false) })
+      .object({
+        audio: z.coerce.number().int().min(0).default(0),
+        hevc: z.coerce.boolean().default(false),
+        transcode: z.coerce.boolean().default(false),
+      })
       .parse(req.query);
     const info = await buildPlayback(svc, fileId(req), ctxOf(req, svc), q);
     return info ?? notFound(reply);
   });
 
   app.get('/api/stream/:id', async (req, reply) => {
-    const file = svc.db.select().from(files).where(eq(files.id, fileId(req))).get();
+    const file = svc.db
+      .select()
+      .from(files)
+      .where(eq(files.id, fileId(req)))
+      .get();
     if (!file) return notFound(reply);
     const source = await svc.tg.byteSource(file);
-    if (!source) return reply.code(503).send({ error: 'unavailable', message: 'Telegram is not connected right now.' });
+    if (!source)
+      return reply
+        .code(503)
+        .send({ error: 'unavailable', message: 'Telegram is not connected right now.' });
     return serveRange(req, reply, source, { filename: file.name });
   });
 
@@ -48,12 +65,22 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
       .parse(req.query);
     const id = fileId(req);
     if (!svc.db.select().from(files).where(eq(files.id, id)).get()) return notFound(reply);
-    if (!(await ffmpegAvailable())) return reply.code(501).send({ error: 'no_ffmpeg', message: 'ffmpeg is not installed on the server.' });
+    if (!(await ffmpegAvailable()))
+      return reply
+        .code(501)
+        .send({ error: 'no_ffmpeg', message: 'ffmpeg is not installed on the server.' });
     const info = await probeFile(svc, id);
-    const copyVideo = q.mode === 'remux' && (info ? canCopyVideo(info.video?.codec ?? null, q.hevc) : true);
+    const copyVideo =
+      q.mode === 'remux' && (info ? canCopyVideo(info.video?.codec ?? null, q.hevc) : true);
     const audioCodec = info?.audio[q.audio]?.codec;
     const copyAudio = Boolean(audioCodec && ['aac', 'mp3', 'opus'].includes(audioCodec));
-    const child = spawnRemux({ input: inputFor(svc, id), start: q.start, audioIndex: q.audio, copyVideo, copyAudio });
+    const child = spawnRemux({
+      input: inputFor(svc, id),
+      start: q.start,
+      audioIndex: q.audio,
+      copyVideo,
+      copyAudio,
+    });
     req.raw.on('close', () => child.kill('SIGKILL'));
     reply.header('Content-Type', 'video/mp4').header('Cache-Control', 'no-store');
     return reply.send(child.stdout);
@@ -69,7 +96,10 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
       const ok = await ffLimit(() => extractThumb(inputFor(svc, id), bucket, out));
       if (!ok) return reply.code(404).send();
     }
-    return reply.header('Cache-Control', 'public, max-age=86400').type('image/jpeg').send(createReadStream(out));
+    return reply
+      .header('Cache-Control', 'public, max-age=86400')
+      .type('image/jpeg')
+      .send(createReadStream(out));
   });
 
   app.get('/api/stream/:id/subs/:n', async (req, reply) => {
@@ -80,7 +110,10 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
       const ok = await ffLimit(() => extractSubtitle(inputFor(svc, Number(id)), idx, out));
       if (!ok) return reply.code(404).send();
     }
-    return reply.header('Cache-Control', 'public, max-age=86400').type('text/vtt; charset=utf-8').send(createReadStream(out));
+    return reply
+      .header('Cache-Control', 'public, max-age=86400')
+      .type('text/vtt; charset=utf-8')
+      .send(createReadStream(out));
   });
 
   // ---- Images ----------------------------------------------------------------------------
@@ -95,7 +128,9 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
     }
     const file = await svc.images.get(size, `/${path}`);
     if (!file) return reply.header('Cache-Control', 'no-store').code(404).send();
-    return reply.type(path.endsWith('.png') ? 'image/png' : 'image/jpeg').send(createReadStream(file));
+    return reply
+      .type(path.endsWith('.png') ? 'image/png' : 'image/jpeg')
+      .send(createReadStream(file));
   });
 
   // ---- Demo assets -----------------------------------------------------------------------
@@ -108,14 +143,21 @@ export function streamRoutes(app: FastifyInstance, svc: Services): void {
     });
     app.get('/api/mock/logo/:name', async (req, reply) => {
       const tvg = (req.params as { name: string }).name.replace(/\.svg$/, '');
-      const letters = tvg.split('.').map((p) => p[0]!.toUpperCase()).join('').slice(0, 2);
+      const letters = tvg
+        .split('.')
+        .map((p) => p[0]!.toUpperCase())
+        .join('')
+        .slice(0, 2);
       let h = 0;
       for (const c of tvg) h = (h * 33 + c.charCodeAt(0)) >>> 0;
       const fills = ['#1d4a5a', '#7a2e1b', '#214c3d', '#3f5f8a', '#5a4638', '#37627f'];
       const fill = fills[h % fills.length]!;
-      return reply.type('image/svg+xml').header('Cache-Control', 'public, max-age=86400').send(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="14" fill="${fill}"/><text x="60" y="76" font-size="46" text-anchor="middle" fill="#F2F0EC" font-family="Georgia, serif">${letters}</text></svg>`,
-      );
+      return reply
+        .type('image/svg+xml')
+        .header('Cache-Control', 'public, max-age=86400')
+        .send(
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="14" fill="${fill}"/><text x="60" y="76" font-size="46" text-anchor="middle" fill="#F2F0EC" font-family="Georgia, serif">${letters}</text></svg>`,
+        );
     });
   }
 }

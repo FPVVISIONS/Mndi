@@ -19,7 +19,11 @@ export class LocalFileSource implements ByteSource {
 }
 
 /** Downloads `count` aligned chunks starting at `index`, yielding each as it arrives. */
-export type ChunkFetcher = (index: number, count: number, signal: AbortSignal) => AsyncIterable<Buffer>;
+export type ChunkFetcher = (
+  index: number,
+  count: number,
+  signal: AbortSignal,
+) => AsyncIterable<Buffer>;
 
 export const CHUNK_SIZE = 512 * 1024;
 const RUN = 8;

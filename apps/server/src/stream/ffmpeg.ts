@@ -28,13 +28,40 @@ export async function ffmpegAvailable(): Promise<boolean> {
 }
 
 const LANG_NAMES: Record<string, string> = {
-  eng: 'English', heb: 'Hebrew', ara: 'Arabic', spa: 'Spanish', fra: 'French', fre: 'French',
-  deu: 'German', ger: 'German', rus: 'Russian', por: 'Portuguese', tur: 'Turkish', ita: 'Italian',
-  jpn: 'Japanese', kor: 'Korean', zho: 'Chinese', hin: 'Hindi',
+  eng: 'English',
+  heb: 'Hebrew',
+  ara: 'Arabic',
+  spa: 'Spanish',
+  fra: 'French',
+  fre: 'French',
+  deu: 'German',
+  ger: 'German',
+  rus: 'Russian',
+  por: 'Portuguese',
+  tur: 'Turkish',
+  ita: 'Italian',
+  jpn: 'Japanese',
+  kor: 'Korean',
+  zho: 'Chinese',
+  hin: 'Hindi',
 };
 const TWO_LETTER: Record<string, string> = {
-  eng: 'en', heb: 'he', ara: 'ar', spa: 'es', fra: 'fr', fre: 'fr', deu: 'de', ger: 'de',
-  rus: 'ru', por: 'pt', tur: 'tr', ita: 'it', jpn: 'ja', kor: 'ko', zho: 'zh', hin: 'hi',
+  eng: 'en',
+  heb: 'he',
+  ara: 'ar',
+  spa: 'es',
+  fra: 'fr',
+  fre: 'fr',
+  deu: 'de',
+  ger: 'de',
+  rus: 'ru',
+  por: 'pt',
+  tur: 'tr',
+  ita: 'it',
+  jpn: 'ja',
+  kor: 'ko',
+  zho: 'zh',
+  hin: 'hi',
 };
 
 const TEXT_SUBS = new Set(['subrip', 'srt', 'ass', 'ssa', 'webvtt', 'mov_text', 'text']);
@@ -89,7 +116,12 @@ export function interpretProbe(json: {
     }));
   const chapters = (json.chapters ?? []).map<Chapter>((c) => {
     const title = c.tags?.title ?? '';
-    return { start: Number(c.start_time), end: Number(c.end_time), title, kind: chapterKind(title) };
+    return {
+      start: Number(c.start_time),
+      end: Number(c.end_time),
+      title,
+      kind: chapterKind(title),
+    };
   });
   return {
     duration: Number(json.format?.duration) || 0,
@@ -106,7 +138,16 @@ export async function probe(input: string): Promise<ProbeInfo | null> {
   try {
     const { stdout } = await execFileAsync(
       'ffprobe',
-      ['-v', 'error', '-print_format', 'json', '-show_format', '-show_streams', '-show_chapters', input],
+      [
+        '-v',
+        'error',
+        '-print_format',
+        'json',
+        '-show_format',
+        '-show_streams',
+        '-show_chapters',
+        input,
+      ],
       { maxBuffer: 16 * 1024 * 1024, timeout: 60_000 },
     );
     return interpretProbe(JSON.parse(stdout));
@@ -160,17 +201,59 @@ export function spawnRemux(o: RemuxOptions): ChildProcess {
   if (o.start > 0) args.push('-ss', String(o.start));
   args.push('-i', o.input, '-map', '0:v:0?', '-map', `0:a:${o.audioIndex}?`, '-sn', '-dn');
   if (o.copyVideo) args.push('-c:v', 'copy');
-  else args.push('-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p', '-vf', "scale='min(1920,iw)':-2");
+  else
+    args.push(
+      '-c:v',
+      'libx264',
+      '-preset',
+      'veryfast',
+      '-crf',
+      '23',
+      '-pix_fmt',
+      'yuv420p',
+      '-vf',
+      "scale='min(1920,iw)':-2",
+    );
   if (o.copyAudio) args.push('-c:a', 'copy');
   else args.push('-c:a', 'aac', '-b:a', '192k', '-ac', '2');
-  args.push('-avoid_negative_ts', 'make_zero', '-movflags', 'frag_keyframe+empty_moov+default_base_moof', '-f', 'mp4', 'pipe:1');
+  args.push(
+    '-avoid_negative_ts',
+    'make_zero',
+    '-movflags',
+    'frag_keyframe+empty_moov+default_base_moof',
+    '-f',
+    'mp4',
+    'pipe:1',
+  );
   return spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'ignore'] });
 }
 
 export function spawnLiveRemux(input: string): ChildProcess {
   return spawn(
     'ffmpeg',
-    ['-hide_banner', '-loglevel', 'error', '-nostdin', '-i', input, '-map', '0:v:0?', '-map', '0:a:0?', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-movflags', 'frag_keyframe+empty_moov+default_base_moof', '-f', 'mp4', 'pipe:1'],
+    [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-nostdin',
+      '-i',
+      input,
+      '-map',
+      '0:v:0?',
+      '-map',
+      '0:a:0?',
+      '-c:v',
+      'copy',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '160k',
+      '-movflags',
+      'frag_keyframe+empty_moov+default_base_moof',
+      '-f',
+      'mp4',
+      'pipe:1',
+    ],
     { stdio: ['ignore', 'pipe', 'ignore'] },
   );
 }
@@ -179,7 +262,23 @@ export async function extractThumb(input: string, at: number, out: string): Prom
   try {
     await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-loglevel', 'error', '-y', '-ss', String(at), '-i', input, '-frames:v', '1', '-vf', 'scale=320:-2', '-q:v', '5', out],
+      [
+        '-hide_banner',
+        '-loglevel',
+        'error',
+        '-y',
+        '-ss',
+        String(at),
+        '-i',
+        input,
+        '-frames:v',
+        '1',
+        '-vf',
+        'scale=320:-2',
+        '-q:v',
+        '5',
+        out,
+      ],
       { timeout: 30_000 },
     );
     return true;
@@ -192,7 +291,19 @@ export async function extractSubtitle(input: string, index: number, out: string)
   try {
     await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-loglevel', 'error', '-y', '-i', input, '-map', `0:s:${index}`, '-f', 'webvtt', out],
+      [
+        '-hide_banner',
+        '-loglevel',
+        'error',
+        '-y',
+        '-i',
+        input,
+        '-map',
+        `0:s:${index}`,
+        '-f',
+        'webvtt',
+        out,
+      ],
       { timeout: 10 * 60_000 },
     );
     return true;

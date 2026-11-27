@@ -18,10 +18,21 @@ interface Props<T extends string> {
 }
 
 /** A row of options with a pill that slides to the selected one. */
-export function Segmented<T extends string>({ options, value, onChange, label, size = 'md', className }: Props<T>) {
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+  size = 'md',
+  className,
+}: Props<T>) {
   const id = useId();
   return (
-    <div role="radiogroup" aria-label={label} className={cn('inline-flex rounded-full bg-surface-2 p-1', className)}>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className={cn('inline-flex rounded-full bg-surface-2 p-1', className)}
+    >
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -38,7 +49,11 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
             )}
           >
             {on && (
-              <motion.span layoutId={`seg-${id}`} transition={spring.snappy} className="absolute inset-0 rounded-full bg-fg" />
+              <motion.span
+                layoutId={`seg-${id}`}
+                transition={spring.snappy}
+                className="absolute inset-0 rounded-full bg-fg"
+              />
             )}
             <span className={cn('relative', on && 'text-bg')}>{o.label}</span>
           </button>
@@ -49,10 +64,20 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
 }
 
 /** Filter pills for categories and genres: same slide, quieter look. */
-export function PillTabs<T extends string>({ options, value, onChange, label, className }: Props<T>) {
+export function PillTabs<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+  className,
+}: Props<T>) {
   const id = useId();
   return (
-    <div role="tablist" aria-label={label} className={cn('no-scrollbar flex gap-2 overflow-x-auto py-1', className)}>
+    <div
+      role="tablist"
+      aria-label={label}
+      className={cn('no-scrollbar flex gap-2 overflow-x-auto py-1', className)}
+    >
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -64,10 +89,18 @@ export function PillTabs<T extends string>({ options, value, onChange, label, cl
             onClick={() => onChange(o.value)}
             className={cn(
               'relative shrink-0 rounded-full border px-4 py-1.5 text-small font-semibold transition-colors duration-150',
-              on ? 'border-transparent text-bg' : 'border-line text-fg-dim hover:border-line-strong hover:text-fg',
+              on
+                ? 'border-transparent text-bg'
+                : 'border-line text-fg-dim hover:border-line-strong hover:text-fg',
             )}
           >
-            {on && <motion.span layoutId={`pill-${id}`} transition={spring.snappy} className="absolute inset-0 rounded-full bg-fg" />}
+            {on && (
+              <motion.span
+                layoutId={`pill-${id}`}
+                transition={spring.snappy}
+                className="absolute inset-0 rounded-full bg-fg"
+              />
+            )}
             <span className="relative">{o.label}</span>
           </button>
         );

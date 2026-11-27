@@ -12,7 +12,17 @@ export function watchPath(card: Pick<TitleCard, 'id' | 'progress'>): string {
   return card.progress ? `/watch/${card.progress.fileId}` : `/watch/title/${card.id}`;
 }
 
-function Round({ label, onClick, children, solid }: { label: string; onClick: () => void; children: React.ReactNode; solid?: boolean }) {
+function Round({
+  label,
+  onClick,
+  children,
+  solid,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  solid?: boolean;
+}) {
   return (
     <motion.button
       type="button"
@@ -27,7 +37,9 @@ function Round({ label, onClick, children, solid }: { label: string; onClick: ()
       }}
       className={cn(
         'grid size-9 place-items-center rounded-full border transition-colors duration-150',
-        solid ? 'border-transparent bg-fg text-bg hover:bg-white' : 'border-white/40 bg-black/40 text-fg hover:border-fg',
+        solid
+          ? 'border-transparent bg-fg text-bg hover:bg-white'
+          : 'border-white/40 bg-black/40 text-fg hover:border-fg',
       )}
     >
       {children}
@@ -45,7 +57,11 @@ export function QuickActions({ card, className }: { card: TitleCard; className?:
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Round solid label={t('card.play', { title: card.title })} onClick={() => navigate(watchPath(card))}>
+      <Round
+        solid
+        label={t('card.play', { title: card.title })}
+        onClick={() => navigate(watchPath(card))}
+      >
         <Play size={16} className="fill-current" />
       </Round>
       <Round
@@ -55,12 +71,27 @@ export function QuickActions({ card, className }: { card: TitleCard; className?:
           push(card.inList ? t('toast.removed') : t('toast.added'));
         }}
       >
-        <motion.span key={String(card.inList)} initial={{ scale: 0.4, rotate: -60, opacity: 0 }} animate={{ scale: 1, rotate: 0, opacity: 1 }} transition={spring.snappy} className="grid">
+        <motion.span
+          key={String(card.inList)}
+          initial={{ scale: 0.4, rotate: -60, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={spring.snappy}
+          className="grid"
+        >
           {card.inList ? <Check size={17} /> : <Plus size={17} />}
         </motion.span>
       </Round>
-      <Round label={card.liked ? t('common.liked') : t('common.like')} onClick={() => toggleLike.mutate({ id: card.id, on: !card.liked })}>
-        <motion.span key={String(card.liked)} initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={spring.snappy} className="grid">
+      <Round
+        label={card.liked ? t('common.liked') : t('common.like')}
+        onClick={() => toggleLike.mutate({ id: card.id, on: !card.liked })}
+      >
+        <motion.span
+          key={String(card.liked)}
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          transition={spring.snappy}
+          className="grid"
+        >
           <ThumbsUp size={15} className={card.liked ? 'fill-fg' : ''} />
         </motion.span>
       </Round>

@@ -4,7 +4,13 @@ import { lookup } from 'node:dns/promises';
 import { eq } from 'drizzle-orm';
 import type { Db } from '../db/client.js';
 import { schema } from '../db/client.js';
-import { extractStreamLinks, isHlsStream, nameFromUrl, parseM3U, type ParsedChannel } from '../parser/m3u.js';
+import {
+  extractStreamLinks,
+  isHlsStream,
+  nameFromUrl,
+  parseM3U,
+  type ParsedChannel,
+} from '../parser/m3u.js';
 import { fetchXmltv, parseXmltv } from './epg.js';
 import { replaceEpg } from './channels.js';
 
@@ -55,10 +61,24 @@ export class LiveService {
       const key = createHash('sha1').update(c.url).digest('hex');
       const res = this.db
         .insert(channels)
-        .values({ sourceId, key, name: c.name.slice(0, 120), logo: c.logo, grp: c.group.slice(0, 80), url: c.url, tvgId: c.tvgId, addedAt: now })
+        .values({
+          sourceId,
+          key,
+          name: c.name.slice(0, 120),
+          logo: c.logo,
+          grp: c.group.slice(0, 80),
+          url: c.url,
+          tvgId: c.tvgId,
+          addedAt: now,
+        })
         .onConflictDoUpdate({
           target: channels.key,
-          set: { name: c.name.slice(0, 120), logo: c.logo, grp: c.group.slice(0, 80), tvgId: c.tvgId },
+          set: {
+            name: c.name.slice(0, 120),
+            logo: c.logo,
+            grp: c.group.slice(0, 80),
+            tvgId: c.tvgId,
+          },
         })
         .run();
       added += res.changes;
@@ -80,17 +100,21 @@ export class LiveService {
         await assertPublicEnough(new URL(url));
         const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
         const text = (await res.text()).slice(0, 5 * 1024 * 1024);
-        if (res.ok && text.includes('#EXTM3U') && !isHlsStream(text)) return this.ingestPlaylist(sourceId, text);
+        if (res.ok && text.includes('#EXTM3U') && !isHlsStream(text))
+          return this.ingestPlaylist(sourceId, text);
       } catch {
         // Unreachable right now: keep it as a single channel and let playback report the problem.
       }
     }
-    return this.upsert(sourceId, [{ name: nameHint || nameFromUrl(url), url, logo: null, group: '', tvgId: null }]);
+    return this.upsert(sourceId, [
+      { name: nameHint || nameFromUrl(url), url, logo: null, group: '', tvgId: null },
+    ]);
   }
 
   async ingestMessageText(sourceId: string, text: string): Promise<number> {
     let n = 0;
-    for (const link of extractStreamLinks(text)) n += await this.ingestLink(sourceId, link.url, link.name);
+    for (const link of extractStreamLinks(text))
+      n += await this.ingestLink(sourceId, link.url, link.name);
     return n;
   }
 

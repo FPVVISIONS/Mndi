@@ -40,12 +40,16 @@ export function resolveMeta(
   english: RawDetails | null,
   lang: string,
 ): LocalizedMeta {
-  const pick = <T,>(a: T | undefined | null, b: T | undefined | null): T | undefined => {
-    const empty = (v: unknown) => v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length);
+  const pick = <T>(a: T | undefined | null, b: T | undefined | null): T | undefined => {
+    const empty = (v: unknown) =>
+      v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length);
     return !empty(a) ? (a as T) : !empty(b) ? (b as T) : undefined;
   };
 
-  const title = pick(kind === 'movie' ? raw.title : raw.name, kind === 'movie' ? english?.title : english?.name);
+  const title = pick(
+    kind === 'movie' ? raw.title : raw.name,
+    kind === 'movie' ? english?.title : english?.name,
+  );
   const originalTitle = (kind === 'movie' ? raw.original_title : raw.original_name) ?? title ?? '';
   const images = raw.images ?? english?.images;
   const date = kind === 'movie' ? raw.release_date : raw.first_air_date;

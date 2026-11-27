@@ -18,7 +18,10 @@ export interface ByteRange {
  * Returns null when there is no usable header (serve the whole body) and 'unsatisfiable' for a 416.
  * Only the first range of a multi-range request is honoured.
  */
-export function parseRange(header: string | undefined, size: number): ByteRange | 'unsatisfiable' | null {
+export function parseRange(
+  header: string | undefined,
+  size: number,
+): ByteRange | 'unsatisfiable' | null {
   if (!header) return null;
   const m = /^bytes=\s*(\d*)\s*-\s*(\d*)\s*(?:,.*)?$/.exec(header.trim());
   if (!m) return null;
@@ -55,7 +58,10 @@ export async function serveRange(
   reply.header('Content-Type', source.mime);
   reply.header('Cache-Control', opts.cacheControl ?? 'private, max-age=3600');
   if (opts.filename) {
-    reply.header('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(opts.filename)}`);
+    reply.header(
+      'Content-Disposition',
+      `inline; filename*=UTF-8''${encodeURIComponent(opts.filename)}`,
+    );
   }
 
   if (range === 'unsatisfiable') {

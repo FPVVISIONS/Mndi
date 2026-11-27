@@ -28,7 +28,9 @@ export function MatchModal({ open, onClose, titleId, fileName, matched }: Props)
   const push = useToasts((s) => s.push);
   const [q, setQ] = useState(fileName);
   const debounced = useDebounced(q, 300);
-  useEffect(() => { if (open) setQ(fileName); }, [open, fileName]);
+  useEffect(() => {
+    if (open) setQ(fileName);
+  }, [open, fileName]);
 
   const { data, isFetching } = useQuery({
     queryKey: ['matches', titleId, debounced],
@@ -50,7 +52,10 @@ export function MatchModal({ open, onClose, titleId, fileName, matched }: Props)
     <Modal open={open} onClose={onClose} title={t('detail.matchTitle')} className="max-w-xl">
       <p className="-mt-2 mb-4 text-small text-fg-dim">{t('detail.matchHint')}</p>
       <label className="relative block">
-        <Search size={17} className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-fg-faint" />
+        <Search
+          size={17}
+          className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-fg-faint"
+        />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -60,23 +65,40 @@ export function MatchModal({ open, onClose, titleId, fileName, matched }: Props)
         />
       </label>
       <ul className="mt-4 max-h-[22rem] space-y-1.5 overflow-y-auto pe-1">
-        {isFetching && !data && Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-24" />)}
+        {isFetching &&
+          !data &&
+          Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-24" />)}
         {data?.matches.map((m) => (
           <li key={m.tmdbId}>
-            <button type="button" onClick={() => apply.mutate(m.tmdbId)} className="flex w-full gap-3 rounded-lg border border-transparent p-2 text-start transition-colors hover:border-line-strong hover:bg-surface-2">
-              <ArtImage image={m.poster} size="w154" className="aspect-[2/3] w-14 shrink-0 rounded-sm" />
+            <button
+              type="button"
+              onClick={() => apply.mutate(m.tmdbId)}
+              className="flex w-full gap-3 rounded-lg border border-transparent p-2 text-start transition-colors hover:border-line-strong hover:bg-surface-2"
+            >
+              <ArtImage
+                image={m.poster}
+                size="w154"
+                className="aspect-[2/3] w-14 shrink-0 rounded-sm"
+              />
               <span className="min-w-0">
-                <span className="block font-semibold">{m.title}{m.year ? <span className="ms-2 font-normal text-fg-dim">{m.year}</span> : null}</span>
+                <span className="block font-semibold">
+                  {m.title}
+                  {m.year ? <span className="ms-2 font-normal text-fg-dim">{m.year}</span> : null}
+                </span>
                 <span className="mt-1 line-clamp-2 text-small text-fg-dim">{m.overview}</span>
               </span>
             </button>
           </li>
         ))}
-        {data && data.matches.length === 0 && <li className="py-8 text-center text-fg-dim">{t('detail.noMatches')}</li>}
+        {data && data.matches.length === 0 && (
+          <li className="py-8 text-center text-fg-dim">{t('detail.noMatches')}</li>
+        )}
       </ul>
       {matched && (
         <div className="mt-4 border-t border-line pt-4">
-          <Button variant="ghost" size="sm" onClick={() => apply.mutate(null)}>{t('detail.unlink')}</Button>
+          <Button variant="ghost" size="sm" onClick={() => apply.mutate(null)}>
+            {t('detail.unlink')}
+          </Button>
         </div>
       )}
     </Modal>

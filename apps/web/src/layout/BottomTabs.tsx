@@ -24,10 +24,25 @@ export function BottomTabs() {
       <ul className="grid h-[var(--tab-h)] grid-cols-5">
         {TABS.map(({ to, key, icon: Icon, ...rest }) => (
           <li key={to}>
-            <NavLink to={to} end={'end' in rest} className="relative grid h-full place-items-center">
+            <NavLink
+              to={to}
+              end={'end' in rest}
+              className="relative grid h-full place-items-center"
+            >
               {({ isActive }) => (
-                <span className={cn('flex flex-col items-center gap-1 text-caption font-medium transition-colors', isActive ? 'text-fg' : 'text-fg-faint')}>
-                  {isActive && <motion.span layoutId="tab-dot" transition={spring.snappy} className="absolute top-0 h-0.5 w-8 rounded-full bg-accent" />}
+                <span
+                  className={cn(
+                    'flex flex-col items-center gap-1 text-caption font-medium transition-colors',
+                    isActive ? 'text-fg' : 'text-fg-faint',
+                  )}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="tab-dot"
+                      transition={spring.snappy}
+                      className="absolute top-0 h-0.5 w-8 rounded-full bg-accent"
+                    />
+                  )}
                   <Icon size={21} strokeWidth={isActive ? 2.2 : 1.8} />
                   {t(`nav.${key}`)}
                 </span>

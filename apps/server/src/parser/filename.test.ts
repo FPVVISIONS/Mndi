@@ -16,7 +16,12 @@ describe('parseFileName: movies', () => {
 
   it('parses spaces and parentheses', () => {
     const p = parseFileName('Glass Orchard (2021) 2160p WEB-DL HEVC.mp4');
-    expect(p).toMatchObject({ title: 'Glass Orchard', year: 2021, quality: '2160p', codec: 'hevc' });
+    expect(p).toMatchObject({
+      title: 'Glass Orchard',
+      year: 2021,
+      quality: '2160p',
+      codec: 'hevc',
+    });
   });
 
   it('treats a leading year as part of the title', () => {

@@ -10,5 +10,6 @@ export async function setLanguage(code: LanguageCode, announce = true): Promise<
   await switchI18n(code);
   usePrefs.getState().set('language', code);
   void api.prefetch(code).catch(() => undefined);
-  if (announce) useToasts.getState().push(i18n.t('toast.language', { name: languageInfo(code).native }));
+  if (announce)
+    useToasts.getState().push(i18n.t('toast.language', { name: languageInfo(code).native }));
 }

@@ -18,7 +18,12 @@ function parseXmltvTime(s: string): number {
 }
 
 const decode = (s: string) =>
-  s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;|&#39;/g, "'");
+  s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;|&#39;/g, "'");
 
 /**
  * Minimal XMLTV reader. It keeps only programmes for wanted channel ids inside the window,
@@ -38,7 +43,8 @@ export function parseXmltv(
     if (!channel || !wanted.has(channel)) continue;
     const start = parseXmltvTime(/start="([^"]*)"/.exec(attrs)?.[1] ?? '');
     const stop = parseXmltvTime(/stop="([^"]*)"/.exec(attrs)?.[1] ?? '');
-    if (!Number.isFinite(start) || !Number.isFinite(stop) || stop < fromSec || start > toSec) continue;
+    if (!Number.isFinite(start) || !Number.isFinite(stop) || stop < fromSec || start > toSec)
+      continue;
     const title = /<title[^>]*>([\s\S]*?)<\/title>/.exec(m[2] ?? '')?.[1];
     if (title) out.push({ channel, start, stop, title: decode(title.trim()) });
   }

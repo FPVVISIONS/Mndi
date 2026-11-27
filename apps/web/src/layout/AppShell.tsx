@@ -15,7 +15,12 @@ function SkipLabel() {
 export function PageTransition({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   return (
-    <motion.div key={pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={tokens.base}>
+    <motion.div
+      key={pathname}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={tokens.base}
+    >
       {children}
     </motion.div>
   );
@@ -24,7 +29,10 @@ export function PageTransition({ children }: { children: ReactNode }) {
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200] focus:rounded-md focus:bg-fg focus:px-4 focus:py-2 focus:text-bg">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[200] focus:rounded-md focus:bg-fg focus:px-4 focus:py-2 focus:text-bg"
+      >
         <SkipLabel />
       </a>
       <Navbar />

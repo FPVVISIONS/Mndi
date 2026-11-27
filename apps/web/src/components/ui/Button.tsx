@@ -26,7 +26,15 @@ interface Props extends Omit<HTMLMotionProps<'button'>, 'children'> {
   children?: ReactNode;
 }
 
-export function Button({ variant = 'secondary', size = 'md', icon, children, className, type = 'button', ...rest }: Props) {
+export function Button({
+  variant = 'secondary',
+  size = 'md',
+  icon,
+  children,
+  className,
+  type = 'button',
+  ...rest
+}: Props) {
   return (
     <motion.button
       type={type}
@@ -53,7 +61,15 @@ interface IconProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   tone?: 'plain' | 'solid';
 }
 
-export function IconButton({ label, children, active, tone = 'plain', className, type = 'button', ...rest }: IconProps) {
+export function IconButton({
+  label,
+  children,
+  active,
+  tone = 'plain',
+  className,
+  type = 'button',
+  ...rest
+}: IconProps) {
   return (
     <motion.button
       type={type}
@@ -64,7 +80,9 @@ export function IconButton({ label, children, active, tone = 'plain', className,
       transition={spring.snappy}
       className={cn(
         'inline-grid size-10 shrink-0 place-items-center rounded-full transition-colors duration-150',
-        tone === 'solid' ? 'border border-white/35 bg-black/40 text-fg hover:border-fg hover:bg-black/60' : 'text-fg-dim hover:bg-white/10 hover:text-fg',
+        tone === 'solid'
+          ? 'border border-white/35 bg-black/40 text-fg hover:border-fg hover:bg-black/60'
+          : 'text-fg-dim hover:bg-white/10 hover:text-fg',
         active && 'text-fg',
         className,
       )}

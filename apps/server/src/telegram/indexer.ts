@@ -22,7 +22,8 @@ interface Extracted {
 
 function extract(msg: Api.Message): Extracted | null {
   const media = msg.media;
-  if (!(media instanceof Api.MessageMediaDocument) || !(media.document instanceof Api.Document)) return null;
+  if (!(media instanceof Api.MessageMediaDocument) || !(media.document instanceof Api.Document))
+    return null;
   const doc = media.document;
   let name = '';
   let duration: number | null = null;
@@ -38,9 +39,18 @@ function extract(msg: Api.Message): Extracted | null {
   }
   const mime = doc.mimeType || 'application/octet-stream';
   const size = Number(doc.size);
-  const base = { name: name || '', caption: msg.message || null, mime, size, duration, width, height };
+  const base = {
+    name: name || '',
+    caption: msg.message || null,
+    mime,
+    size,
+    duration,
+    width,
+    height,
+  };
   if (PLAYLIST_EXT.test(name) || /mpegurl/i.test(mime)) return { kind: 'playlist', file: base };
-  const isVideo = mime.startsWith('video/') || mime === 'application/x-matroska' || VIDEO_EXT.test(name);
+  const isVideo =
+    mime.startsWith('video/') || mime === 'application/x-matroska' || VIDEO_EXT.test(name);
   if (!isVideo) return null;
   return { kind: 'video', file: base };
 }
@@ -89,7 +99,11 @@ export class Indexer {
     if (!kind) return;
     try {
       await this.handle(kind, chatId, e.message);
-      this.db.update(sources).set({ lastMessageId: e.message.id }).where(eq(sources.chatId, chatId)).run();
+      this.db
+        .update(sources)
+        .set({ lastMessageId: e.message.id })
+        .where(eq(sources.chatId, chatId))
+        .run();
     } catch {
       // A single malformed message must never stop the listener.
     }
@@ -107,7 +121,12 @@ export class Indexer {
     }
     const x = extract(msg);
     if (x?.kind !== 'video') return;
-    const result = ingestVideo(this.db, kind, { ...x.file, chatId, messageId: msg.id, date: msg.date });
+    const result = ingestVideo(this.db, kind, {
+      ...x.file,
+      chatId,
+      messageId: msg.id,
+      date: msg.date,
+    });
     if (result?.createdTitle) void this.meta.matchTitle(result.titleId);
   }
 
@@ -120,7 +139,8 @@ export class Indexer {
     this.scanning = true;
     this.scanned = 0;
     try {
-      for (let id = this.queue.shift(); id; id = this.queue.shift()) await this.scanSource(id).catch(() => undefined);
+      for (let id = this.queue.shift(); id; id = this.queue.shift())
+        await this.scanSource(id).catch(() => undefined);
     } finally {
       this.scanning = false;
       void this.matchPending();
@@ -151,13 +171,21 @@ export class Indexer {
       offsetId = page[page.length - 1]!.id;
       if (page.length < PAGE) break;
     }
-    this.db.update(sources).set({ lastMessageId: newest, scannedAt: Math.floor(Date.now() / 1000) }).where(eq(sources.chatId, chatId)).run();
+    this.db
+      .update(sources)
+      .set({ lastMessageId: newest, scannedAt: Math.floor(Date.now() / 1000) })
+      .where(eq(sources.chatId, chatId))
+      .run();
   }
 
   /** Match titles that have no TMDB id yet, a few at a time. */
   private async matchPending(): Promise<void> {
     if (!this.meta.enabled) return;
-    const rows = this.db.select().from(titles).where(sql`tmdb_id IS NULL AND locked = 0`).all();
+    const rows = this.db
+      .select()
+      .from(titles)
+      .where(sql`tmdb_id IS NULL AND locked = 0`)
+      .all();
     for (const r of rows) await this.meta.matchTitle(r.id).catch(() => undefined);
     this.meta.prefetch('en');
   }
@@ -168,7 +196,11 @@ export class Indexer {
       this.db.delete(files).where(eq(files.chatId, id)).run();
       this.db.delete(channels).where(eq(channels.sourceId, id)).run();
     }
-    this.db.run(sql`DELETE FROM episodes WHERE id NOT IN (SELECT episode_id FROM files WHERE episode_id IS NOT NULL)`);
-    this.db.run(sql`DELETE FROM titles WHERE id NOT IN (SELECT title_id FROM files WHERE title_id IS NOT NULL)`);
+    this.db.run(
+      sql`DELETE FROM episodes WHERE id NOT IN (SELECT episode_id FROM files WHERE episode_id IS NOT NULL)`,
+    );
+    this.db.run(
+      sql`DELETE FROM titles WHERE id NOT IN (SELECT title_id FROM files WHERE title_id IS NOT NULL)`,
+    );
   }
 }

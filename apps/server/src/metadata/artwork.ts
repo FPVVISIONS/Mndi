@@ -4,9 +4,7 @@ export type ArtworkKind = 'poster' | 'backdrop' | 'logo';
 
 /** Highest voted first; vote count and resolution break ties. */
 function byQuality(a: TmdbImage, b: TmdbImage): number {
-  return (
-    b.vote_average - a.vote_average || b.vote_count - a.vote_count || b.width - a.width || 0
-  );
+  return b.vote_average - a.vote_average || b.vote_count - a.vote_count || b.width - a.width || 0;
 }
 
 function bestOf(images: TmdbImage[], match: (img: TmdbImage) => boolean): TmdbImage | null {

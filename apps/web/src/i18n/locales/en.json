@@ -325,7 +325,7 @@
     "chooseTitle": "Pick what to index",
     "chooseBody": "Tag each chat you want in the library. Leave the rest on Skip.",
     "filter": "Filter chats",
-    "members": "{{count}} members",
+    "members": "{{count, number}} members",
     "skip": "Skip",
     "chooseNone": "Pick at least one chat",
     "start": "Build library",

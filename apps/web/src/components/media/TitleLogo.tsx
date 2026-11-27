@@ -16,13 +16,29 @@ interface Props {
 export function TitleLogo({ logo, title, className, height = '7rem', textClassName }: Props) {
   if (logo) {
     return (
-      <div className={cn('max-w-full', className)} style={{ height, width: `calc(${height} * 3.4)` }}>
-        <ArtImage image={logo} size="w500" alt={title} fit="contain" eager className="!bg-transparent size-full [&_img]:object-[var(--logo-pos,left)] [dir=rtl]_&:[--logo-pos:right]" />
+      <div
+        className={cn('max-w-full', className)}
+        style={{ height, width: `calc(${height} * 3.4)` }}
+      >
+        <ArtImage
+          image={logo}
+          size="w500"
+          alt={title}
+          fit="contain"
+          eager
+          className="!bg-transparent size-full [&_img]:object-[var(--logo-pos,left)] [dir=rtl]_&:[--logo-pos:right]"
+        />
       </div>
     );
   }
   return (
-    <h1 className={cn('font-display text-balance text-display-s sm:text-display-m', textClassName, className)}>
+    <h1
+      className={cn(
+        'font-display text-balance text-display-s sm:text-display-m',
+        textClassName,
+        className,
+      )}
+    >
       <Crossfade k={title}>{title}</Crossfade>
     </h1>
   );

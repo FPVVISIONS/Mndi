@@ -19,7 +19,16 @@ interface Props {
 
 const panelVariants = {
   hidden: { opacity: 0, y: -8 },
-  show: { opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.out, staggerChildren: stagger.actions, delayChildren: 0.04 } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: duration.base,
+      ease: ease.out,
+      staggerChildren: stagger.actions,
+      delayChildren: 0.04,
+    },
+  },
   exit: { opacity: 0, y: -4, transition: { duration: duration.fast } },
 };
 const item = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0 } };
@@ -61,9 +70,23 @@ export function TitleCardView({ card, className }: Props) {
         className="block overflow-hidden rounded-md outline-offset-4"
         draggable={false}
       >
-        <motion.div layoutId={`art-${art}`} className="relative aspect-[2/3] overflow-hidden rounded-md bg-surface-2 shadow-[var(--shadow-card)]">
-          <ArtImage image={card.poster} size="w342" alt="" className="size-full" fallback={<PosterFallback title={card.title} />} />
-          {progress > 0 && <ProgressBar value={progress} className="absolute inset-x-0 bottom-0 h-[3px] rounded-none bg-black/50" />}
+        <motion.div
+          layoutId={`art-${art}`}
+          className="relative aspect-[2/3] overflow-hidden rounded-md bg-surface-2 shadow-[var(--shadow-card)]"
+        >
+          <ArtImage
+            image={card.poster}
+            size="w342"
+            alt=""
+            className="size-full"
+            fallback={<PosterFallback title={card.title} />}
+          />
+          {progress > 0 && (
+            <ProgressBar
+              value={progress}
+              className="absolute inset-x-0 bottom-0 h-[3px] rounded-none bg-black/50"
+            />
+          )}
         </motion.div>
       </Link>
 

@@ -18,7 +18,12 @@ export async function probeFile(svc: Services, fileId: number): Promise<ProbeInf
   if (!row) return null;
   if (row.probe) return JSON.parse(row.probe) as ProbeInfo;
   const info = await probe(row.localPath ?? `${svc.internalBase()}/api/stream/${fileId}`);
-  if (info) svc.db.update(files).set({ probe: JSON.stringify(info) }).where(eq(files.id, fileId)).run();
+  if (info)
+    svc.db
+      .update(files)
+      .set({ probe: JSON.stringify(info) })
+      .where(eq(files.id, fileId))
+      .run();
   return info;
 }
 
@@ -27,7 +32,12 @@ export function inputFor(svc: Services, fileId: number): string {
   return row?.localPath ?? `${svc.internalBase()}/api/stream/${fileId}`;
 }
 
-export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: PlaybackQuery): Promise<PlaybackInfo | null> {
+export async function buildPlayback(
+  svc: Services,
+  fileId: number,
+  ctx: Ctx,
+  q: PlaybackQuery,
+): Promise<PlaybackInfo | null> {
   const file = svc.db.select().from(files).where(eq(files.id, fileId)).get();
   if (!file?.titleId) return null;
   const row = svc.db.select().from(titles).where(eq(titles.id, file.titleId)).get();
@@ -37,7 +47,14 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
   const videoCodec = info?.video?.codec ?? file.codec ?? null;
   const audioCodec = info?.audio[q.audio]?.codec ?? null;
   const ff = await ffmpegAvailable();
-  let mode = decideMode({ ext: file.container, mime: file.mime, videoCodec, audioCodec, audioIndex: q.audio, hevc: q.hevc });
+  let mode = decideMode({
+    ext: file.container,
+    mime: file.mime,
+    videoCodec,
+    audioCodec,
+    audioIndex: q.audio,
+    hevc: q.hevc,
+  });
   if (!ff) mode = 'direct';
   else if (q.transcode) mode = 'transcode';
 
@@ -53,19 +70,44 @@ export async function buildPlayback(svc: Services, fileId: number, ctx: Ctx, q: 
       const name = season?.episodes.find((e) => e.episode_number === ep.episode)?.name;
       subtitle = [episodeLabel(ep.season, ep.episode), name].filter(Boolean).join(' · ');
       versions = svc.library.versionsOf('episode', ep.id, ctx);
-      const all = svc.db.select().from(episodes).where(eq(episodes.titleId, row.id)).orderBy(episodes.season, episodes.episode).all();
+      const all = svc.db
+        .select()
+        .from(episodes)
+        .where(eq(episodes.titleId, row.id))
+        .orderBy(episodes.season, episodes.episode)
+        .all();
       const following = all[all.findIndex((e) => e.id === ep.id) + 1];
-      const nextFile = following ? svc.library.pick(svc.db.select().from(files).where(and(eq(files.episodeId, following.id))).all(), ctx, 'episode', following.id) : undefined;
+      const nextFile = following
+        ? svc.library.pick(
+            svc.db
+              .select()
+              .from(files)
+              .where(and(eq(files.episodeId, following.id)))
+              .all(),
+            ctx,
+            'episode',
+            following.id,
+          )
+        : undefined;
       if (following && nextFile) {
         const nextName = row.tmdbId
-          ? (await svc.meta.season(row.tmdbId, following.season, ctx.lang))?.episodes.find((e) => e.episode_number === following.episode)?.name
+          ? (await svc.meta.season(row.tmdbId, following.season, ctx.lang))?.episodes.find(
+              (e) => e.episode_number === following.episode,
+            )?.name
           : undefined;
-        next = { fileId: nextFile.id, label: episodeLabel(following.season, following.episode), title: nextName ?? card.title };
+        next = {
+          fileId: nextFile.id,
+          label: episodeLabel(following.season, following.episode),
+          title: nextName ?? card.title,
+        };
       }
     }
   }
 
-  const url = mode === 'direct' ? `/api/stream/${fileId}` : `/api/stream/${fileId}/remux?audio=${q.audio}&mode=${mode}&hevc=${q.hevc ? 1 : 0}`;
+  const url =
+    mode === 'direct'
+      ? `/api/stream/${fileId}`
+      : `/api/stream/${fileId}/remux?audio=${q.audio}&mode=${mode}&hevc=${q.hevc ? 1 : 0}`;
 
   return {
     fileId,

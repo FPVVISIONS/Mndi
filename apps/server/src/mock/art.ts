@@ -27,10 +27,14 @@ function motifShapes(t: MockTitle, w: number, h: number): string {
   switch (t.motif) {
     case 'sun': {
       const rad = Math.min(w, h) * (0.2 + r() * 0.08);
-      out.push(`<circle cx="${w * (0.4 + r() * 0.2)}" cy="${horizon - rad * 0.4}" r="${rad}" fill="${accent}"/>`);
+      out.push(
+        `<circle cx="${w * (0.4 + r() * 0.2)}" cy="${horizon - rad * 0.4}" r="${rad}" fill="${accent}"/>`,
+      );
       for (let i = 0; i < 6; i++) {
         const y = horizon + i * (h - horizon) * 0.17;
-        out.push(`<rect x="0" y="${y}" width="${w}" height="${(h - horizon) * 0.1}" fill="${i % 2 ? bg : mid}" opacity="${0.95 - i * 0.08}"/>`);
+        out.push(
+          `<rect x="0" y="${y}" width="${w}" height="${(h - horizon) * 0.1}" fill="${i % 2 ? bg : mid}" opacity="${0.95 - i * 0.08}"/>`,
+        );
       }
       out.push(`<rect x="0" y="${horizon}" width="${w}" height="${h * 0.012}" fill="${bg}"/>`);
       break;
@@ -42,7 +46,9 @@ function motifShapes(t: MockTitle, w: number, h: number): string {
         const rad = 8 + i * (w / 55);
         const gap = rad * 3.2;
         for (let x = (i % 2) * gap * 0.5; x < w + gap; x += gap) {
-          out.push(`<circle cx="${x}" cy="${y}" r="${rad}" fill="${i % 3 === 0 ? accent : mid}" opacity="${0.45 + i * 0.08}"/>`);
+          out.push(
+            `<circle cx="${x}" cy="${y}" r="${rad}" fill="${i % 3 === 0 ? accent : mid}" opacity="${0.45 + i * 0.08}"/>`,
+          );
         }
       }
       break;
@@ -55,7 +61,10 @@ function motifShapes(t: MockTitle, w: number, h: number): string {
         out.push(`<rect x="${x}" y="${h - bh}" width="${bw}" height="${bh}" fill="${mid}"/>`);
         for (let wy = h - bh + 14; wy < h - 14; wy += 22) {
           for (let wx = x + 8; wx < x + bw - 10; wx += 16) {
-            if (r() > 0.55) out.push(`<rect x="${wx}" y="${wy}" width="6" height="9" fill="${accent}" opacity="${0.5 + r() * 0.5}"/>`);
+            if (r() > 0.55)
+              out.push(
+                `<rect x="${wx}" y="${wy}" width="6" height="9" fill="${accent}" opacity="${0.5 + r() * 0.5}"/>`,
+              );
           }
         }
         x += bw + w * 0.008;
@@ -66,16 +75,22 @@ function motifShapes(t: MockTitle, w: number, h: number): string {
       const n = 5;
       for (let i = 0; i < n; i++) {
         const inset = i * Math.min(w, h) * 0.075;
-        out.push(`<rect x="${w * 0.2 + inset}" y="${h * 0.12 + inset * 1.2}" width="${w * 0.6 - inset * 2}" height="${h * 0.72 - inset * 2.4}" fill="${i % 2 ? bg : mid}" stroke="${accent}" stroke-width="${i === n - 1 ? 0 : 2}" opacity="${0.55 + i * 0.1}"/>`);
+        out.push(
+          `<rect x="${w * 0.2 + inset}" y="${h * 0.12 + inset * 1.2}" width="${w * 0.6 - inset * 2}" height="${h * 0.72 - inset * 2.4}" fill="${i % 2 ? bg : mid}" stroke="${accent}" stroke-width="${i === n - 1 ? 0 : 2}" opacity="${0.55 + i * 0.1}"/>`,
+        );
       }
-      out.push(`<rect x="${w * 0.46}" y="${h * 0.5}" width="${w * 0.08}" height="${h * 0.34}" fill="${accent}"/>`);
+      out.push(
+        `<rect x="${w * 0.46}" y="${h * 0.5}" width="${w * 0.08}" height="${h * 0.34}" fill="${accent}"/>`,
+      );
       break;
     }
     case 'rings': {
       const cx = w * (0.5 + (r() - 0.5) * 0.2);
       const cy = h * 0.4;
       for (let i = 9; i >= 1; i--) {
-        out.push(`<circle cx="${cx}" cy="${cy}" r="${i * Math.min(w, h) * 0.075}" fill="none" stroke="${i % 3 === 0 ? accent : mid}" stroke-width="${i % 3 === 0 ? 3 : 10}" opacity="${0.9 - i * 0.07}"/>`);
+        out.push(
+          `<circle cx="${cx}" cy="${cy}" r="${i * Math.min(w, h) * 0.075}" fill="none" stroke="${i % 3 === 0 ? accent : mid}" stroke-width="${i % 3 === 0 ? 3 : 10}" opacity="${0.9 - i * 0.07}"/>`,
+        );
       }
       out.push(`<circle cx="${cx}" cy="${cy}" r="${Math.min(w, h) * 0.03}" fill="${accent}"/>`);
       break;
@@ -84,18 +99,28 @@ function motifShapes(t: MockTitle, w: number, h: number): string {
       for (let i = 0; i < 6; i++) {
         const x0 = r() * w;
         const sw = w * (0.18 + r() * 0.3);
-        out.push(`<polygon points="${x0},${h} ${x0 + sw * 0.4},${h * (0.2 + r() * 0.4)} ${x0 + sw},${h}" fill="${i % 2 ? mid : bg}" opacity="${0.55 + r() * 0.4}"/>`);
+        out.push(
+          `<polygon points="${x0},${h} ${x0 + sw * 0.4},${h * (0.2 + r() * 0.4)} ${x0 + sw},${h}" fill="${i % 2 ? mid : bg}" opacity="${0.55 + r() * 0.4}"/>`,
+        );
       }
-      out.push(`<circle cx="${w * 0.7}" cy="${h * 0.28}" r="${Math.min(w, h) * 0.1}" fill="${accent}"/>`);
+      out.push(
+        `<circle cx="${w * 0.7}" cy="${h * 0.28}" r="${Math.min(w, h) * 0.1}" fill="${accent}"/>`,
+      );
       break;
     }
     case 'moons': {
       for (let i = 0; i < 4; i++) {
         const rad = Math.min(w, h) * (0.1 + r() * 0.13);
-        out.push(`<circle cx="${w * (0.15 + r() * 0.7)}" cy="${h * (0.12 + r() * 0.5)}" r="${rad}" fill="${i === 0 ? accent : mid}"/>`);
+        out.push(
+          `<circle cx="${w * (0.15 + r() * 0.7)}" cy="${h * (0.12 + r() * 0.5)}" r="${rad}" fill="${i === 0 ? accent : mid}"/>`,
+        );
       }
-      out.push(`<path d="M0 ${h * 0.72} Q ${w * 0.3} ${h * 0.6} ${w * 0.55} ${h * 0.75} T ${w} ${h * 0.7} V ${h} H0Z" fill="${mid}"/>`);
-      out.push(`<path d="M0 ${h * 0.84} Q ${w * 0.4} ${h * 0.74} ${w} ${h * 0.86} V ${h} H0Z" fill="${bg}"/>`);
+      out.push(
+        `<path d="M0 ${h * 0.72} Q ${w * 0.3} ${h * 0.6} ${w * 0.55} ${h * 0.75} T ${w} ${h * 0.7} V ${h} H0Z" fill="${mid}"/>`,
+      );
+      out.push(
+        `<path d="M0 ${h * 0.84} Q ${w * 0.4} ${h * 0.74} ${w} ${h * 0.86} V ${h} H0Z" fill="${bg}"/>`,
+      );
       break;
     }
   }
@@ -118,14 +143,29 @@ function wrap(text: string, max: number): string[] {
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-function textBlock(lines: string[], x: number, y: number, size: number, fill: string, rtl: boolean, anchor = 'middle') {
+function textBlock(
+  lines: string[],
+  x: number,
+  y: number,
+  size: number,
+  fill: string,
+  rtl: boolean,
+  anchor = 'middle',
+) {
   const dir = rtl ? ' direction="rtl"' : '';
   return lines
-    .map((l, i) => `<text x="${x}" y="${y + i * size * 1.05}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-weight="400"${dir}>${esc(l)}</text>`)
+    .map(
+      (l, i) =>
+        `<text x="${x}" y="${y + i * size * 1.05}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-weight="400"${dir}>${esc(l)}</text>`,
+    )
     .join('');
 }
 
-export function renderArt(slug: string, kind: 'poster' | 'backdrop' | 'logo', lang: string): string | null {
+export function renderArt(
+  slug: string,
+  kind: 'poster' | 'backdrop' | 'logo',
+  lang: string,
+): string | null {
   const t = findMockBySlug(slug);
   if (!t) return null;
   const info = languageInfo(lang);

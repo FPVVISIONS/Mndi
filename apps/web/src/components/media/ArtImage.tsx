@@ -23,7 +23,16 @@ interface Props {
  * Artwork with a dominant-colour placeholder. When the source changes (a language switch),
  * the new image loads on top of the old one and fades in, so nothing flashes empty.
  */
-export function ArtImage({ image, size, alt = '', fit = 'cover', eager, className, imgClassName, fallback }: Props) {
+export function ArtImage({
+  image,
+  size,
+  alt = '',
+  fit = 'cover',
+  eager,
+  className,
+  imgClassName,
+  fallback,
+}: Props) {
   const src = image ? imageUrl(image, size) : null;
   const [layers, setLayers] = useState<Layer[]>(() => (src ? [{ src, loaded: false }] : []));
   const prune = useRef<number>();
@@ -45,7 +54,10 @@ export function ArtImage({ image, size, alt = '', fit = 'cover', eager, classNam
   useEffect(() => () => window.clearTimeout(prune.current), []);
 
   return (
-    <div className={cn('relative overflow-hidden bg-surface-2', className)} style={{ backgroundColor: image?.color }}>
+    <div
+      className={cn('relative overflow-hidden bg-surface-2', className)}
+      style={{ backgroundColor: image?.color }}
+    >
       {!src && fallback}
       {layers.map((l, i) => (
         <img

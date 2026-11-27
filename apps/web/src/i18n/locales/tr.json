@@ -325,7 +325,7 @@
     "chooseTitle": "Neyin taranacağını seç",
     "chooseBody": "Kütüphanede istediğin her sohbeti etiketle. Gerisini Atla'da bırak.",
     "filter": "Sohbetleri filtrele",
-    "members": "{{count}} üye",
+    "members": "{{count, number}} üye",
     "skip": "Atla",
     "chooseNone": "En az bir sohbet seç",
     "start": "Kütüphaneyi kur",

@@ -32,7 +32,10 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
     if (!open) return;
     setName(profile?.name ?? '');
     setColor(profile?.color ?? PROFILE_COLORS[Math.floor(Math.random() * PROFILE_COLORS.length)]!);
-    setAvatar(profile?.avatar ?? Object.keys(AVATARS)[Math.floor(Math.random() * Object.keys(AVATARS).length)]!);
+    setAvatar(
+      profile?.avatar ??
+        Object.keys(AVATARS)[Math.floor(Math.random() * Object.keys(AVATARS).length)]!,
+    );
     setConfirmDelete(false);
   }, [open, profile]);
 
@@ -60,7 +63,11 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
   const valid = name.trim().length > 0;
 
   return (
-    <Modal open={open} onClose={onClose} title={profile ? t('profiles.editTitle') : t('profiles.createTitle')}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={profile ? t('profiles.editTitle') : t('profiles.createTitle')}
+    >
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -68,7 +75,11 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
         }}
       >
         <div className="flex items-center gap-5">
-          <ProfileAvatar profile={{ color, avatar, name }} className="size-24 shrink-0 rounded-lg" iconSize={44} />
+          <ProfileAvatar
+            profile={{ color, avatar, name }}
+            className="size-24 shrink-0 rounded-lg"
+            iconSize={44}
+          />
           <label className="block flex-1">
             <span className="eyebrow">{t('profiles.namePlaceholder')}</span>
             <input
@@ -92,7 +103,10 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
                 aria-checked={c === color}
                 aria-label={c}
                 onClick={() => setColor(c)}
-                className={cn('grid size-9 place-items-center rounded-full ring-offset-2 ring-offset-surface-1 transition-shadow', c === color && 'ring-2 ring-fg')}
+                className={cn(
+                  'grid size-9 place-items-center rounded-full ring-offset-2 ring-offset-surface-1 transition-shadow',
+                  c === color && 'ring-2 ring-fg',
+                )}
                 style={{ backgroundColor: c }}
               >
                 {c === color && <Check size={16} className="text-bg" strokeWidth={3} />}
@@ -112,7 +126,12 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
                 aria-checked={key === avatar}
                 aria-label={key}
                 onClick={() => setAvatar(key)}
-                className={cn('grid h-12 place-items-center rounded-md border transition-colors', key === avatar ? 'border-fg bg-surface-3 text-fg' : 'border-line text-fg-dim hover:border-line-strong hover:text-fg')}
+                className={cn(
+                  'grid h-12 place-items-center rounded-md border transition-colors',
+                  key === avatar
+                    ? 'border-fg bg-surface-3 text-fg'
+                    : 'border-line text-fg-dim hover:border-line-strong hover:text-fg',
+                )}
               >
                 <Icon size={20} />
               </button>
@@ -124,18 +143,28 @@ export function ProfileEditor({ open, onClose, profile, canDelete }: Props) {
           {profile && canDelete ? (
             confirmDelete ? (
               <div className="flex items-center gap-2">
-                <span className="max-w-48 text-small text-fg-dim">{t('profiles.deleteConfirm', { name: profile.name })}</span>
-                <Button variant="danger" size="sm" onClick={() => remove.mutate()}>{t('common.delete')}</Button>
+                <span className="max-w-48 text-small text-fg-dim">
+                  {t('profiles.deleteConfirm', { name: profile.name })}
+                </span>
+                <Button variant="danger" size="sm" onClick={() => remove.mutate()}>
+                  {t('common.delete')}
+                </Button>
               </div>
             ) : (
-              <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(true)}>{t('profiles.delete')}</Button>
+              <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(true)}>
+                {t('profiles.delete')}
+              </Button>
             )
           ) : (
             <span />
           )}
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
-            <Button type="submit" variant="primary" disabled={!valid || save.isPending}>{t('common.save')}</Button>
+            <Button variant="ghost" onClick={onClose}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" variant="primary" disabled={!valid || save.isPending}>
+              {t('common.save')}
+            </Button>
           </div>
         </div>
       </form>

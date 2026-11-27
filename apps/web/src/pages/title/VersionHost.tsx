@@ -13,12 +13,23 @@ export interface VersionTarget {
 }
 
 /** Loads the releases for a movie or episode and, once one is picked, remembers it and starts playback. */
-export function VersionHost({ target, onClose, onPlayed }: { target: VersionTarget | null; onClose: () => void; onPlayed?: (fileId: number) => void }) {
+export function VersionHost({
+  target,
+  onClose,
+  onPlayed,
+}: {
+  target: VersionTarget | null;
+  onClose: () => void;
+  onPlayed?: (fileId: number) => void;
+}) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { data } = useQuery({
     queryKey: ['versions', target?.scope, target?.refId],
-    queryFn: () => (target!.scope === 'title' ? api.titleVersions(target!.refId) : api.episodeVersions(target!.refId)),
+    queryFn: () =>
+      target!.scope === 'title'
+        ? api.titleVersions(target!.refId)
+        : api.episodeVersions(target!.refId),
     enabled: Boolean(target),
     staleTime: 0,
   });

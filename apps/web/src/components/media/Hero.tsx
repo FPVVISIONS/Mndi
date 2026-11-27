@@ -42,12 +42,13 @@ export function Hero({ items, trailerFor }: Props) {
   }, [index, items.length, paused]);
 
   const trailer = card ? trailerFor(card.id) : null;
+  const trailerKey = trailer?.key;
   useEffect(() => {
     setShowVideo(false);
-    if (!preview || !trailer || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!preview || !trailerKey || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = window.setTimeout(() => setShowVideo(true), PREVIEW_DELAY);
     return () => window.clearTimeout(id);
-  }, [card?.id, trailer?.key, preview]);
+  }, [card?.id, trailerKey, preview]);
 
   if (!card) return null;
   const hasProgress = Boolean(card.progress);
@@ -64,7 +65,11 @@ export function Hero({ items, trailerFor }: Props) {
           key={card.id}
           className="absolute inset-0 -z-10"
           initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1, transition: { duration: duration.hero, ease: ease.out } }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            transition: { duration: duration.hero, ease: ease.out },
+          }}
           exit={{ opacity: 0, transition: { duration: duration.hero } }}
         >
           <ArtImage image={card.backdrop} size="w1280" eager className="size-full" />
@@ -119,11 +124,19 @@ export function Hero({ items, trailerFor }: Props) {
             <motion.div variants={fadeUp} className="mt-5">
               <MetaLine card={card} />
             </motion.div>
-            <motion.p variants={fadeUp} className="mt-3 line-clamp-3 max-w-[34rem] text-lead text-fg/90 text-pretty">
+            <motion.p
+              variants={fadeUp}
+              className="mt-3 line-clamp-3 max-w-[34rem] text-lead text-fg/90 text-pretty"
+            >
               <Crossfade k={card.overview}>{card.overview}</Crossfade>
             </motion.p>
             <motion.div variants={fadeUp} className="mt-7 flex flex-wrap items-center gap-3">
-              <Button variant="primary" size="lg" icon={<Play size={20} className="fill-current" />} onClick={() => navigate(watchPath(card))}>
+              <Button
+                variant="primary"
+                size="lg"
+                icon={<Play size={20} className="fill-current" />}
+                onClick={() => navigate(watchPath(card))}
+              >
                 {hasProgress ? t('common.resume') : t('common.play')}
               </Button>
               <Link to={`/title/${card.id}`} state={{ background: location }} className="contents">
@@ -148,7 +161,12 @@ export function Hero({ items, trailerFor }: Props) {
               onClick={() => setIndex(i)}
               className="group grid h-6 place-items-center px-0.5"
             >
-              <span className={cn('relative block h-[3px] overflow-hidden rounded-full bg-white/30 transition-[width] duration-300', i === index ? 'w-10' : 'w-5 group-hover:bg-white/50')}>
+              <span
+                className={cn(
+                  'relative block h-[3px] overflow-hidden rounded-full bg-white/30 transition-[width] duration-300',
+                  i === index ? 'w-10' : 'w-5 group-hover:bg-white/50',
+                )}
+              >
                 {i === index && (
                   <motion.span
                     key={`${index}-${paused}`}

@@ -31,27 +31,44 @@ export function IndexStep() {
   const { data } = useStatus();
   const done = useMutation({
     mutationFn: api.completeOnboarding,
-    onSuccess: () => { invalidateLibrary(qc); navigate('/', { replace: true }); },
+    onSuccess: () => {
+      invalidateLibrary(qc);
+      navigate('/', { replace: true });
+    },
   });
   const idx = data?.index;
 
   return (
-    <motion.div variants={staggerChildren(stagger.list)} initial="hidden" animate="show" className="space-y-6">
-      <motion.h2 variants={fadeUp} className="font-display text-title-l">{t('onboarding.indexTitle')}</motion.h2>
-      <motion.p variants={fadeUp} className="text-fg-dim">{idx && idx.items === 0 ? t('onboarding.waiting') : t('onboarding.indexBody')}</motion.p>
+    <motion.div
+      variants={staggerChildren(stagger.list)}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      <motion.h2 variants={fadeUp} className="font-display text-title-l">
+        {t('onboarding.indexTitle')}
+      </motion.h2>
+      <motion.p variants={fadeUp} className="text-fg-dim">
+        {idx && idx.items === 0 ? t('onboarding.waiting') : t('onboarding.indexBody')}
+      </motion.p>
       <div className="grid grid-cols-3 gap-3">
         <Counter value={idx?.items ?? 0} label={t('onboarding.files')} />
         <Counter value={idx?.titles ?? 0} label={t('onboarding.titles')} />
         <Counter value={idx?.channels ?? 0} label={t('onboarding.channels')} />
       </div>
       {data && !data.tmdb && (
-        <motion.div variants={fadeUp} className="flex gap-3 rounded-lg border border-line bg-surface-1 p-4 text-small text-fg-dim">
+        <motion.div
+          variants={fadeUp}
+          className="flex gap-3 rounded-lg border border-line bg-surface-1 p-4 text-small text-fg-dim"
+        >
           <TriangleAlert size={18} className="mt-0.5 shrink-0 text-accent" />
           {t('onboarding.noTmdb')}
         </motion.div>
       )}
       <motion.div variants={fadeUp}>
-        <Button variant="primary" size="lg" onClick={() => done.mutate()} disabled={done.isPending}>{t('onboarding.open')}</Button>
+        <Button variant="primary" size="lg" onClick={() => done.mutate()} disabled={done.isPending}>
+          {t('onboarding.open')}
+        </Button>
       </motion.div>
     </motion.div>
   );

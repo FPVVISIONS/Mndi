@@ -12,7 +12,14 @@ interface Props {
   panelClassName?: string;
 }
 
-export function Popover({ trigger, children, align = 'end', side = 'bottom', className, panelClassName }: Props) {
+export function Popover({
+  trigger,
+  children,
+  align = 'end',
+  side = 'bottom',
+  className,
+  panelClassName,
+}: Props) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
@@ -45,7 +52,9 @@ export function Popover({ trigger, children, align = 'end', side = 'bottom', cla
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: duration.fast } }}
             transition={{ duration: duration.base, ease: ease.out }}
-            style={{ transformOrigin: `${side === 'bottom' ? 'top' : 'bottom'} ${align === 'end' ? 'right' : 'left'}` }}
+            style={{
+              transformOrigin: `${side === 'bottom' ? 'top' : 'bottom'} ${align === 'end' ? 'right' : 'left'}`,
+            }}
             className={cn(
               'absolute z-50 min-w-48 rounded-lg border border-line bg-surface-2 p-1.5 shadow-[var(--shadow-pop)]',
               side === 'bottom' ? 'top-[calc(100%+0.5rem)]' : 'bottom-[calc(100%+0.5rem)]',

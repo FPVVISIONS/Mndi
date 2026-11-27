@@ -13,7 +13,12 @@ export function pickAudio(tracks: AudioTrack[], pref: AudioPref, uiLang: string)
  * Which subtitle track to show, or null for none.
  * "auto" shows subtitles in the interface language only when the audio is in a different language.
  */
-export function pickSubtitle(subs: SubtitleTrack[], audioLang: string | null, pref: SubtitlePref, uiLang: string): number | null {
+export function pickSubtitle(
+  subs: SubtitleTrack[],
+  audioLang: string | null,
+  pref: SubtitlePref,
+  uiLang: string,
+): number | null {
   if (pref === 'off' || !subs.length) return null;
   const wanted = pref === 'auto' || pref === 'ui' ? uiLang : pref;
   if (pref === 'auto' && audioLang === uiLang) return null;

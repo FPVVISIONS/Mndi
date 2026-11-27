@@ -183,13 +183,7 @@ export interface Profile {
 }
 
 export type TelegramState =
-  | 'unconfigured'
-  | 'logged-out'
-  | 'connecting'
-  | 'ready'
-  | 'reconnecting'
-  | 'flood-wait'
-  | 'error';
+  'unconfigured' | 'logged-out' | 'connecting' | 'ready' | 'reconnecting' | 'flood-wait' | 'error';
 
 export interface AppStatus {
   mock: boolean;

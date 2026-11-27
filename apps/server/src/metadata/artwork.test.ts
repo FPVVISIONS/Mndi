@@ -28,9 +28,13 @@ describe('pickImage', () => {
 
   it('falls back to English, then to language-neutral', () => {
     expect(pickImage(posters, 'fr', 'poster')?.path).toBe('/en-high.jpg');
-    expect(pickImage(posters.filter((p) => p.iso_639_1 !== 'en'), 'fr', 'poster')?.path).toBe(
-      '/neutral.jpg',
-    );
+    expect(
+      pickImage(
+        posters.filter((p) => p.iso_639_1 !== 'en'),
+        'fr',
+        'poster',
+      )?.path,
+    ).toBe('/neutral.jpg');
   });
 
   it('uses the English poster directly for English', () => {
@@ -38,7 +42,11 @@ describe('pickImage', () => {
   });
 
   it('breaks ties on vote count, then width', () => {
-    const tied = [img('/a.jpg', 'de', 5, 3), img('/b.jpg', 'de', 5, 9), img('/c.jpg', 'de', 5, 9, 2000)];
+    const tied = [
+      img('/a.jpg', 'de', 5, 3),
+      img('/b.jpg', 'de', 5, 9),
+      img('/c.jpg', 'de', 5, 9, 2000),
+    ];
     expect(pickImage(tied, 'de', 'poster')?.path).toBe('/c.jpg');
   });
 
@@ -56,7 +64,9 @@ describe('pickImage', () => {
   it('prefers a textless backdrop over an English one', () => {
     const backdrops = [img('/en.jpg', 'en', 8), img('/none.jpg', null, 5)];
     expect(pickImage(backdrops, 'tr', 'backdrop')?.path).toBe('/none.jpg');
-    expect(pickImage([...backdrops, img('/tr.jpg', 'tr', 1)], 'tr', 'backdrop')?.path).toBe('/tr.jpg');
+    expect(pickImage([...backdrops, img('/tr.jpg', 'tr', 1)], 'tr', 'backdrop')?.path).toBe(
+      '/tr.jpg',
+    );
   });
 
   it('builds de-duplicated language orders', () => {
@@ -75,9 +85,17 @@ describe('resolveMeta', () => {
     release_date: '2019-05-01',
     runtime: 118,
     vote_average: 7.34,
-    images: { posters: [img('/he.jpg', 'he'), img('/en.jpg', 'en')], logos: [img('/logo-en.png', 'en')] },
+    images: {
+      posters: [img('/he.jpg', 'he'), img('/en.jpg', 'en')],
+      logos: [img('/logo-en.png', 'en')],
+    },
   };
-  const en: RawDetails = { id: 1, title: 'Harbour', overview: 'A quiet port.', tagline: 'Hold the line.' };
+  const en: RawDetails = {
+    id: 1,
+    title: 'Harbour',
+    overview: 'A quiet port.',
+    tagline: 'Hold the line.',
+  };
 
   it('fills untranslated text from English, except taglines', () => {
     const m = resolveMeta('movie', he, en, 'he');
@@ -128,7 +146,13 @@ describe('resolveMeta', () => {
 
 describe('scoreCandidate', () => {
   const hit = (title: string, year: number, popularity = 10): SearchHit => ({
-    id: 1, title, originalTitle: title, year, overview: '', posterPath: null, popularity,
+    id: 1,
+    title,
+    originalTitle: title,
+    year,
+    overview: '',
+    posterPath: null,
+    popularity,
   });
   const parsed = { title: 'The Long Harbour', year: 2019 };
 

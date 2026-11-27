@@ -1,5 +1,11 @@
 import type { AppStatus, HomePayload, TitleCard } from '@marquee/shared';
-import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryKey,
+} from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { usePrefs } from '../stores/prefs';
 import { useProfile } from '../stores/profile';
@@ -74,12 +80,20 @@ export function useEpisodes(id: number, season: number) {
 
 export function useMyList() {
   const { key } = useScope();
-  return useQuery({ queryKey: ['myList', ...key], queryFn: api.myList, placeholderData: keepPreviousData });
+  return useQuery({
+    queryKey: ['myList', ...key],
+    queryFn: api.myList,
+    placeholderData: keepPreviousData,
+  });
 }
 
 export function useChannels() {
   const { key } = useScope();
-  return useQuery({ queryKey: ['channels', ...key], queryFn: api.channels, refetchInterval: 60_000 });
+  return useQuery({
+    queryKey: ['channels', ...key],
+    queryFn: api.channels,
+    refetchInterval: 60_000,
+  });
 }
 
 export function useSearch(q: string) {
@@ -98,14 +112,33 @@ type CardPatch = (c: TitleCard) => TitleCard;
 /** Apply a change to every cached copy of a title card, so a toggle is reflected everywhere at once. */
 function patchCards(qc: ReturnType<typeof useQueryClient>, id: number, patch: CardPatch) {
   const fix = (c: TitleCard) => (c.id === id ? patch(c) : c);
-  qc.setQueriesData<HomePayload>({ queryKey: ['home'] }, (d) =>
-    d && { ...d, hero: d.hero.map(fix), rows: d.rows.map((r) => ({ ...r, items: r.items.map(fix) })) });
-  qc.setQueriesData<{ items: TitleCard[] }>({ queryKey: ['titles'] }, (d) => d && { ...d, items: d.items.map(fix) });
-  qc.setQueriesData<{ items: TitleCard[] }>({ queryKey: ['myList'] }, (d) => d && { ...d, items: d.items.map(fix) });
-  qc.setQueriesData<TitleCard & { similar: TitleCard[] }>({ queryKey: ['title'] }, (d) =>
-    d && (d.id === id ? { ...patch(d), similar: d.similar } : { ...d, similar: d.similar.map(fix) }));
-  qc.setQueriesData<{ movies: TitleCard[]; series: TitleCard[] }>({ queryKey: ['search'] }, (d) =>
-    d && { ...d, movies: d.movies.map(fix), series: d.series.map(fix) });
+  qc.setQueriesData<HomePayload>(
+    { queryKey: ['home'] },
+    (d) =>
+      d && {
+        ...d,
+        hero: d.hero.map(fix),
+        rows: d.rows.map((r) => ({ ...r, items: r.items.map(fix) })),
+      },
+  );
+  qc.setQueriesData<{ items: TitleCard[] }>(
+    { queryKey: ['titles'] },
+    (d) => d && { ...d, items: d.items.map(fix) },
+  );
+  qc.setQueriesData<{ items: TitleCard[] }>(
+    { queryKey: ['myList'] },
+    (d) => d && { ...d, items: d.items.map(fix) },
+  );
+  qc.setQueriesData<TitleCard & { similar: TitleCard[] }>(
+    { queryKey: ['title'] },
+    (d) =>
+      d &&
+      (d.id === id ? { ...patch(d), similar: d.similar } : { ...d, similar: d.similar.map(fix) }),
+  );
+  qc.setQueriesData<{ movies: TitleCard[]; series: TitleCard[] }>(
+    { queryKey: ['search'] },
+    (d) => d && { ...d, movies: d.movies.map(fix), series: d.series.map(fix) },
+  );
 }
 
 export function useToggleList() {
@@ -133,8 +166,11 @@ export function useToggleFavourite() {
   return useMutation({
     mutationFn: ({ id, on }: { id: number; on: boolean }) => api.setFavourite(id, on),
     onMutate: ({ id, on }) => {
-      qc.setQueriesData<{ channels: { id: number; favourite: boolean }[] }>({ queryKey: ['channels'] }, (d) =>
-        d && { channels: d.channels.map((c) => (c.id === id ? { ...c, favourite: on } : c)) });
+      qc.setQueriesData<{ channels: { id: number; favourite: boolean }[] }>(
+        { queryKey: ['channels'] },
+        (d) =>
+          d && { channels: d.channels.map((c) => (c.id === id ? { ...c, favourite: on } : c)) },
+      );
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['channels'] });
@@ -144,7 +180,16 @@ export function useToggleFavourite() {
 }
 
 export function invalidateLibrary(qc: ReturnType<typeof useQueryClient>, extra: QueryKey[] = []) {
-  for (const key of [['home'], ['titles'], ['title'], ['myList'], ['search'], ['channels'], ['status'], ...extra]) {
+  for (const key of [
+    ['home'],
+    ['titles'],
+    ['title'],
+    ['myList'],
+    ['search'],
+    ['channels'],
+    ['status'],
+    ...extra,
+  ]) {
     void qc.invalidateQueries({ queryKey: key });
   }
 }

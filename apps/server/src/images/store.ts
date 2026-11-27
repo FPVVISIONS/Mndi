@@ -3,7 +3,18 @@ import { join } from 'node:path';
 import sharp from 'sharp';
 import { createDeduper } from '../lib/async.js';
 
-const SIZES = new Set(['w92', 'w154', 'w185', 'w300', 'w342', 'w500', 'w780', 'w1280', 'h632', 'original']);
+const SIZES = new Set([
+  'w92',
+  'w154',
+  'w185',
+  'w300',
+  'w342',
+  'w500',
+  'w780',
+  'w1280',
+  'h632',
+  'original',
+]);
 const PATH_RE = /^\/[A-Za-z0-9_-]+\.(jpg|jpeg|png|webp)$/;
 
 export function isValidTmdbImage(size: string, path: string): boolean {
@@ -44,10 +55,20 @@ export class ImageStore {
     const file = await this.get('w92', path);
     if (!file) return null;
     try {
-      const { data } = await sharp(file).resize(1, 1, { fit: 'cover' }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+      const { data } = await sharp(file)
+        .resize(1, 1, { fit: 'cover' })
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
       const bg = [11, 11, 12];
       const mix = (c: number, i: number) => Math.round(c * 0.6 + (bg[i] ?? 0) * 0.4);
-      return `#${[0, 1, 2].map((i) => mix(data[i] ?? 0, i).toString(16).padStart(2, '0')).join('')}`;
+      return `#${[0, 1, 2]
+        .map((i) =>
+          mix(data[i] ?? 0, i)
+            .toString(16)
+            .padStart(2, '0'),
+        )
+        .join('')}`;
     } catch {
       return null;
     }

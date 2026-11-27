@@ -22,7 +22,11 @@ export function Toaster() {
             transition={spring.soft}
             className="pointer-events-auto flex items-center gap-2.5 rounded-full border border-line-strong bg-surface-3 py-2.5 ps-3.5 pe-5 text-small font-medium shadow-[var(--shadow-pop)]"
           >
-            {t.tone === 'error' ? <CircleAlert size={16} className="text-accent" /> : <Check size={16} className="text-accent" />}
+            {t.tone === 'error' ? (
+              <CircleAlert size={16} className="text-accent" />
+            ) : (
+              <Check size={16} className="text-accent" />
+            )}
             {t.message}
           </motion.div>
         ))}

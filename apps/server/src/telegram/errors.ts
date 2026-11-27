@@ -14,18 +14,23 @@ export function rpcName(err: unknown): string {
 
 export function floodSeconds(err: unknown): number | null {
   const e = err as RpcLike;
-  if (typeof e?.seconds === 'number' && /FLOOD/.test(rpcName(err) + (e.constructor?.name ?? ''))) return e.seconds;
+  if (typeof e?.seconds === 'number' && /FLOOD/.test(rpcName(err) + (e.constructor?.name ?? '')))
+    return e.seconds;
   const m = /FLOOD_WAIT_(\d+)|wait of (\d+) seconds/i.exec(rpcName(err));
   return m ? Number(m[1] ?? m[2]) : null;
 }
 
 export function isTransient(err: unknown): boolean {
   const msg = rpcName(err);
-  return /TIMEOUT|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|EPIPE|Not connected|Connection closed|CONNECTION|network|RPC_CALL_FAIL|RPC_MCGET_FAIL|Cannot send requests while disconnected|SERVER_ERROR|INTERDC/i.test(msg);
+  return /TIMEOUT|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|EPIPE|Not connected|Connection closed|CONNECTION|network|RPC_CALL_FAIL|RPC_MCGET_FAIL|Cannot send requests while disconnected|SERVER_ERROR|INTERDC/i.test(
+    msg,
+  );
 }
 
 export function isSessionDead(err: unknown): boolean {
-  return /AUTH_KEY_UNREGISTERED|AUTH_KEY_INVALID|SESSION_REVOKED|SESSION_EXPIRED|USER_DEACTIVATED/.test(rpcName(err));
+  return /AUTH_KEY_UNREGISTERED|AUTH_KEY_INVALID|SESSION_REVOKED|SESSION_EXPIRED|USER_DEACTIVATED/.test(
+    rpcName(err),
+  );
 }
 
 export function isFileReferenceExpired(err: unknown): boolean {

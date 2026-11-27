@@ -5,10 +5,19 @@ import { schema } from '../db/client.js';
 
 const { channels, favChannels, epg } = schema;
 
-export function listChannels(db: Db, profileId: number, now = Math.floor(Date.now() / 1000)): Channel[] {
+export function listChannels(
+  db: Db,
+  profileId: number,
+  now = Math.floor(Date.now() / 1000),
+): Channel[] {
   const rows = db.select().from(channels).orderBy(channels.grp, channels.name).all();
   const favs = new Set(
-    db.select().from(favChannels).where(eq(favChannels.profileId, profileId)).all().map((f) => f.channelId),
+    db
+      .select()
+      .from(favChannels)
+      .where(eq(favChannels.profileId, profileId))
+      .all()
+      .map((f) => f.channelId),
   );
   const current = db
     .select()
@@ -34,7 +43,12 @@ export function listChannels(db: Db, profileId: number, now = Math.floor(Date.no
       group: c.grp,
       favourite: favs.has(c.id),
       nowPlaying: p
-        ? { title: p.title, start: p.start, end: p.stop, next: c.tvgId ? nextByKey.get(c.tvgId) : undefined }
+        ? {
+            title: p.title,
+            start: p.start,
+            end: p.stop,
+            next: c.tvgId ? nextByKey.get(c.tvgId) : undefined,
+          }
         : null,
     };
   });
@@ -42,10 +56,16 @@ export function listChannels(db: Db, profileId: number, now = Math.floor(Date.no
 
 export function setFavourite(db: Db, profileId: number, channelId: number, on: boolean): void {
   if (on) db.insert(favChannels).values({ profileId, channelId }).onConflictDoNothing().run();
-  else db.delete(favChannels).where(and(eq(favChannels.profileId, profileId), eq(favChannels.channelId, channelId))).run();
+  else
+    db.delete(favChannels)
+      .where(and(eq(favChannels.profileId, profileId), eq(favChannels.channelId, channelId)))
+      .run();
 }
 
-export function replaceEpg(db: Db, rows: { channel: string; start: number; stop: number; title: string }[]): void {
+export function replaceEpg(
+  db: Db,
+  rows: { channel: string; start: number; stop: number; title: string }[],
+): void {
   db.transaction((tx) => {
     tx.run(sql`DELETE FROM epg WHERE stop < ${Math.floor(Date.now() / 1000) - 3600}`);
     for (const r of rows) {

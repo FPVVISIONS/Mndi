@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "concurrently -n server,web -c gray,white \"npm run dev -w @marquee/server\" \"npm run dev -w @marquee/web\"",
     "dev:mock": "MARQUEE_MOCK=1 npm run dev",
@@ -14,7 +17,9 @@
     "format": "prettier --write .",
     "test": "npm run test --workspaces --if-present"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "concurrently": "^9.1.0",

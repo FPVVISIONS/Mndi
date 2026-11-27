@@ -1,8 +1,22 @@
 import { languageInfo, type LanguageCode, type TitleKind } from '@marquee/shared';
 import { titleKey } from '../parser/filename.js';
 import { similarity } from '../metadata/localize.js';
-import type { MetadataProvider, RawDetails, RawSeason, SearchHit, TmdbImage } from '../metadata/types.js';
-import { CAST, EPISODE_NAMES, EPISODE_WORD, GENRES, MOCK_CATALOG, findMock, type MockTitle } from './catalog.js';
+import type {
+  MetadataProvider,
+  RawDetails,
+  RawSeason,
+  SearchHit,
+  TmdbImage,
+} from '../metadata/types.js';
+import {
+  CAST,
+  EPISODE_NAMES,
+  EPISODE_WORD,
+  GENRES,
+  MOCK_CATALOG,
+  findMock,
+  type MockTitle,
+} from './catalog.js';
 
 function images(t: MockTitle, kind: 'poster' | 'logo', langs: LanguageCode[]): TmdbImage[] {
   return langs.map((l, i) => ({
@@ -35,16 +49,48 @@ function toDetails(t: MockTitle, lang: LanguageCode): RawDetails {
       posters: images(t, 'poster', t.posterLangs),
       logos: images(t, 'logo', t.logoLangs),
       backdrops: [
-        { file_path: `mock/${t.slug}/backdrop/0`, iso_639_1: null, vote_average: 6, vote_count: 20, width: 1280, height: 720 },
+        {
+          file_path: `mock/${t.slug}/backdrop/0`,
+          iso_639_1: null,
+          vote_average: 6,
+          vote_count: 20,
+          width: 1280,
+          height: 720,
+        },
       ],
     },
     credits: {
-      cast: CAST.map(([name, character], i) => ({ name, character, profile_path: null, order: (i + t.id) % 10 })),
+      cast: CAST.map(([name, character], i) => ({
+        name,
+        character,
+        profile_path: null,
+        order: (i + t.id) % 10,
+      })),
     },
-    videos: { results: [{ site: 'File', type: 'Trailer', key: `/api/mock/sample/${(t.id % 3) + 1}.webm`, official: true }] },
-    release_dates: { results: [{ iso_3166_1: 'US', release_dates: [{ certification: t.rating > 7.5 ? 'R' : 'PG-13', type: 3 }] }] },
+    videos: {
+      results: [
+        {
+          site: 'File',
+          type: 'Trailer',
+          key: `/api/mock/sample/${(t.id % 3) + 1}.webm`,
+          official: true,
+        },
+      ],
+    },
+    release_dates: {
+      results: [
+        {
+          iso_3166_1: 'US',
+          release_dates: [{ certification: t.rating > 7.5 ? 'R' : 'PG-13', type: 3 }],
+        },
+      ],
+    },
     content_ratings: { results: [{ iso_3166_1: 'US', rating: 'TV-MA' }] },
-    seasons: t.seasons.map((n, i) => ({ season_number: i + 1, name: `Season ${i + 1}`, episode_count: n })),
+    seasons: t.seasons.map((n, i) => ({
+      season_number: i + 1,
+      name: `Season ${i + 1}`,
+      episode_count: n,
+    })),
   } as RawDetails;
 }
 
@@ -69,13 +115,23 @@ export class MockProvider implements MetadataProvider {
       }));
   }
 
-  async details(kind: TitleKind, id: number, _tmdbLang: string, uiLang: string): Promise<RawDetails> {
+  async details(
+    kind: TitleKind,
+    id: number,
+    _tmdbLang: string,
+    uiLang: string,
+  ): Promise<RawDetails> {
     const t = findMock(id);
     if (!t) throw new Error(`Unknown mock title ${id}`);
     return toDetails(t, languageInfo(uiLang).code);
   }
 
-  async season(tvId: number, season: number, _tmdbLang: string, uiLang: string): Promise<RawSeason> {
+  async season(
+    tvId: number,
+    season: number,
+    _tmdbLang: string,
+    uiLang: string,
+  ): Promise<RawSeason> {
     const t = findMock(tvId);
     const count = t?.seasons[season - 1] ?? 0;
     const lang = languageInfo(uiLang).code;

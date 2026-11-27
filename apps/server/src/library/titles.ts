@@ -41,7 +41,15 @@ function qualityFromHeight(h: number | null): string | null {
   return '480p';
 }
 
-export const QUALITY_RANK: Record<string, number> = { '2160p': 5, '1440p': 4, '1080p': 3, '720p': 2, '576p': 1, '480p': 1, '360p': 0 };
+export const QUALITY_RANK: Record<string, number> = {
+  '2160p': 5,
+  '1440p': 4,
+  '1080p': 3,
+  '720p': 2,
+  '576p': 1,
+  '480p': 1,
+  '360p': 0,
+};
 
 /** Insert or update one video message, grouping it into a title (and an episode for series). */
 export function ingestVideo(
@@ -59,16 +67,35 @@ export function ingestVideo(
 
   let createdTitle = false;
   let title = isSeries
-    ? db.select().from(titles).where(and(eq(titles.kind, 'series'), eq(titles.key, key))).get()
-    : (parsed.year
-        ? db.select().from(titles).where(and(eq(titles.kind, 'movie'), eq(titles.key, key), eq(titles.year, parsed.year))).get()
+    ? db
+        .select()
+        .from(titles)
+        .where(and(eq(titles.kind, 'series'), eq(titles.key, key)))
+        .get()
+    : ((parsed.year
+        ? db
+            .select()
+            .from(titles)
+            .where(and(eq(titles.kind, 'movie'), eq(titles.key, key), eq(titles.year, parsed.year)))
+            .get()
         : undefined) ??
-      db.select().from(titles).where(and(eq(titles.kind, 'movie'), eq(titles.key, key))).get();
+      db
+        .select()
+        .from(titles)
+        .where(and(eq(titles.kind, 'movie'), eq(titles.key, key)))
+        .get());
 
   if (!title) {
     title = db
       .insert(titles)
-      .values({ kind, key, name: parsed.title, year: parsed.year ?? 0, addedAt: now, updatedAt: now })
+      .values({
+        kind,
+        key,
+        name: parsed.title,
+        year: parsed.year ?? 0,
+        addedAt: now,
+        updatedAt: now,
+      })
       .returning()
       .get();
     createdTitle = true;
@@ -83,11 +110,21 @@ export function ingestVideo(
     const existing = db
       .select()
       .from(episodes)
-      .where(and(eq(episodes.titleId, title.id), eq(episodes.season, season), eq(episodes.episode, episode)))
+      .where(
+        and(
+          eq(episodes.titleId, title.id),
+          eq(episodes.season, season),
+          eq(episodes.episode, episode),
+        ),
+      )
       .get();
     episodeId =
       existing?.id ??
-      db.insert(episodes).values({ titleId: title.id, season, episode, addedAt: now }).returning().get().id;
+      db
+        .insert(episodes)
+        .values({ titleId: title.id, season, episode, addedAt: now })
+        .returning()
+        .get().id;
   }
 
   const ext = extOf(f.name, f.mime);
@@ -128,15 +165,27 @@ export function ingestVideo(
 
 /** Remove a deleted message and any title or episode left empty by it. */
 export function removeFile(db: Db, chatId: string, messageId: number): void {
-  const f = db.select().from(files).where(and(eq(files.chatId, chatId), eq(files.messageId, messageId))).get();
+  const f = db
+    .select()
+    .from(files)
+    .where(and(eq(files.chatId, chatId), eq(files.messageId, messageId)))
+    .get();
   if (!f) return;
   db.delete(files).where(eq(files.id, f.id)).run();
   if (f.episodeId) {
-    const left = db.select({ n: sql<number>`count(*)` }).from(files).where(eq(files.episodeId, f.episodeId)).get();
+    const left = db
+      .select({ n: sql<number>`count(*)` })
+      .from(files)
+      .where(eq(files.episodeId, f.episodeId))
+      .get();
     if (!left?.n) db.delete(episodes).where(eq(episodes.id, f.episodeId)).run();
   }
   if (f.titleId) {
-    const left = db.select({ n: sql<number>`count(*)` }).from(files).where(eq(files.titleId, f.titleId)).get();
+    const left = db
+      .select({ n: sql<number>`count(*)` })
+      .from(files)
+      .where(eq(files.titleId, f.titleId))
+      .get();
     if (!left?.n) db.delete(titles).where(eq(titles.id, f.titleId)).run();
   }
 }
@@ -150,7 +199,13 @@ export function mergeTitles(db: Db, fromId: number, intoId: number): void {
       const clash = tx
         .select()
         .from(episodes)
-        .where(and(eq(episodes.titleId, intoId), eq(episodes.season, ep.season), eq(episodes.episode, ep.episode)))
+        .where(
+          and(
+            eq(episodes.titleId, intoId),
+            eq(episodes.season, ep.season),
+            eq(episodes.episode, ep.episode),
+          ),
+        )
         .get();
       if (clash) {
         tx.update(files).set({ episodeId: clash.id }).where(eq(files.episodeId, ep.id)).run();
@@ -161,7 +216,9 @@ export function mergeTitles(db: Db, fromId: number, intoId: number): void {
     }
     tx.update(files).set({ titleId: intoId }).where(eq(files.titleId, fromId)).run();
     for (const table of ['progress', 'my_list', 'likes'] as const) {
-      tx.run(sql.raw(`UPDATE OR IGNORE ${table} SET title_id = ${intoId} WHERE title_id = ${fromId}`));
+      tx.run(
+        sql.raw(`UPDATE OR IGNORE ${table} SET title_id = ${intoId} WHERE title_id = ${fromId}`),
+      );
       tx.run(sql.raw(`DELETE FROM ${table} WHERE title_id = ${fromId}`));
     }
     tx.delete(titles).where(eq(titles.id, fromId)).run();

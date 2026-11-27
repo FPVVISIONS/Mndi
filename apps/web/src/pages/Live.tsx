@@ -21,9 +21,12 @@ export default function Live() {
   const { data, isPending } = useChannels();
   const [cat, setCat] = useState(ALL);
   const [q, setQ] = useState('');
-  const channels = data?.channels ?? [];
+  const channels = useMemo(() => data?.channels ?? [], [data?.channels]);
 
-  const groups = useMemo(() => [...new Set(channels.map((c) => c.group).filter(Boolean))].sort(), [channels]);
+  const groups = useMemo(
+    () => [...new Set(channels.map((c) => c.group).filter(Boolean))].sort(),
+    [channels],
+  );
   const shown = channels.filter(
     (c) =>
       (cat === ALL || (cat === FAV ? c.favourite : c.group === cat)) &&
@@ -35,7 +38,10 @@ export default function Live() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-title-l">{t('live.title')}</h1>
         <label className="relative block w-full sm:w-72">
-          <Search size={16} className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-fg-faint" />
+          <Search
+            size={16}
+            className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-fg-faint"
+          />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -51,13 +57,30 @@ export default function Live() {
           value={cat}
           onChange={setCat}
           className="mb-8"
-          options={[{ value: ALL, label: t('common.all') }, { value: FAV, label: t('live.favourites') }, ...groups.map((g) => ({ value: g, label: g }))]}
+          options={[
+            { value: ALL, label: t('common.all') },
+            { value: FAV, label: t('live.favourites') },
+            ...groups.map((g) => ({ value: g, label: g })),
+          ]}
         />
       )}
       {isPending ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-24" />)}</div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }, (_, i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
+        </div>
       ) : channels.length === 0 ? (
-        <EmptyState icon={<Radio size={26} />} title={t('live.noneTitle')} body={t('live.noneBody')} action={<Button variant="primary" onClick={() => navigate('/settings?tab=library')}>{t('browse.emptyAction')}</Button>} />
+        <EmptyState
+          icon={<Radio size={26} />}
+          title={t('live.noneTitle')}
+          body={t('live.noneBody')}
+          action={
+            <Button variant="primary" onClick={() => navigate('/settings?tab=library')}>
+              {t('browse.emptyAction')}
+            </Button>
+          }
+        />
       ) : shown.length === 0 ? (
         <EmptyState
           icon={<Radio size={26} />}
@@ -65,7 +88,13 @@ export default function Live() {
           body={cat === FAV && !q ? t('live.noFavBody') : t('live.noMatchBody')}
         />
       ) : (
-        <motion.ul variants={staggerChildren(stagger.list)} initial="hidden" animate="show" key={cat} className="grid gap-3 pb-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <motion.ul
+          variants={staggerChildren(stagger.list)}
+          initial="hidden"
+          animate="show"
+          key={cat}
+          className="grid gap-3 pb-20 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
           {shown.map((c) => (
             <motion.li key={c.id} variants={fadeUp} layout>
               <ChannelTile channel={c} />

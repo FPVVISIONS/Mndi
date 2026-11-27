@@ -325,7 +325,7 @@
     "chooseTitle": "Choisissez quoi indexer",
     "chooseBody": "Étiquetez chaque chat à ajouter à la bibliothèque. Laissez les autres sur Ignorer.",
     "filter": "Filtrer les chats",
-    "members": "{{count}} membres",
+    "members": "{{count, number}} membres",
     "skip": "Ignorer",
     "chooseNone": "Choisissez au moins un chat",
     "start": "Créer la bibliothèque",

@@ -32,7 +32,9 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
   return (
     <div className="page-x pt-[calc(var(--nav-h)+1.5rem)]">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-title-l">{kind === 'movie' ? t('browse.movies') : t('browse.series')}</h1>
+        <h1 className="font-display text-title-l">
+          {kind === 'movie' ? t('browse.movies') : t('browse.series')}
+        </h1>
         <Popover
           trigger={({ toggle }) => (
             <Button variant="secondary" size="sm" onClick={toggle} icon={<ArrowDownUp size={15} />}>
@@ -40,9 +42,20 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
             </Button>
           )}
         >
-          {(close) => sorts.map((s) => (
-            <MenuItem key={s.value} active={s.value === sort} onClick={() => { setSort(s.value); close(); }}>{s.label}</MenuItem>
-          ))}
+          {(close) =>
+            sorts.map((s) => (
+              <MenuItem
+                key={s.value}
+                active={s.value === sort}
+                onClick={() => {
+                  setSort(s.value);
+                  close();
+                }}
+              >
+                {s.label}
+              </MenuItem>
+            ))
+          }
         </Popover>
       </div>
 
@@ -51,14 +64,19 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
           label={t('detail.genres')}
           value={genre}
           onChange={setGenre}
-          options={[{ value: '', label: t('browse.allGenres') }, ...data.genres.map((g) => ({ value: g, label: g }))]}
+          options={[
+            { value: '', label: t('browse.allGenres') },
+            ...data.genres.map((g) => ({ value: g, label: g })),
+          ]}
           className="mb-8"
         />
       )}
 
       {isPending ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-4">
-          {Array.from({ length: 14 }, (_, i) => <Skeleton key={i} className="aspect-[2/3]" />)}
+          {Array.from({ length: 14 }, (_, i) => (
+            <Skeleton key={i} className="aspect-[2/3]" />
+          ))}
         </div>
       ) : data && data.items.length > 0 ? (
         <VirtualGrid
@@ -70,9 +88,23 @@ export default function Browse({ kind }: { kind: 'movie' | 'series' }) {
           render={(c) => <TitleCardView card={c} />}
         />
       ) : genre ? (
-        <EmptyState icon={<Icon size={26} />} title={t('browse.noMatchTitle')} body={t('browse.noMatchBody')} action={<Button onClick={() => setGenre('')}>{t('browse.allGenres')}</Button>} />
+        <EmptyState
+          icon={<Icon size={26} />}
+          title={t('browse.noMatchTitle')}
+          body={t('browse.noMatchBody')}
+          action={<Button onClick={() => setGenre('')}>{t('browse.allGenres')}</Button>}
+        />
       ) : (
-        <EmptyState icon={<Icon size={26} />} title={t('browse.emptyTitle')} body={t('browse.emptyBody')} action={<Button variant="primary" onClick={() => navigate('/settings?tab=library')}>{t('browse.emptyAction')}</Button>} />
+        <EmptyState
+          icon={<Icon size={26} />}
+          title={t('browse.emptyTitle')}
+          body={t('browse.emptyBody')}
+          action={
+            <Button variant="primary" onClick={() => navigate('/settings?tab=library')}>
+              {t('browse.emptyAction')}
+            </Button>
+          }
+        />
       )}
     </div>
   );

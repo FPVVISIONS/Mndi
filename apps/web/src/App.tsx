@@ -31,7 +31,12 @@ const Watch = {
 function Splash() {
   return (
     <div className="grid min-h-dvh place-items-center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="flex flex-col items-center gap-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.15 }}
+        className="flex flex-col items-center gap-6"
+      >
         <Wordmark />
         <Spinner />
       </motion.div>
@@ -53,14 +58,36 @@ function Offline() {
   const { t } = useTranslation();
   return (
     <div className="grid min-h-dvh place-items-center">
-      <EmptyState icon={<WifiOff size={26} />} title={t('error.offlineTitle')} body={t('error.offlineBody')} action={<Button variant="primary" onClick={() => location.reload()}>{t('common.retry')}</Button>} />
+      <EmptyState
+        icon={<WifiOff size={26} />}
+        title={t('error.offlineTitle')}
+        body={t('error.offlineBody')}
+        action={
+          <Button variant="primary" onClick={() => location.reload()}>
+            {t('common.retry')}
+          </Button>
+        }
+      />
     </div>
   );
 }
 
 function NotFound() {
   const { t } = useTranslation();
-  return <div className="pt-[var(--nav-h)]"><EmptyState icon={<WifiOff size={26} />} title={t('error.notFoundTitle')} body={t('error.notFoundBody')} action={<Button variant="primary" onClick={() => (location.href = '/')}>{t('nav.home')}</Button>} /></div>;
+  return (
+    <div className="pt-[var(--nav-h)]">
+      <EmptyState
+        icon={<WifiOff size={26} />}
+        title={t('error.notFoundTitle')}
+        body={t('error.notFoundBody')}
+        action={
+          <Button variant="primary" onClick={() => (location.href = '/')}>
+            {t('nav.home')}
+          </Button>
+        }
+      />
+    </div>
+  );
 }
 
 /** Decides what the person sees first: setup, who's watching, or the app. */
@@ -94,7 +121,8 @@ export default function App() {
   if (gate === 'loading') return <Splash />;
   if (gate === 'offline') return <Offline />;
   if (gate === 'welcome' && path !== '/welcome') return <Navigate to="/welcome" replace />;
-  if (gate === 'profiles' && path !== '/profiles') return <Navigate to="/profiles" replace state={{ from: path }} />;
+  if (gate === 'profiles' && path !== '/profiles')
+    return <Navigate to="/profiles" replace state={{ from: path }} />;
   if (gate === 'app' && path === '/welcome') return <Navigate to="/" replace />;
 
   return (
