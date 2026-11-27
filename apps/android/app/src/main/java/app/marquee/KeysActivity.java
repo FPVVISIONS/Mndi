@@ -46,7 +46,7 @@ public class KeysActivity extends Activity {
                     done = true;
                     save(m.group(1), m.group(2));
                 } else if (value.contains("needHash") && rounds % 8 == 0) {
-                    Toast.makeText(this, "Tap the eye icon next to api_hash", Toast.LENGTH_LONG).show();
+                    Toast.makeText(KeysActivity.this, "Tap the eye icon next to api_hash", Toast.LENGTH_LONG).show();
                 }
             });
             handler.postDelayed(this, 1200);
