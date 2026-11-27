@@ -27,6 +27,7 @@
         </activity>
         <service
             android:name=".NodeService"
+            android:process=":node"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
     </application>

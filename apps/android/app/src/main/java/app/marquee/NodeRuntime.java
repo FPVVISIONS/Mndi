@@ -12,12 +12,20 @@ import java.io.OutputStream;
 
 /** Starts the bundled Marquee server on Node.js (nodejs-mobile). Node can start once per process. */
 public final class NodeRuntime {
-    public static final int PORT = 38787;
+    public static final int PORT = BuildConfigInfo.PORT;
     private static final String TAG = "Marquee";
     private static boolean started;
 
     /** Why Node could not load or start, shown on screen instead of closing silently. */
     public static volatile String error;
+
+    private static void report(Context context, String message) {
+        error = message;
+        try (OutputStream out = new FileOutputStream(BuildConfigInfo.errorFile(context))) {
+            out.write(message.getBytes());
+        } catch (IOException ignored) {
+        }
+    }
 
     static {
         try {
@@ -34,9 +42,15 @@ public final class NodeRuntime {
     private static native int startNode(String[] arguments);
 
     public static synchronized void ensureStarted(Context context) {
-        if (started || error != null) return;
-        started = true;
         final Context app = context.getApplicationContext();
+        if (started) return;
+        started = true;
+        //noinspection ResultOfMethodCallIgnored
+        BuildConfigInfo.errorFile(app).delete();
+        if (error != null) {
+            report(app, error);
+            return;
+        }
         // Node and V8 need a far bigger stack than Android gives a thread by default.
         Thread thread = new Thread(null, () -> {
             try {
@@ -51,10 +65,10 @@ public final class NodeRuntime {
                     new File(project, "web").getAbsolutePath(),
                     String.valueOf(PORT),
                 });
-                error = "The Marquee server stopped (code " + code + ").";
+                report(app, "The Marquee server stopped (code " + code + ").");
                 Log.e(TAG, error);
             } catch (Throwable e) {
-                error = "Could not start the Marquee server: " + e;
+                report(app, "Could not start the Marquee server: " + e);
                 Log.e(TAG, error, e);
             }
         }, "marquee-node", 16L * 1024 * 1024);

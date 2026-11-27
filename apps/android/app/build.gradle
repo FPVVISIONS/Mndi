@@ -14,8 +14,8 @@ android {
         applicationId 'app.marquee'
         minSdk 24
         targetSdk 34
-        versionCode 2
-        versionName '0.1.1'
+        versionCode 3
+        versionName '0.1.2'
         externalNativeBuild {
             cmake {
                 // libnode links against the shared C++ runtime, so it must ship with the app.
@@ -31,8 +31,9 @@ android {
         abi {
             enable true
             reset()
-            include 'arm64-v8a', 'armeabi-v7a'
-            universalApk false
+            include 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+            // Also one APK that runs on every phone, tablet and PC emulator.
+            universalApk true
         }
     }
 
