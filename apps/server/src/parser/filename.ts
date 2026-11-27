@@ -219,8 +219,9 @@ function tidyTitle(t: string): string {
     .replace(/\s+/g, ' ')
     .replace(/^[\s\-–_.]+/, '')
     .trim();
-  const letters = clean.replace(/[^\p{L}]/gu, '');
-  const allLower = letters === letters.toLowerCase() && /\p{Lu}|\p{Ll}/u.test(letters);
+  // Cased letters only (they change between upper and lower case); works without ICU.
+  const letters = [...clean].filter((ch) => ch.toLowerCase() !== ch.toUpperCase()).join('');
+  const allLower = letters.length > 0 && letters === letters.toLowerCase();
   const allUpper = letters.length > 4 && letters === letters.toUpperCase();
   if (!(allLower || allUpper)) return clean;
   const small = new Set(['a', 'an', 'the', 'of', 'and', 'in', 'on', 'at', 'to', 'for', 'vs']);
@@ -281,14 +282,68 @@ export function parseMedia({ fileName, caption }: MediaNameInput): ParsedName {
   return fromFile ?? fromCaption ?? parseFileName(fileName ?? 'unknown');
 }
 
+/*
+ * No Unicode property escapes (\p{...}) in this file: the Node.js inside the Android app is built
+ * without ICU, where they are a syntax error. Explicit ranges and tables below work everywhere.
+ */
+
+/** Combining marks: Latin diacritics, Hebrew points and Arabic harakat. */
+const COMBINING = /[\u0300-\u036f\u0591-\u05c7\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed]/g;
+
+/** Accent folding for engines whose normalize() cannot decompose (no ICU). */
+const ACCENTS: Record<string, string> = Object.fromEntries(
+  [
+    ['àáâãäåāăą', 'a'],
+    ['çćčĉċ', 'c'],
+    ['ďđ', 'd'],
+    ['èéêëēĕėęě', 'e'],
+    ['ğĝġģ', 'g'],
+    ['ĥħ', 'h'],
+    ['ìíîïĩīĭįı', 'i'],
+    ['ĵ', 'j'],
+    ['ķ', 'k'],
+    ['ĺļľŀł', 'l'],
+    ['ñńņňŉ', 'n'],
+    ['òóôõöøōŏő', 'o'],
+    ['ŕŗř', 'r'],
+    ['śŝşšș', 's'],
+    ['ţťŧț', 't'],
+    ['ùúûüũūŭůűų', 'u'],
+    ['ŵ', 'w'],
+    ['ýÿŷ', 'y'],
+    ['źżž', 'z'],
+    ['æ', 'ae'],
+    ['œ', 'oe'],
+    ['ß', 'ss'],
+    ['þ', 'th'],
+  ].flatMap(([chars, base]) => [...chars!].map((c) => [c, base!])),
+);
+const DECOMPOSES = 'é'.normalize('NFD').length === 2;
+
+/** Letters and digits of the scripts Marquee's languages use (plus CJK, Hangul and Thai). */
+function isWordChar(ch: string): boolean {
+  if (ch.toLowerCase() !== ch.toUpperCase()) return true; // cased letters: Latin, Cyrillic, Greek...
+  const c = ch.codePointAt(0) ?? 0;
+  return (
+    (c >= 0x30 && c <= 0x39) || // 0-9
+    (c >= 0x05d0 && c <= 0x05ea) || // Hebrew letters
+    (c >= 0x0620 && c <= 0x064a) ||
+    (c >= 0x0660 && c <= 0x0669) ||
+    (c >= 0x0671 && c <= 0x06d3) || // Arabic
+    (c >= 0x0900 && c <= 0x097f) || // Devanagari
+    (c >= 0x0e00 && c <= 0x0e7f) || // Thai
+    (c >= 0x3040 && c <= 0x30ff) || // Hiragana, Katakana
+    (c >= 0x4e00 && c <= 0x9fff) || // CJK
+    (c >= 0xac00 && c <= 0xd7af) // Hangul
+  );
+}
+
 /** Stable key for grouping releases of the same title. */
 export function titleKey(title: string): string {
-  return title
-    .normalize('NFD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .replace(/^(the|a|an)\s+/, '')
-    .replace(/&/g, ' and ')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim();
+  const lower = title.normalize('NFD').replace(COMBINING, '').toLowerCase();
+  const folded = DECOMPOSES ? lower : [...lower].map((ch) => ACCENTS[ch] ?? ch).join('');
+  const words = [...folded.replace(/^(the|a|an)\s+/, '').replace(/&/g, ' and ')]
+    .map((ch) => (isWordChar(ch) ? ch : ' '))
+    .join('');
+  return words.replace(/\s+/g, ' ').trim();
 }

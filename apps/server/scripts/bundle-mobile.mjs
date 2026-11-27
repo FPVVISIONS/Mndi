@@ -1,7 +1,7 @@
 // Bundles the server into one file for nodejs-mobile (Node 18 on Android) and copies the web app
 // next to it. Output: apps/android/app/src/main/assets/nodejs-project/
 import { build } from 'esbuild';
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -38,6 +38,16 @@ await build({
   external: ['better-sqlite3', 'drizzle-orm/better-sqlite3', 'sharp'],
   logLevel: 'warning',
 });
+
+// The Node.js inside the app has no ICU: a regex literal with \p{...} is a syntax error there and
+// stops the whole server from loading. Refuse to ship one.
+const code = readFileSync(resolve(out, 'main.js'), 'utf8');
+const bad = code.split('\n').findIndex((line) => /(?<!\\)\\[pP]\{/.test(line));
+if (bad >= 0) {
+  console.error(`Unicode property escape on line ${bad + 1} of the bundle; Android's Node cannot parse it:`);
+  console.error(code.split('\n')[bad].trim().slice(0, 200));
+  process.exit(1);
+}
 
 cpSync(web, resolve(out, 'web'), { recursive: true });
 writeFileSync(
