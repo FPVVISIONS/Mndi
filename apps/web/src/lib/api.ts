@@ -67,6 +67,8 @@ export const api = {
   auth: () => request<AuthState>('/api/auth', { lang: false }),
   saveCredentials: (apiId: number, apiHash: string) =>
     send<AuthState>('POST', '/api/auth/credentials', { apiId, apiHash }),
+  keysPhone: (phone: string) => send<AuthState>('POST', '/api/auth/keys/phone', { phone }),
+  keysCode: (code: string) => send<AuthState>('POST', '/api/auth/keys/code', { code }),
   sendPhone: (phone: string) => send<AuthState>('POST', '/api/auth/phone', { phone }),
   sendCode: (code: string) => send<AuthState>('POST', '/api/auth/code', { code }),
   sendPassword: (password: string) => send<AuthState>('POST', '/api/auth/password', { password }),

@@ -14,6 +14,7 @@ import { decrypt, encrypt } from '../lib/crypto.js';
 import type { ChunkCache } from '../stream/chunkCache.js';
 import { CHUNK_SIZE, ChunkedSource, LocalFileSource } from '../stream/sources.js';
 import type { ByteSource } from '../stream/range.js';
+import { KeysError, TelegramKeysClient } from './apikeys.js';
 import type { FileRow, TelegramBackend } from './backend.js';
 import {
   floodSeconds,
@@ -49,6 +50,8 @@ export class TelegramManager implements TelegramBackend {
   private creds: { apiId: number; apiHash: string } | null = null;
   private phone = '';
   private codeHash = '';
+  private keysClient: TelegramKeysClient | null = null;
+  private keysPhone = '';
   private passwordWaiter: ((pw: string) => void) | null = null;
   private qrCancelled = false;
   private listeners: (() => void)[] = [];
@@ -158,6 +161,61 @@ export class TelegramManager implements TelegramBackend {
     this.auth = { step: 'phone' };
     this.set('logged-out');
     return this.auth;
+  }
+
+  // ---- automatic API keys (my.telegram.org) ---------------------------------------------
+
+  private keysFail(step: AuthState['step'], err: unknown): AuthState {
+    const reason = err instanceof KeysError ? err.reason : 'network';
+    const error =
+      reason === 'phone_invalid'
+        ? 'phone_invalid'
+        : reason === 'code_invalid'
+          ? 'code_invalid'
+          : reason === 'too_many_tries'
+            ? 'flood'
+            : reason === 'network'
+              ? 'network'
+              : 'keys_failed';
+    this.auth = { step, error };
+    return this.auth;
+  }
+
+  /** Step 1 of phone-only sign-in: my.telegram.org sends a code to the Telegram app. */
+  async requestKeysCode(phone: string): Promise<AuthState> {
+    const digits = phone.replace(/[^\d+]/g, '');
+    if (digits.replace(/\D/g, '').length < 7)
+      return this.keysFail('credentials', new KeysError('phone_invalid'));
+    const normalized = digits.startsWith('+') ? digits : `+${digits}`;
+    try {
+      const client = new TelegramKeysClient();
+      await client.sendCode(normalized);
+      this.keysClient = client;
+      this.keysPhone = normalized;
+      this.auth = { step: 'keys-code' };
+    } catch (err) {
+      return this.keysFail('credentials', err);
+    }
+    return this.auth;
+  }
+
+  /** Step 2: use that code to read or create the keys, then ask Telegram for the sign-in code. */
+  async submitKeysCode(code: string): Promise<AuthState> {
+    if (!this.keysClient) return this.keysFail('credentials', new KeysError('code_invalid'));
+    let keys;
+    try {
+      keys = await this.keysClient.getKeys(code);
+    } catch (err) {
+      const reason = err instanceof KeysError ? err.reason : 'network';
+      // A wrong code can be typed again; anything else starts over.
+      if (reason === 'code_invalid') return this.keysFail('keys-code', err);
+      this.keysClient = null;
+      return this.keysFail('credentials', err);
+    }
+    this.keysClient = null;
+    const saved = await this.saveCredentials(keys.apiId, keys.apiHash);
+    if (saved.error) return this.keysFail('credentials', new KeysError('create_failed'));
+    return this.sendPhone(this.keysPhone);
   }
 
   private newClient(session: string): TelegramClient {
@@ -323,6 +381,7 @@ export class TelegramManager implements TelegramBackend {
   async cancelAuth(): Promise<AuthState> {
     this.qrCancelled = true;
     this.passwordWaiter = null;
+    this.keysClient = null;
     if (this.state !== 'ready') {
       await this.client?.disconnect().catch(() => undefined);
       this.client = null;

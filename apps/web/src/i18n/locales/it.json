@@ -294,7 +294,8 @@
     "flood": "Troppi tentativi. Riprova tra {{seconds}} secondi.",
     "no_account": "Questo numero non ha un account Telegram.",
     "network": "Impossibile raggiungere Telegram. Controlla la connessione.",
-    "unknown": "Qualcosa è andato storto. Riprova."
+    "unknown": "Qualcosa è andato storto. Riprova.",
+    "keys_failed": "Impossibile configurare Telegram in automatico. Riprova o aggiungi le chiavi API a mano."
   },
   "onboarding": {
     "steps": {
@@ -345,6 +346,12 @@
     "channels": "Canali",
     "open": "Apri la libreria",
     "waiting": "In attesa dei primi risultati",
-    "noTmdb": "Ancora nessuna chiave TMDB: i titoli mostrano il nome del file, senza locandine né trame. Aggiungine una qui o più tardi nelle Impostazioni."
+    "noTmdb": "Ancora nessuna chiave TMDB: i titoli mostrano il nome del file, senza locandine né trame. Aggiungine una qui o più tardi nelle Impostazioni.",
+    "autoBody": "Inserisci il numero del tuo account Telegram. Telegram invierà due codici alla tua app Telegram: il primo configura Marquee, il secondo ti fa accedere.",
+    "keysCodeTitle": "Inserisci il codice di configurazione",
+    "keysCodeBody": "Telegram ha appena inviato un messaggio con un codice alla tua app Telegram. Copialo qui esattamente, lettere comprese.",
+    "keysCodeLabel": "Codice di configurazione",
+    "manualKeys": "Ho già le mie chiavi API",
+    "useAuto": "Accedi invece con il numero di telefono"
   }
 }

@@ -199,7 +199,11 @@ export interface AppStatus {
   languagesCached: LanguageCode[];
 }
 
-export type AuthStep = 'credentials' | 'phone' | 'code' | 'password' | 'qr' | 'done';
+/**
+ * 'credentials' asks for a phone number to create API keys automatically (or for keys by hand);
+ * 'keys-code' waits for the code my.telegram.org sends to the Telegram app.
+ */
+export type AuthStep = 'credentials' | 'keys-code' | 'phone' | 'code' | 'password' | 'qr' | 'done';
 
 /** Error codes the UI translates; the server never sends raw Telegram messages. */
 export type AuthErrorCode =
@@ -208,6 +212,7 @@ export type AuthErrorCode =
   | 'code_expired'
   | 'password_invalid'
   | 'credentials_invalid'
+  | 'keys_failed'
   | 'flood'
   | 'no_account'
   | 'network'

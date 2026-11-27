@@ -62,11 +62,21 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
+  const [manual, setManual] = useState(false);
+  const [keysCode, setKeysCode] = useState('');
 
   const put = (a: AuthState) => qc.setQueryData(['auth'], a);
   const creds = useMutation({
     mutationFn: () => api.saveCredentials(Number(apiId), apiHash),
     onSuccess: put,
+  });
+  const keysPhone = useMutation({ mutationFn: () => api.keysPhone(phone), onSuccess: put });
+  const keysSubmit = useMutation({
+    mutationFn: () => api.keysCode(keysCode),
+    onSuccess: (a) => {
+      put(a);
+      if (a.step === 'code') setCode('');
+    },
   });
   const sendPhone = useMutation({ mutationFn: () => api.sendPhone(phone), onSuccess: put });
   const sendCode = useMutation({ mutationFn: (c: string) => api.sendCode(c), onSuccess: put });
@@ -103,7 +113,104 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
       animate="show"
       transition={tokens.base}
     >
-      {step === 'credentials' && (
+      {step === 'credentials' && !manual && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            keysPhone.mutate();
+          }}
+          className="space-y-5"
+        >
+          <m.h2 variants={fadeUp} className="font-display text-title-l">
+            {t('onboarding.phoneTitle')}
+          </m.h2>
+          <m.p variants={fadeUp} className="text-fg-dim">
+            {t('onboarding.autoBody')}
+          </m.p>
+          <m.div variants={fadeUp}>
+            <Field
+              label={t('onboarding.phoneLabel')}
+              type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              placeholder="+1 555 010 0199"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoFocus
+            />
+          </m.div>
+          <ErrorLine auth={auth} />
+          <m.div variants={fadeUp} className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={phone.replace(/\D/g, '').length < 7 || keysPhone.isPending}
+            >
+              {keysPhone.isPending ? <Spinner /> : t('onboarding.sendCode')}
+            </Button>
+            <button
+              type="button"
+              className="text-small text-fg-dim underline underline-offset-4 hover:text-fg"
+              onClick={() => setManual(true)}
+            >
+              {t('onboarding.manualKeys')}
+            </button>
+          </m.div>
+        </form>
+      )}
+
+      {step === 'keys-code' && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            keysSubmit.mutate();
+          }}
+          className="space-y-5"
+        >
+          <m.h2 variants={fadeUp} className="font-display text-title-l">
+            {t('onboarding.keysCodeTitle')}
+          </m.h2>
+          <m.p variants={fadeUp} className="text-fg-dim">
+            {t('onboarding.keysCodeBody')}
+          </m.p>
+          <m.div variants={fadeUp}>
+            <Field
+              label={t('onboarding.keysCodeLabel')}
+              autoComplete="one-time-code"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              autoFocus
+              value={keysCode}
+              onChange={(e) => setKeysCode(e.target.value.trim())}
+            />
+          </m.div>
+          <ErrorLine auth={auth} />
+          <m.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={keysCode.length < 4 || keysSubmit.isPending}
+            >
+              {keysSubmit.isPending ? <Spinner /> : t('common.continue')}
+            </Button>
+            <Button
+              variant="ghost"
+              icon={<ArrowLeft size={16} className="flip-rtl" />}
+              onClick={() => {
+                setKeysCode('');
+                cancel.mutate();
+              }}
+            >
+              {t('onboarding.differentNumber')}
+            </Button>
+          </m.div>
+        </form>
+      )}
+
+      {step === 'credentials' && manual && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -144,6 +251,15 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             >
               {t('onboarding.credSave')}
             </Button>
+          </m.div>
+          <m.div variants={fadeUp}>
+            <button
+              type="button"
+              className="text-small text-fg-dim underline underline-offset-4 hover:text-fg"
+              onClick={() => setManual(false)}
+            >
+              {t('onboarding.useAuto')}
+            </button>
           </m.div>
         </form>
       )}
@@ -258,7 +374,7 @@ export function ConnectStep({ onDone }: { onDone: () => void }) {
             />
           </m.div>
           <ErrorLine auth={auth} />
-          <m.div variants={fadeUp} className="flex items-center gap-3">
+          <m.div variants={fadeUp} className="flex flex-wrap items-center gap-3">
             <Button
               type="submit"
               variant="primary"

@@ -294,7 +294,8 @@
     "flood": "Too many attempts. Try again in {{seconds}} seconds.",
     "no_account": "That number has no Telegram account.",
     "network": "Couldn't reach Telegram. Check your connection.",
-    "unknown": "Something went wrong. Try again."
+    "unknown": "Something went wrong. Try again.",
+    "keys_failed": "Couldn't set up Telegram automatically. Try again, or add your API keys by hand."
   },
   "onboarding": {
     "steps": {
@@ -345,6 +346,12 @@
     "channels": "Channels",
     "open": "Open library",
     "waiting": "Waiting for the first results",
-    "noTmdb": "No TMDB key yet, so titles show file names without posters or descriptions. Add one here or later in Settings."
+    "noTmdb": "No TMDB key yet, so titles show file names without posters or descriptions. Add one here or later in Settings.",
+    "autoBody": "Enter the number your Telegram account uses. Telegram will send two codes to your Telegram app: the first sets Marquee up, the second signs you in.",
+    "keysCodeTitle": "Enter the setup code",
+    "keysCodeBody": "Telegram just sent a message with a code to your Telegram app. Copy it here exactly, letters included.",
+    "keysCodeLabel": "Setup code",
+    "manualKeys": "I have my own API keys",
+    "useAuto": "Sign in with my phone number instead"
   }
 }

@@ -2,6 +2,7 @@
 // crash capture and environment, so even a failure while loading dependencies is reported.
 import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { ensureFetch } from './lib/nodeFetch.js';
 
 const [, , dataDir = process.cwd(), webDir = '', port = '38787'] = process.argv;
 mkdirSync(dataDir, { recursive: true });
@@ -32,6 +33,8 @@ step(
   `node ${process.version} ${process.platform}/${process.arch}, ` +
     `wasm ${typeof (globalThis as { WebAssembly?: unknown }).WebAssembly}`,
 );
+
+if (ensureFetch()) step('using built-in HTTPS client (no WebAssembly)');
 
 process.env.DATA_DIR = dataDir;
 process.env.MARQUEE_WEB_DIST = webDir;

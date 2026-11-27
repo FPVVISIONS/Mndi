@@ -9,6 +9,9 @@ export interface TelegramBackend {
   status(): AppStatus['telegram'];
   authState(): AuthState;
   saveCredentials(apiId: number, apiHash: string): Promise<AuthState>;
+  /** Phone-only sign-in: create API keys on my.telegram.org with a code sent to Telegram. */
+  requestKeysCode(phone: string): Promise<AuthState>;
+  submitKeysCode(code: string): Promise<AuthState>;
   sendPhone(phone: string): Promise<AuthState>;
   submitCode(code: string): Promise<AuthState>;
   submitPassword(password: string): Promise<AuthState>;

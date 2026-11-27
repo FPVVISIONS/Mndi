@@ -16,7 +16,9 @@ const { sources, files } = schema;
  */
 export class MockBackend implements TelegramBackend {
   private state: AppStatus['telegram']['state'];
-  private auth: AuthState = { step: 'phone' };
+  private auth: AuthState = {
+    step: process.env.MARQUEE_MOCK_KEYS === '1' ? 'credentials' : 'phone',
+  };
   private listeners: (() => void)[] = [];
   private phone = '';
 
@@ -46,6 +48,17 @@ export class MockBackend implements TelegramBackend {
   }
   async saveCredentials(): Promise<AuthState> {
     return (this.auth = { step: 'phone' });
+  }
+  async requestKeysCode(phone: string): Promise<AuthState> {
+    if (phone.replace(/\D/g, '').length < 7)
+      return (this.auth = { step: 'credentials', error: 'phone_invalid' });
+    this.phone = phone;
+    return (this.auth = { step: 'keys-code' });
+  }
+  async submitKeysCode(code: string): Promise<AuthState> {
+    if (code.trim() !== 'demo-key')
+      return (this.auth = { step: 'keys-code', error: 'code_invalid' });
+    return this.sendPhone(this.phone);
   }
   async sendPhone(phone: string): Promise<AuthState> {
     if (phone.replace(/\D/g, '').length < 7)
@@ -79,6 +92,7 @@ export class MockBackend implements TelegramBackend {
     return (this.auth = { step: 'qr', qr: { svg, expiresAt: Date.now() + 30_000 } });
   }
   async cancelAuth(): Promise<AuthState> {
+    if (this.auth.step === 'keys-code') return (this.auth = { step: 'credentials' });
     return (this.auth = { step: 'phone' });
   }
   async logout(): Promise<void> {

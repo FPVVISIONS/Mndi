@@ -294,7 +294,8 @@
     "flood": "Çok fazla deneme. {{seconds}} saniye sonra tekrar dene.",
     "no_account": "Bu numaraya ait bir Telegram hesabı yok.",
     "network": "Telegram'a ulaşılamadı. Bağlantını kontrol et.",
-    "unknown": "Bir şeyler ters gitti. Tekrar dene."
+    "unknown": "Bir şeyler ters gitti. Tekrar dene.",
+    "keys_failed": "Telegram otomatik olarak kurulamadı. Tekrar deneyin veya API anahtarlarınızı elle ekleyin."
   },
   "onboarding": {
     "steps": {
@@ -345,6 +346,12 @@
     "channels": "Kanallar",
     "open": "Kütüphaneyi aç",
     "waiting": "İlk sonuçlar bekleniyor",
-    "noTmdb": "Henüz TMDB anahtarı yok; yapımlar afişsiz ve özetsiz, dosya adlarıyla görünüyor. Buradan ya da daha sonra Ayarlar’dan ekleyebilirsin."
+    "noTmdb": "Henüz TMDB anahtarı yok; yapımlar afişsiz ve özetsiz, dosya adlarıyla görünüyor. Buradan ya da daha sonra Ayarlar’dan ekleyebilirsin.",
+    "autoBody": "Telegram hesabınızın numarasını girin. Telegram, Telegram uygulamanıza iki kod gönderecek: ilki Marquee'yi kurar, ikincisi oturum açar.",
+    "keysCodeTitle": "Kurulum kodunu girin",
+    "keysCodeBody": "Telegram az önce Telegram uygulamanıza kod içeren bir mesaj gönderdi. Kodu harfleriyle birlikte aynen buraya kopyalayın.",
+    "keysCodeLabel": "Kurulum kodu",
+    "manualKeys": "Kendi API anahtarlarım var",
+    "useAuto": "Bunun yerine telefon numarasıyla giriş yap"
   }
 }
